@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router";
-import type { Note } from "../entities";
+import type { Note } from "@entities";
 
 export function useNoteSearch(notes: Note[]) {
     const [searchParams, setSearchParams] = useSearchParams();

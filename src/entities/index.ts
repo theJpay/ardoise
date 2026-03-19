@@ -1,1 +1,1 @@
-export * from "./Note";
+export * from "./note";

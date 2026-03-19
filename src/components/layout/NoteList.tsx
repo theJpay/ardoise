@@ -3,13 +3,7 @@ import { SearchBar } from "../inputs";
 import type { Note } from "@entities";
 
 function NoteList() {
-    const noteList: Note[] = [
-        { id: "1", title: "Getting started with Ardoise", content: "" },
-        { id: "2", title: "React hooks cheatsheet", content: "" },
-        { id: "3", title: "Meeting notes — 18 March", content: "" },
-        { id: "4", title: "Book recommendations", content: "" },
-        { id: "5", title: "Idées de voyages", content: "" }
-    ];
+    const noteList: Note[] = [];
 
     const { search, setSearch, filteredNotes } = useNoteSearch(noteList);
     const isEmpty = filteredNotes.length === 0;
