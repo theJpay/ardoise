@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router";
+
 import App from "./App.tsx";
 import { NoteEditor } from "./components/editor";
 

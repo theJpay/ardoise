@@ -1,6 +1,7 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import js from "@eslint/js";
 import prettier from "eslint-config-prettier";
+import importPlugin from "eslint-plugin-import";
 import prettierPlugin from "eslint-plugin-prettier";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
@@ -23,13 +24,23 @@ export default defineConfig([
             globals: globals.browser
         },
         plugins: {
+            import: importPlugin,
             prettier: prettierPlugin
         },
         rules: {
             ...reactHooks.configs.recommended.rules,
             "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
             "prettier/prettier": "error",
-            "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }]
+            "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+            "import/order": ["error", {
+                "groups": [
+                    "builtin",
+                    "external",
+                    ["internal", "parent", "sibling", "index"],
+                    "type"
+                ],
+                "newlines-between": "always"
+            }]
         }
     }
 ]);

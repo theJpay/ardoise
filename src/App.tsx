@@ -1,4 +1,5 @@
 import { Outlet } from "react-router";
+
 import { NoteList, Sidebar } from "./components/layout";
 
 function App() {
