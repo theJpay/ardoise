@@ -1,3 +1,4 @@
+import { Outlet } from "react-router";
 import { NoteList, Sidebar } from "./components/layout";
 
 function App() {
@@ -12,8 +13,8 @@ function App() {
                 </div>
                 <NoteList />
             </main>
-            <div className="flex-1 flex items-center justify-center">
-                <p className="text-text-muted text-sm">Select a note to start editing</p>
+            <div className="flex-1">
+                <Outlet />
             </div>
         </div>
     );
