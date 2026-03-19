@@ -1,18 +1,23 @@
+import { useNotes } from "@hooks/useNotes";
 import { useNoteSearch } from "@hooks/useNoteSearch";
+
 import { SearchBar } from "../inputs";
-import type { Note } from "@entities";
 
 function NoteList() {
-    const noteList: Note[] = [];
+    const { notes, loading, error } = useNotes();
 
-    const { search, setSearch, filteredNotes } = useNoteSearch(noteList);
+    const { search, setSearch, filteredNotes } = useNoteSearch(notes);
     const isEmpty = filteredNotes.length === 0;
 
     return (
         <>
             <SearchBar value={search} onChange={setSearch} />
 
-            {isEmpty ? (
+            {error ? (
+                <div>{error}</div>
+            ) : loading ? (
+                <div>Loading notes...</div>
+            ) : isEmpty ? (
                 <div className="flex flex-col items-center justify-center h-full gap-3">
                     <p className="text-text-muted text-sm">No notes yet</p>
                 </div>
