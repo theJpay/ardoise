@@ -14,7 +14,8 @@ export default defineConfig({
             "@entities/*": path.resolve(__dirname, "./src/entities/*"),
             "@components": path.resolve(__dirname, "./src/components/index.ts"),
             "@components/*": path.resolve(__dirname, "./src/components/*"),
-            "@services": path.resolve(__dirname, "./src/services")
+            "@services": path.resolve(__dirname, "./src/services"),
+            "@stores": path.resolve(__dirname, "./src/stores")
         }
     }
 });

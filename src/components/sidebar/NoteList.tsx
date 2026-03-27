@@ -4,18 +4,18 @@ import type { Note } from "@entities";
 
 type NoteListProps = {
     notes: Note[];
-    loading: boolean;
+    isLoading: boolean;
     error: string | null;
 };
 
-function NoteList({ notes, loading, error }: NoteListProps) {
+function NoteList({ notes, isLoading, error }: NoteListProps) {
     const isEmpty = notes.length === 0;
 
     if (error) {
         return <p className="text-muted text-xs px-3 py-2">{error}</p>;
     }
 
-    if (loading) {
+    if (isLoading) {
         return <p className="text-subtle text-xs px-3 py-2">Loading...</p>;
     }
 
