@@ -10,13 +10,13 @@ function Rail() {
             </span>
 
             <button className="w-8 h-8 rounded-md flex items-center justify-center text-accent bg-accent-glow transition-colors duration-100">
-                <FileText size={14} strokeWidth={1.6} />
+                <FileText size={14} strokeWidth={1.5} />
             </button>
 
             <div className="flex-1" />
 
             <button className="w-8 h-8 rounded-md flex items-center justify-center text-subtle hover:bg-surface hover:text-muted transition-colors duration-100">
-                <Settings size={14} strokeWidth={1.6} />
+                <Settings size={14} strokeWidth={1.5} />
             </button>
         </aside>
     );

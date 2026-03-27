@@ -1,0 +1,27 @@
+import { Link, useParams } from "react-router";
+
+import type { Note } from "@entities";
+
+type NoteItemProps = {
+    note: Note;
+};
+
+function NoteItem({ note }: NoteItemProps) {
+    const { noteId } = useParams();
+    const isActive = noteId === note.id;
+
+    return (
+        <Link
+            to={`/notes/${note.id}`}
+            className={`flex items-center h-8 px-3 border-l-2 transition-colors duration-100 ${
+                isActive
+                    ? "border-accent bg-elevated text-text"
+                    : "border-transparent hover:bg-elevated text-muted"
+            }`}
+        >
+            <span className="text-xs truncate">{note.title}</span>
+        </Link>
+    );
+}
+
+export default NoteItem;

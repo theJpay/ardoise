@@ -1,3 +1,3 @@
 export { NoteEditor } from "./editor";
-export { NoteList } from "./noteList";
+export { SideBar } from "./sidebar";
 export { Rail } from "./rail";
