@@ -30,6 +30,9 @@
             "@entities/*": [
                 "./src/entities/*"
             ],
+            "@components": [
+                "./src/components/index"
+            ],
             "@components/*": [
                 "./src/components/*"
             ],

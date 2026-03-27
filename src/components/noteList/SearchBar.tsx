@@ -1,3 +1,5 @@
+import { Search } from "lucide-react";
+
 type SearchBarProps = {
     value: string;
     onChange: (value: string) => void;
@@ -5,13 +7,14 @@ type SearchBarProps = {
 
 function SearchBar({ value, onChange }: SearchBarProps) {
     return (
-        <div className="px-3 py-2 border-b border-border-subtle">
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-bg border border-border rounded hover:border-muted transition-colors duration-100">
+            <Search size={11} strokeWidth={1.5} className="text-subtle shrink-0" />
             <input
                 type="search"
                 placeholder="Search notes..."
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full bg-transparent text-sm text-text-primary placeholder:text-text-muted outline-none"
+                className="flex-1 bg-transparent font-mono text-xs text-text placeholder:text-subtle outline-none"
             />
         </div>
     );

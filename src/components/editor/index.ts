@@ -1,1 +1,1 @@
-export { default as NoteEditor } from "./NoteEditor.tsx";
+export { default as NoteEditor } from "./NoteEditor";

@@ -1,20 +1,14 @@
 import { Outlet } from "react-router";
-
-import { NoteList, Sidebar } from "./components/layout";
+import { Rail, NoteList } from "@components";
 
 function App() {
     return (
-        <div className="flex h-screen bg-surface overflow-hidden">
-            <Sidebar />
-            <main className="flex flex-col w-72 border-r border-border-subtle shrink-0">
-                <div className="px-4 py-4 border-b border-border-subtle">
-                    <h2 className="text-sm font-medium text-text-secondary uppercase tracking-wider">
-                        Notes
-                    </h2>
-                </div>
+        <div className="flex h-screen bg-bg overflow-hidden">
+            <Rail />
+            <main className="flex flex-col w-60 bg-surface border-r border-border shrink-0">
                 <NoteList />
             </main>
-            <div className="flex-1">
+            <div className="flex-1 bg-editor-bg">
                 <Outlet />
             </div>
         </div>
