@@ -6,7 +6,15 @@ import SearchBar from "./SearchBar";
 import AddNoteButton from "./AddNoteButton";
 import NoteList from "./NoteList";
 
-function SideBar({ isLoading, error }: { isLoading: boolean; error: string | null }) {
+function SideBar({
+    isLoading,
+    error,
+    searchRef
+}: {
+    isLoading: boolean;
+    error: string | null;
+    searchRef: React.RefObject<HTMLInputElement | null>;
+}) {
     const navigate = useNavigate();
 
     const notes = useNotes();
@@ -21,7 +29,7 @@ function SideBar({ isLoading, error }: { isLoading: boolean; error: string | nul
     return (
         <div className="flex flex-col h-full">
             <div className="flex flex-col gap-1.5 p-3 border-b border-border-soft shrink-0">
-                <SearchBar value={search} onChange={setSearch} />
+                <SearchBar value={search} onChange={setSearch} ref={searchRef} />
                 <AddNoteButton onClick={handleAddNote} />
             </div>
 
