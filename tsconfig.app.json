@@ -21,8 +21,14 @@
         "noEmit": true,
         "jsx": "react-jsx",
         "paths": {
-            "@hooks/*": [
-                "./src/hooks/*"
+            "@assets/*": [
+                "./src/assets/*"
+            ],
+            "@components": [
+                "./src/components/index"
+            ],
+            "@components/*": [
+                "./src/components/*"
             ],
             "@entities": [
                 "./src/entities/index"
@@ -30,11 +36,8 @@
             "@entities/*": [
                 "./src/entities/*"
             ],
-            "@components": [
-                "./src/components/index"
-            ],
-            "@components/*": [
-                "./src/components/*"
+            "@hooks/*": [
+                "./src/hooks/*"
             ],
             "@services/*": [
                 "./src/services/*"
