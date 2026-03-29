@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router";
+import { Note } from "@components";
 
 import App from "./App.tsx";
-import { NoteEditor } from "./components/editor";
 
 export const router = createBrowserRouter([
     {
@@ -12,7 +12,7 @@ export const router = createBrowserRouter([
                 index: true,
                 element: <p className="text-text-muted text-sm">Select a note to start editing</p>
             },
-            { path: ":noteId", Component: NoteEditor }
+            { path: ":noteId", Component: Note }
         ]
     },
     {

@@ -1,54 +1,36 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
 import { useDebounce } from "@hooks/useDebounce";
-import { useNotes, useNotesActions } from "@stores/notes.store";
+import { useNotesActions } from "@stores/notes.store";
 
-import { MarkdownEditor } from "../markdownEditor";
+import { MarkdownEditor } from "../../markdownEditor";
 import NoteEditorFooter from "./NoteEditorFooter";
 import NoteEditorTitle from "./NoteEditorTitle";
 
-function NoteEditor() {
-    const navigate = useNavigate();
-    const { noteId } = useParams<{ noteId: string }>();
+import type { Note } from "@entities";
 
+function NoteEditor({ note }: { note: Note }) {
     const { updateNote } = useNotesActions();
-    const selectedNote = useNotes().find((note) => note.id === noteId);
-
     const { debouncedCallback: debouncedUpdateNote } = useDebounce(updateNote);
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
 
     useEffect(() => {
-        if (!selectedNote) {
-            return;
-        }
-
-        setTitle(selectedNote.title);
-        setContent(selectedNote.content);
+        setTitle(note.title);
+        setContent(note.content);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedNote?.id]);
-
-    useEffect(() => {
-        if (!selectedNote) {
-            navigate("/");
-        }
-    }, [selectedNote, navigate]);
-
-    if (!selectedNote) {
-        return null;
-    }
+    }, [note.id]);
 
     const wordCount = content.trim() === "" ? 0 : content.trim().split(/\s+/).length;
 
     const handleTitleChange = (newTitle: string) => {
         setTitle(newTitle);
-        debouncedUpdateNote(selectedNote.id, { title: newTitle });
+        debouncedUpdateNote(note.id, { title: newTitle });
     };
 
     const handleContentChange = (newContent: string) => {
         setContent(newContent);
-        debouncedUpdateNote(selectedNote.id, { content: newContent });
+        debouncedUpdateNote(note.id, { content: newContent });
     };
 
     return (
@@ -57,7 +39,7 @@ function NoteEditor() {
                 <div className="w-full max-w-[72ch] flex flex-col gap-2">
                     <NoteEditorTitle
                         title={title}
-                        date={selectedNote.updatedAt}
+                        date={note.updatedAt}
                         onChange={handleTitleChange}
                     />
                     <MarkdownEditor text={content} onChange={handleContentChange} />
