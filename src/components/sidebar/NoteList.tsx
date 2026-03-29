@@ -4,25 +4,9 @@ import type { Note } from "@entities";
 
 type NoteListProps = {
     notes: Note[];
-    isLoading: boolean;
-    error: string | null;
 };
 
-function NoteList({ notes, isLoading, error }: NoteListProps) {
-    const isEmpty = notes.length === 0;
-
-    if (error) {
-        return <p className="text-muted text-xs px-3 py-2">{error}</p>;
-    }
-
-    if (isLoading) {
-        return <p className="text-subtle text-xs px-3 py-2">Loading...</p>;
-    }
-
-    if (isEmpty) {
-        return <p className="text-subtle text-xs px-3 py-8 text-center">No notes yet</p>;
-    }
-
+function NoteList({ notes }: NoteListProps) {
     return (
         <ul>
             {notes.map((note) => (

@@ -14,8 +14,8 @@ function EmptyState({ icon, title, body, action }: EmptyStateProps) {
                 {icon}
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
-                <p className="font-sans text-[13px] font-medium text-muted">{title}</p>
-                <p className="font-mono text-[10px] text-subtle">{body}</p>
+                <p className="font-sans text-ui-base font-medium text-muted">{title}</p>
+                <p className="font-mono text-ui-sm text-subtle">{body}</p>
             </div>
             {action && <div className="mt-1">{action}</div>}
         </div>

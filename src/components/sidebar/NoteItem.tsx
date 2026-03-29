@@ -25,7 +25,7 @@ function NoteItem({ note }: NoteItemProps) {
                 strokeWidth={1.5}
                 className={isActive ? "text-accent" : "text-subtle"}
             />
-            <span className="text-xs truncate">{note.title}</span>
+            <span className="text-ui-base truncate">{note.title}</span>
         </Link>
     );
 }

@@ -7,15 +7,12 @@ import { useNotes } from "@stores/notes.store";
 import SearchBar from "./SearchBar";
 import NoteList from "./NoteList";
 
-function SideBar({
-    isLoading,
-    error,
-    searchRef
-}: {
+type SideBarProps = {
     isLoading: boolean;
-    error: string | null;
     searchRef: React.RefObject<HTMLInputElement | null>;
-}) {
+};
+
+function SideBar({ isLoading, searchRef }: SideBarProps) {
     const notes = useNotes();
     const { search, setSearch, filteredNotes } = useNoteSearch(notes);
 
@@ -40,19 +37,19 @@ function SideBar({
                     </div>
                 ) : noNotes ? (
                     <EmptyState
-                        icon={<FileText size={18} strokeWidth={1.5} />}
+                        icon={<FileText size={16} strokeWidth={1.5} />}
                         title="No notes yet"
                         body="Start writing something. It stays on your device."
                         action={<AddNoteButton onClick={createNote} />}
                     />
                 ) : noSearchResults ? (
                     <EmptyState
-                        icon={<Search size={18} strokeWidth={1.5} />}
+                        icon={<Search size={16} strokeWidth={1.5} />}
                         title="No results"
                         body={`Nothing matches "${search}". Try a different search.`}
                     />
                 ) : (
-                    <NoteList notes={filteredNotes} isLoading={isLoading} error={error} />
+                    <NoteList notes={filteredNotes} />
                 )}
             </div>
         </div>

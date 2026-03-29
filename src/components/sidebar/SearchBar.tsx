@@ -15,7 +15,7 @@ function SearchBar({ value, onChange, ref }: SearchBarProps) {
                 placeholder="Search notes..."
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="flex-1 bg-transparent font-mono text-xs text-text placeholder:text-subtle outline-none"
+                className="flex-1 bg-transparent font-mono text-ui-base text-text placeholder:text-subtle outline-none"
                 ref={ref}
             />
         </div>
