@@ -3,7 +3,7 @@ import { getNotes } from "@services/notes.service";
 import { useNotesActions } from "@stores/notes.store";
 
 export function useInitNotes() {
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { setNotes } = useNotesActions();
 

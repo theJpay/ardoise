@@ -17,12 +17,15 @@ function App() {
             }}
         >
             <Rail />
-            <main className="flex flex-col bg-surface border-r border-border overflow-hidden">
+            <aside
+                className="flex flex-col bg-surface border-r border-border overflow-hidden"
+                aria-label="Sidebar"
+            >
                 <SideBar isLoading={isLoading} error={error} searchRef={searchRef} />
-            </main>
-            <div className="bg-editor-bg overflow-hidden">
+            </aside>
+            <main className="bg-editor-bg overflow-hidden">
                 <Outlet />
-            </div>
+            </main>
         </div>
     );
 }

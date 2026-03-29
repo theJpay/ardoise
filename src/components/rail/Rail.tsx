@@ -10,7 +10,10 @@ function Rail() {
     const { toggleSidebar } = useEditorActions();
 
     return (
-        <aside className="flex flex-col items-center w-12 h-screen bg-bg border-r border-border shrink-0 py-3.5">
+        <nav
+            className="flex flex-col items-center w-12 h-screen bg-bg border-r border-border shrink-0 py-3.5"
+            aria-label="Application navigation"
+        >
             <LogoMark />
 
             <div className="flex flex-col items-center gap-0.5 w-full px-1 mt-4">
@@ -21,7 +24,7 @@ function Rail() {
 
             <div className="flex flex-col items-center gap-0.5 w-full px-1">
                 <RailButton
-                    icon={<FileText size={14} strokeWidth={1.5} />}
+                    icon={<FileText size={18} strokeWidth={1.5} />}
                     label="My notes"
                     isActive={true}
                     to="/notes"
@@ -32,22 +35,22 @@ function Rail() {
 
             <div className="flex flex-col items-center gap-0.5 w-full px-1">
                 <RailButton
-                    icon={<CircleHelp size={14} strokeWidth={1.5} />}
+                    icon={<CircleHelp size={18} strokeWidth={1.5} />}
                     label="Keyboard shortcuts"
                 />
                 <RailButton
-                    icon={<PanelLeft size={14} strokeWidth={1.5} />}
+                    icon={<PanelLeft size={18} strokeWidth={1.5} />}
                     label="Toggle sidebar"
                     isActive={isSidebarOpen}
                     onClick={toggleSidebar}
                 />
                 <RailButton
-                    icon={<Settings size={14} strokeWidth={1.5} />}
+                    icon={<Settings size={18} strokeWidth={1.5} />}
                     label="Settings"
                     to="/settings"
                 />
             </div>
-        </aside>
+        </nav>
     );
 }
 

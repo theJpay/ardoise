@@ -10,22 +10,22 @@ function EditorModeToggler() {
             <button
                 onClick={toggleMode}
                 aria-label="Write mode"
-                className={`w-6.5 h-6.5 rounded-md flex items-center justify-center transition-colors duration-100 ${
+                className={`w-7 h-7 rounded-md flex items-center justify-center transition-colors duration-100 ${
                     mode === "edit" ? "bg-accent-glow text-accent" : "text-subtle hover:text-muted"
                 }`}
             >
-                <PenLine size={14} strokeWidth={1.5} aria-hidden="true" />
+                <PenLine size={18} strokeWidth={1.5} aria-hidden="true" />
             </button>
             <button
                 onClick={toggleMode}
                 aria-label="Preview mode"
-                className={`w-6.5 h-6.5 rounded-md flex items-center justify-center transition-colors duration-100 ${
+                className={`w-7 h-7 rounded-md flex items-center justify-center transition-colors duration-100 ${
                     mode === "preview"
                         ? "bg-accent-glow text-accent"
                         : "text-subtle hover:text-muted"
                 }`}
             >
-                <BookOpen size={14} strokeWidth={1.5} aria-hidden="true" />
+                <BookOpen size={18} strokeWidth={1.5} aria-hidden="true" />
             </button>
         </div>
     );

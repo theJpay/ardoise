@@ -1,9 +1,10 @@
-import { useNavigate } from "react-router";
+import { FileText, Search } from "lucide-react";
+import { AddNoteButton, EmptyState } from "@components/generics";
+import { useCreateNote } from "@hooks/useCreateNote";
 import { useNoteSearch } from "@hooks/useNoteSearch";
-import { useNotes, useNotesActions } from "@stores/notes.store";
+import { useNotes } from "@stores/notes.store";
 
 import SearchBar from "./SearchBar";
-import AddNoteButton from "./AddNoteButton";
 import NoteList from "./NoteList";
 
 function SideBar({
@@ -15,26 +16,44 @@ function SideBar({
     error: string | null;
     searchRef: React.RefObject<HTMLInputElement | null>;
 }) {
-    const navigate = useNavigate();
-
     const notes = useNotes();
-    const { addNote } = useNotesActions();
     const { search, setSearch, filteredNotes } = useNoteSearch(notes);
 
-    const handleAddNote = async () => {
-        const newNote = await addNote({ title: "New Note", content: "" });
-        navigate(`/notes/${newNote.id}`);
-    };
+    const { createNote } = useCreateNote();
+
+    const noNotes = notes.length === 0;
+    const noSearchResults = filteredNotes.length === 0 && search.trim() !== "";
 
     return (
         <div className="flex flex-col h-full">
             <div className="flex flex-col gap-1.5 p-3 border-b border-border-soft shrink-0">
                 <SearchBar value={search} onChange={setSearch} ref={searchRef} />
-                <AddNoteButton onClick={handleAddNote} />
+                <AddNoteButton onClick={createNote} />
             </div>
 
             <div className="flex flex-col flex-1 overflow-y-auto py-1.5">
-                <NoteList notes={filteredNotes} isLoading={isLoading} error={error} />
+                {isLoading ? (
+                    <div className="flex flex-col gap-0.5 p-2">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="h-8 rounded-md bg-elevated animate-pulse" />
+                        ))}
+                    </div>
+                ) : noNotes ? (
+                    <EmptyState
+                        icon={<FileText size={18} strokeWidth={1.5} />}
+                        title="No notes yet"
+                        body="Start writing something. It stays on your device."
+                        action={<AddNoteButton onClick={createNote} />}
+                    />
+                ) : noSearchResults ? (
+                    <EmptyState
+                        icon={<Search size={18} strokeWidth={1.5} />}
+                        title="No results"
+                        body={`Nothing matches "${search}". Try a different search.`}
+                    />
+                ) : (
+                    <NoteList notes={filteredNotes} isLoading={isLoading} error={error} />
+                )}
             </div>
         </div>
     );

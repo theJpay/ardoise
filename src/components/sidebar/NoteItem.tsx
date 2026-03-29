@@ -21,7 +21,7 @@ function NoteItem({ note }: NoteItemProps) {
             }`}
         >
             <File
-                size={12}
+                size={14}
                 strokeWidth={1.5}
                 className={isActive ? "text-accent" : "text-subtle"}
             />

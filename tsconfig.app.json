@@ -25,13 +25,13 @@
                 "./src/assets/*"
             ],
             "@components": [
-                "./src/components/index"
+                "./src/components"
             ],
             "@components/*": [
                 "./src/components/*"
             ],
             "@entities": [
-                "./src/entities/index"
+                "./src/entities"
             ],
             "@entities/*": [
                 "./src/entities/*"
