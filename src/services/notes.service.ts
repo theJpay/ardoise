@@ -12,9 +12,7 @@ export async function getNotes(): Promise<Note[]> {
     const localNotes = localStorage.getItem("notes");
 
     if (!localNotes) {
-        const seedNotes = generateFakeNotes(5);
-        localStorage.setItem("notes", JSON.stringify(seedNotes));
-        return seedNotes;
+        return [];
     }
 
     const rawNotes: NoteDTO[] = JSON.parse(localNotes);
@@ -83,7 +81,7 @@ export async function deleteNote(id: string): Promise<boolean> {
     return true;
 }
 
-function generateFakeNotes(count: number): Note[] {
+/* function generateFakeNotes(count: number): Note[] {
     const notes: Note[] = [];
     for (let i = 0; i < count; i++) {
         notes.push({
@@ -95,4 +93,4 @@ function generateFakeNotes(count: number): Note[] {
         });
     }
     return notes;
-}
+} */
