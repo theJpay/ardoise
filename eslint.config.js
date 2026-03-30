@@ -32,15 +32,18 @@ export default defineConfig([
             "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
             "prettier/prettier": "error",
             "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
-            "import/order": ["error", {
-                "groups": [
-                    "builtin",
-                    "external",
-                    ["internal", "parent", "sibling", "index"],
-                    "type"
-                ],
-                "newlines-between": "always"
-            }]
+            "import/order": [
+                "error",
+                {
+                    groups: [
+                        "builtin",
+                        "external",
+                        ["internal", "parent", "sibling", "index"],
+                        "type"
+                    ],
+                    "newlines-between": "always"
+                }
+            ]
         }
     }
 ]);
