@@ -1,4 +1,4 @@
-import { BLOCK_SYNTAXES } from "./constants";
+import { BLOCK_SYNTAXES } from "./actions";
 
 type ToggleResult = {
     content: string;

@@ -1,0 +1,72 @@
+.ardoise-editor {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.8;
+    color: var(--color-editor-text);
+}
+
+.ardoise-editor .ed-token-dim {
+    color: var(--color-dim);
+}
+
+.ardoise-editor .ed-token-muted {
+    color: var(--color-muted);
+}
+
+.ardoise-editor .ed-token-subtle {
+    color: var(--color-subtle);
+}
+
+.ardoise-editor .ed-heading {
+    color: var(--color-editor-text);
+    font-weight: 500;
+}
+
+.ardoise-editor .ed-h5 {
+    color: var(--color-muted);
+    font-weight: 500;
+}
+
+.ardoise-editor .ed-h6 {
+    color: var(--color-dim);
+    font-weight: 400;
+}
+
+.ardoise-editor .ed-quote {
+    color: var(--color-muted);
+    font-style: italic;
+}
+
+.ardoise-editor .ed-code-fence {
+    color: var(--color-dim);
+}
+
+.ardoise-editor .ed-bold {
+    color: var(--color-editor-text);
+    font-weight: 500;
+}
+
+.ardoise-editor .ed-italic {
+    color: var(--color-editor-text);
+    font-style: italic;
+}
+
+.ardoise-editor .ed-code {
+    color: var(--color-accent);
+    background: var(--color-elevated);
+    padding: 0;
+    border-radius: 0;
+}
+
+.ardoise-editor .ed-strike {
+    color: var(--color-muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--color-dim);
+}
+
+.ardoise-editor .ed-link {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent-dim);
+}

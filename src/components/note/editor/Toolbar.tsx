@@ -1,4 +1,5 @@
-import { BLOCK_ACTIONS } from "./utils";
+import { TOOLBAR_ACTIONS } from "./utils/actions";
+import { TOOLBAR_ACTION_ICONS } from "./utils/icons";
 
 type ToolbarProps = {
     isBlockActive: (actionName: string) => boolean;
@@ -8,7 +9,7 @@ type ToolbarProps = {
 function Toolbar({ isBlockActive, onToggleBlock }: ToolbarProps) {
     return (
         <div className="border-border-soft flex h-10 shrink-0 items-center gap-0.5 border-b px-5">
-            {BLOCK_ACTIONS.map(({ name, icon, label }) => (
+            {TOOLBAR_ACTIONS.map(({ name, label }) => (
                 <button
                     key={name}
                     aria-label={label}
@@ -19,7 +20,7 @@ function Toolbar({ isBlockActive, onToggleBlock }: ToolbarProps) {
                     }`}
                     onClick={() => onToggleBlock(name)}
                 >
-                    {icon}
+                    {TOOLBAR_ACTION_ICONS[name]}
                 </button>
             ))}
             <div className="bg-border-soft mx-1 h-4 w-px" />
