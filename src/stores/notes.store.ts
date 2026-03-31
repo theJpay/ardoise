@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
+
 import { createNote, deleteNote, updateNote } from "@services/notes.service";
 
 import type { Note } from "@entities";

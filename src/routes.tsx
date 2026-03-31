@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router";
+
 import { Note, NoteIndex } from "@components";
 
 import App from "./App.tsx";

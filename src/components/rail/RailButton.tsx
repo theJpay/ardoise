@@ -15,14 +15,14 @@ function RailButton({ icon, label, isActive, to, onClick }: RailButtonProps) {
 
     if (to) {
         return (
-            <Link to={to} className={className} aria-label={label}>
+            <Link aria-label={label} className={className} to={to}>
                 {icon}
             </Link>
         );
     }
 
     return (
-        <button onClick={onClick} className={className} aria-label={label}>
+        <button aria-label={label} className={className} onClick={onClick}>
             {icon}
         </button>
     );

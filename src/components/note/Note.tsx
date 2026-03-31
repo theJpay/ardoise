@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
 import { FileX } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
+
 import { EmptyState } from "@components/generics";
 import { useDebounce } from "@hooks/useDebounce";
 import { useEditorMode } from "@stores/editor.store";
@@ -59,9 +60,9 @@ function Note() {
     if (!selectedNote) {
         return (
             <EmptyState
+                body="This note may have been deleted."
                 icon={<FileX size={16} strokeWidth={1.5} />}
                 title="Note not found"
-                body="This note may have been deleted."
             />
         );
     }
@@ -82,9 +83,9 @@ function Note() {
                     className={`mx-auto flex w-full flex-col gap-2 ${mode === "edit" ? "max-w-[72ch]" : "max-w-180"}`}
                 >
                     <NoteTitle
-                        title={title}
                         date={selectedNote.updatedAt}
                         mode={mode}
+                        title={title}
                         onChange={handleTitleChange}
                     />
                     {mode === "edit" ? (

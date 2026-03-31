@@ -1,4 +1,5 @@
 import { CircleHelp, File, PanelLeft, Settings } from "lucide-react";
+
 import { useEditorActions, useIsSidebarOpen } from "@stores/editor.store";
 
 import EditorModeToggler from "./EditorModeToggle";
@@ -11,8 +12,8 @@ function Rail() {
 
     return (
         <nav
-            className="bg-bg border-border flex h-screen w-12 shrink-0 flex-col items-center border-r py-3.5"
             aria-label="Application navigation"
+            className="bg-bg border-border flex h-screen w-12 shrink-0 flex-col items-center border-r py-3.5"
         >
             <LogoMark />
 
@@ -25,8 +26,8 @@ function Rail() {
             <div className="flex w-full flex-col items-center gap-0.5 px-1">
                 <RailButton
                     icon={<File size={16} strokeWidth={1.5} />}
-                    label="My notes"
                     isActive={true}
+                    label="My notes"
                     to="/notes"
                 />
             </div>
@@ -40,8 +41,8 @@ function Rail() {
                 />
                 <RailButton
                     icon={<PanelLeft size={16} strokeWidth={1.5} />}
-                    label="Toggle sidebar"
                     isActive={isSidebarOpen}
+                    label="Toggle sidebar"
                     onClick={toggleSidebar}
                 />
                 <RailButton

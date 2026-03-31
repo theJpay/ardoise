@@ -1,4 +1,5 @@
 import { Outlet } from "react-router";
+
 import { Rail, SideBar } from "@components";
 import { useInitNotes } from "@hooks/useInitNotes";
 import { useRegisterGlobalShortcuts } from "@hooks/useRegisterGlobalShortcuts";
@@ -18,8 +19,8 @@ function App() {
         >
             <Rail />
             <aside
-                className="bg-surface border-border flex flex-col overflow-hidden border-r"
                 aria-label="Sidebar"
+                className="bg-surface border-border flex flex-col overflow-hidden border-r"
             >
                 <SideBar isLoading={isLoading} searchRef={searchRef} />
             </aside>

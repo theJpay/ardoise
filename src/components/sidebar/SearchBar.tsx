@@ -13,19 +13,19 @@ function SearchBar({ value, onChange, ref }: SearchBarProps) {
 
     return (
         <div className="bg-bg border-border focus-within:border-accent hover:border-muted hover:focus-within:border-accent flex h-8 items-center gap-2 rounded border px-2.5 transition-colors duration-100">
-            <Search size={12} strokeWidth={1.5} className="text-dim shrink-0" />
+            <Search className="text-dim shrink-0" size={12} strokeWidth={1.5} />
             <input
                 ref={ref}
-                type="search"
+                className="text-ui-sm text-text placeholder:text-dim flex-1 bg-transparent font-mono outline-none"
                 placeholder="Search..."
+                type="search"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="text-ui-sm text-text placeholder:text-dim flex-1 bg-transparent font-mono outline-none"
             />
             {hasValue ? (
                 <button
-                    onClick={() => onChange("")}
                     className="text-subtle hover:text-muted flex shrink-0 items-center"
+                    onClick={() => onChange("")}
                 >
                     <X size={11} strokeWidth={2} />
                 </button>

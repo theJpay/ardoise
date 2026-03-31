@@ -14,10 +14,10 @@ function NoteTitle({ title, date, mode, onChange }: NoteTitleProps) {
                 <div className="text-ed-body flex items-baseline font-mono">
                     <span className="text-dim font-medium">#&nbsp;</span>
                     <input
+                        className="text-editor-text placeholder:text-dim w-full border-none bg-transparent font-mono font-medium outline-none"
+                        placeholder="Untitled"
                         value={title}
                         onChange={(e) => onChange(e.target.value)}
-                        placeholder="Untitled"
-                        className="text-editor-text placeholder:text-dim w-full border-none bg-transparent font-mono font-medium outline-none"
                     />
                 </div>
             ) : (

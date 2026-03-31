@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import { getNotes } from "@services/notes.service";
 import { useNotesActions } from "@stores/notes.store";
 

@@ -13,17 +13,17 @@ function NoteItem({ note }: NoteItemProps) {
 
     return (
         <Link
-            to={`/notes/${note.id}`}
             className={`text-text box-border flex h-8 items-center border-l-2 transition-colors duration-100 ${
                 isActive
                     ? "border-accent bg-elevated pr-2.5 pl-6"
                     : "hover:bg-elevated border-transparent pr-2.5 pl-6.5"
             }`}
+            to={`/notes/${note.id}`}
         >
             <File
+                className={`mr-2 shrink-0 ${isActive ? "text-accent" : "text-dim"}`}
                 size={13}
                 strokeWidth={1.5}
-                className={`mr-2 shrink-0 ${isActive ? "text-accent" : "text-dim"}`}
             />
             {note.title ? (
                 <span className="text-ui-base truncate">{note.title}</span>

@@ -5,7 +5,7 @@ type LogoMarkProps = {
 };
 
 function LogoMark({ size = 24 }: LogoMarkProps) {
-    return <ArdoiseLogo width={size} height={size} className="text-accent" aria-hidden="true" />;
+    return <ArdoiseLogo aria-hidden="true" className="text-accent" height={size} width={size} />;
 }
 
 export default LogoMark;

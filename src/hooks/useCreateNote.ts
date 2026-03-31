@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router";
+
 import { useNotesActions } from "@stores/notes.store";
 
 export function useCreateNote() {
