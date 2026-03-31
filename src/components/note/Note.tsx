@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FileX } from "lucide-react";
 import { useParams } from "react-router";
 import { EmptyState } from "@components/generics";
@@ -6,10 +6,10 @@ import { useDebounce } from "@hooks/useDebounce";
 import { useEditorMode } from "@stores/editor.store";
 import { useNotes, useNotesActions } from "@stores/notes.store";
 
-import { NoteEditor } from "./editor";
-import { NoteViewer } from "./viewer";
+import { NoteEditor, Toolbar, useEditorCommands } from "./editor";
 import NoteFooter from "./NoteFooter";
 import NoteTitle from "./NoteTitle";
+import { NoteViewer } from "./viewer";
 
 function Note() {
     const { noteId } = useParams<{ noteId: string }>();
@@ -27,6 +27,26 @@ function Note() {
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    const [cursorPosition, setCursorPosition] = useState(0);
+    const editorRef = useRef<HTMLTextAreaElement>(null);
+
+    const handleContentChange = (newContent: string) => {
+        setContent(newContent);
+        if (selectedNote) {
+            debouncedUpdateContent(selectedNote.id, newContent);
+        }
+    };
+
+    const handleCursorChange = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+        setCursorPosition(e.currentTarget.selectionStart);
+    };
+
+    const { toggleBlock, isBlockActive } = useEditorCommands(
+        editorRef,
+        content,
+        cursorPosition,
+        handleContentChange
+    );
 
     useEffect(() => {
         if (selectedNote) {
@@ -53,13 +73,10 @@ function Note() {
         debouncedUpdateTitle(selectedNote.id, newTitle);
     };
 
-    const handleContentChange = (newContent: string) => {
-        setContent(newContent);
-        debouncedUpdateContent(selectedNote.id, newContent);
-    };
-
     return (
         <div className="flex h-full flex-col">
+            <Toolbar isBlockActive={isBlockActive} onToggleBlock={toggleBlock} />
+
             <div className="flex-1 overflow-auto px-6 py-12">
                 <div
                     className={`mx-auto flex w-full flex-col gap-2 ${mode === "edit" ? "max-w-[72ch]" : "max-w-180"}`}
@@ -71,7 +88,12 @@ function Note() {
                         onChange={handleTitleChange}
                     />
                     {mode === "edit" ? (
-                        <NoteEditor content={content} onChange={handleContentChange} />
+                        <NoteEditor
+                            ref={editorRef}
+                            content={content}
+                            onChange={handleContentChange}
+                            onCursorChange={handleCursorChange}
+                        />
                     ) : (
                         <NoteViewer content={content} />
                     )}

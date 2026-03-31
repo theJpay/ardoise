@@ -7,9 +7,11 @@ import { useNotes } from "@stores/notes.store";
 import SearchBar from "./SearchBar";
 import NoteList from "./NoteList";
 
+import type { RefObject } from "react";
+
 type SideBarProps = {
     isLoading: boolean;
-    searchRef: React.RefObject<HTMLInputElement | null>;
+    searchRef: RefObject<HTMLInputElement | null>;
 };
 
 function SideBar({ isLoading, searchRef }: SideBarProps) {

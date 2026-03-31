@@ -1,11 +1,11 @@
 import { Search, X } from "lucide-react";
 
-import type { Ref } from "react";
+import type { RefObject } from "react";
 
 type SearchBarProps = {
     value: string;
     onChange: (value: string) => void;
-    ref: Ref<HTMLInputElement>;
+    ref: RefObject<HTMLInputElement | null>;
 };
 
 function SearchBar({ value, onChange, ref }: SearchBarProps) {
@@ -15,12 +15,12 @@ function SearchBar({ value, onChange, ref }: SearchBarProps) {
         <div className="bg-bg border-border focus-within:border-accent hover:border-muted hover:focus-within:border-accent flex h-8 items-center gap-2 rounded border px-2.5 transition-colors duration-100">
             <Search size={12} strokeWidth={1.5} className="text-dim shrink-0" />
             <input
+                ref={ref}
                 type="search"
                 placeholder="Search..."
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 className="text-ui-sm text-text placeholder:text-dim flex-1 bg-transparent font-mono outline-none"
-                ref={ref}
             />
             {hasValue ? (
                 <button
