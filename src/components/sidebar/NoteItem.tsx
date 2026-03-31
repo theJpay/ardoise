@@ -14,18 +14,22 @@ function NoteItem({ note }: NoteItemProps) {
     return (
         <Link
             to={`/notes/${note.id}`}
-            className={`flex box-border items-center gap-1.5 h-8 px-3 border-l-2 transition-colors duration-100 text-text ${
+            className={`text-text box-border flex h-8 items-center border-l-2 transition-colors duration-100 ${
                 isActive
-                    ? "border-accent bg-elevated text-text"
-                    : "border-transparent hover:bg-elevated"
+                    ? "border-accent bg-elevated pr-2.5 pl-6"
+                    : "hover:bg-elevated border-transparent pr-2.5 pl-6.5"
             }`}
         >
             <File
-                size={14}
+                size={13}
                 strokeWidth={1.5}
-                className={isActive ? "text-accent" : "text-subtle"}
+                className={`mr-2 shrink-0 ${isActive ? "text-accent" : "text-dim"}`}
             />
-            <span className="text-ui-base truncate">{note.title}</span>
+            {note.title ? (
+                <span className="text-ui-base truncate">{note.title}</span>
+            ) : (
+                <span className="text-ui-sm text-muted italic">Untitled</span>
+            )}
         </Link>
     );
 }

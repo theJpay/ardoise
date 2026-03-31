@@ -6,26 +6,28 @@ function EditorModeToggler() {
     const { toggleMode } = useEditorActions();
 
     return (
-        <div className="flex flex-col gap-px p-0.5 bg-surface rounded-lg">
+        <div className="bg-surface border-border-soft flex flex-col gap-0.5 rounded-lg border p-1">
             <button
                 onClick={toggleMode}
                 aria-label="Write mode"
-                className={`w-7 h-7 rounded-md flex items-center justify-center transition-colors duration-100 ${
-                    mode === "edit" ? "bg-accent-glow text-accent" : "text-subtle hover:text-muted"
+                className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-100 ${
+                    mode === "edit"
+                        ? "bg-accent-glow text-accent"
+                        : "text-dim hover:bg-elevated hover:text-muted"
                 }`}
             >
-                <PenLine size={18} strokeWidth={1.5} aria-hidden="true" />
+                <PenLine size={15} strokeWidth={1.5} aria-hidden="true" />
             </button>
             <button
                 onClick={toggleMode}
                 aria-label="Preview mode"
-                className={`w-7 h-7 rounded-md flex items-center justify-center transition-colors duration-100 ${
+                className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-100 ${
                     mode === "preview"
                         ? "bg-accent-glow text-accent"
-                        : "text-subtle hover:text-muted"
+                        : "text-dim hover:bg-elevated hover:text-muted"
                 }`}
             >
-                <BookOpen size={18} strokeWidth={1.5} aria-hidden="true" />
+                <BookOpen size={15} strokeWidth={1.5} aria-hidden="true" />
             </button>
         </div>
     );

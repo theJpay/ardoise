@@ -22,17 +22,19 @@ function SideBar({ isLoading, searchRef }: SideBarProps) {
     const noSearchResults = filteredNotes.length === 0 && search.trim() !== "";
 
     return (
-        <div className="flex flex-col h-full">
-            <div className="flex flex-col gap-1.5 p-3 border-b border-border-soft shrink-0">
+        <div className="flex h-full flex-col">
+            <div className="border-border-soft flex shrink-0 flex-col gap-2 border-b p-3">
                 <SearchBar value={search} onChange={setSearch} ref={searchRef} />
                 <AddNoteButton onClick={createNote} />
             </div>
 
-            <div className="flex flex-col flex-1 overflow-y-auto py-1.5">
+            <div className="text-ui-xs text-dim shrink-0 px-3 pt-2.5 pb-0.5 font-mono">Notes</div>
+
+            <div className="flex flex-1 flex-col overflow-y-auto">
                 {isLoading ? (
                     <div className="flex flex-col gap-0.5 p-2">
                         {[1, 2, 3].map((i) => (
-                            <div key={i} className="h-8 rounded-md bg-elevated animate-pulse" />
+                            <div key={i} className="bg-elevated h-8 animate-pulse rounded-md" />
                         ))}
                     </div>
                 ) : noNotes ? (

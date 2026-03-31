@@ -6,7 +6,7 @@ export function useCreateNote() {
     const { addNote } = useNotesActions();
 
     const createNote = async () => {
-        const newNote = await addNote({ title: "New note", content: "" });
+        const newNote = await addNote({ title: "", content: "" });
         navigate(`/notes/${newNote.id}`);
     };
 

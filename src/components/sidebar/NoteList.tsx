@@ -10,7 +10,9 @@ function NoteList({ notes }: NoteListProps) {
     return (
         <ul>
             {notes.map((note) => (
-                <NoteItem key={note.id} note={note} />
+                <li key={note.id}>
+                    <NoteItem note={note} />
+                </li>
             ))}
         </ul>
     );

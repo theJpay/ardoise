@@ -3,11 +3,14 @@ import { useNavigate, useParams } from "react-router";
 import { useEditorActions } from "@stores/editor.store";
 import { useNotesActions } from "@stores/notes.store";
 
+import { useCreateNote } from "./useCreateNote";
+
 export function useRegisterGlobalShortcuts() {
     const navigate = useNavigate();
     const { noteId } = useParams();
+    const { createNote } = useCreateNote();
     const { toggleSidebar, toggleMode } = useEditorActions();
-    const { addNote, removeNote } = useNotesActions();
+    const { removeNote } = useNotesActions();
     const searchRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -22,8 +25,7 @@ export function useRegisterGlobalShortcuts() {
             }
             if (areActionKeysPressed("createNote", event)) {
                 event.preventDefault();
-                const newNote = await addNote({ title: "New Note", content: "" });
-                navigate(`/notes/${newNote.id}`);
+                createNote();
             }
             if (areActionKeysPressed("deleteNote", event)) {
                 if (!noteId) {
@@ -48,7 +50,7 @@ export function useRegisterGlobalShortcuts() {
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
         };
-    }, [navigate, noteId, addNote, removeNote, toggleSidebar, toggleMode]);
+    }, [navigate, noteId, removeNote, toggleSidebar, toggleMode, createNote]);
 
     return { searchRef };
 }
@@ -73,7 +75,7 @@ function areActionKeysPressed(action: GlobalKeyboardAction, e: KeyboardEvent) {
         case "focusSearch":
             return isMetaKeyPressed && e.key.toLowerCase() === "k";
         case "createNote":
-            return e.key.toLowerCase() === "c";
+            return !isMetaKeyPressed && e.key.toLowerCase() === "c";
         case "deleteNote":
             return isMetaKeyPressed && e.key.toLowerCase() === "backspace";
         case "toggleEditMode":

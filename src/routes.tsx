@@ -12,7 +12,7 @@ export const router = createBrowserRouter([
                 index: true,
                 element: <NoteIndex />
             },
-            { path: ":noteId", Component: Note }
+            { path: ":noteId", element: <Note /> }
         ]
     },
     {

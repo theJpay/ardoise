@@ -23,12 +23,6 @@ export async function getNotes(): Promise<Note[]> {
     }));
 }
 
-export async function getNoteById(id: string): Promise<Note | null> {
-    const notes = await getNotes();
-    const note = notes.find((n) => n.id === id);
-    return note ?? null;
-}
-
 export async function createNote(
     note: Omit<Note, "id" | "createdAt" | "updatedAt">
 ): Promise<Note> {
@@ -47,7 +41,7 @@ export async function createNote(
 
 export async function updateNote(
     id: string,
-    updatedFields: Partial<Omit<Note, "id" | "createdAt">>
+    updatedFields: Partial<Omit<Note, "id" | "createdAt" | "updatedAt">>
 ): Promise<Note | null> {
     const notes = await getNotes();
     const noteIndex = notes.findIndex((n) => n.id === id);
@@ -80,17 +74,3 @@ export async function deleteNote(id: string): Promise<boolean> {
     localStorage.setItem("notes", JSON.stringify(newNotes));
     return true;
 }
-
-/* function generateFakeNotes(count: number): Note[] {
-    const notes: Note[] = [];
-    for (let i = 0; i < count; i++) {
-        notes.push({
-            id: crypto.randomUUID(),
-            title: `Note ${i + 1}`,
-            content: `This is the content of note ${i + 1}.`,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        });
-    }
-    return notes;
-} */

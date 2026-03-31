@@ -13,7 +13,6 @@ export function useDebounce<T extends (...args: any[]) => unknown>(
                 clearTimeout(timeoutRef.current);
             }
             timeoutRef.current = setTimeout(() => {
-                console.log("debounced callback called with args:", args);
                 callback(...args);
             }, delay);
         },

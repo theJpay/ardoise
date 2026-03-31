@@ -6,9 +6,7 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 
-import type { Note } from "@entities";
-
-export async function renderNote(note: Note) {
+export async function renderMarkdown(content: string) {
     const html = await unified()
         .use(remarkParse)
         .use(remarkGfm)
@@ -16,13 +14,9 @@ export async function renderNote(note: Note) {
         .use(rehypeHighlight)
         .use(rehypeSanitize, { ...buildSchema() })
         .use(rehypeStringify)
-        .process(getNote());
+        .process(content);
 
     return html.toString();
-
-    function getNote() {
-        return `# ${note.title}\n${note.content}`;
-    }
 }
 
 function buildSchema(): typeof defaultSchema {
@@ -30,7 +24,7 @@ function buildSchema(): typeof defaultSchema {
         ...defaultSchema,
         attributes: {
             ...defaultSchema.attributes,
-            span: [...(defaultSchema.attributes?.span || []), ["className", /^hljs-./]]
+            span: [...(defaultSchema.attributes?.span || []), ["className", /^hljs-/]]
         },
         tagNames: [...(defaultSchema.tagNames || []), "span"]
     };

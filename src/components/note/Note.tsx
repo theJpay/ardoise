@@ -1,17 +1,40 @@
+import { useEffect, useState } from "react";
 import { FileX } from "lucide-react";
 import { useParams } from "react-router";
 import { EmptyState } from "@components/generics";
+import { useDebounce } from "@hooks/useDebounce";
 import { useEditorMode } from "@stores/editor.store";
-import { useNotes } from "@stores/notes.store";
+import { useNotes, useNotesActions } from "@stores/notes.store";
 
 import { NoteEditor } from "./editor";
 import { NoteViewer } from "./viewer";
+import NoteFooter from "./NoteFooter";
+import NoteTitle from "./NoteTitle";
 
 function Note() {
     const { noteId } = useParams<{ noteId: string }>();
 
     const mode = useEditorMode();
     const selectedNote = useNotes().find((note) => note.id === noteId);
+
+    const { updateNote } = useNotesActions();
+    const { debouncedCallback: debouncedUpdateTitle } = useDebounce(
+        (noteId: string, title: string) => updateNote(noteId, { title })
+    );
+    const { debouncedCallback: debouncedUpdateContent } = useDebounce(
+        (noteId: string, content: string) => updateNote(noteId, { content })
+    );
+
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
+
+    useEffect(() => {
+        if (selectedNote) {
+            setTitle(selectedNote.title);
+            setContent(selectedNote.content);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedNote?.id]);
 
     if (!selectedNote) {
         return (
@@ -23,10 +46,40 @@ function Note() {
         );
     }
 
-    return mode === "edit" ? (
-        <NoteEditor note={selectedNote} />
-    ) : (
-        <NoteViewer note={selectedNote} />
+    const wordCount = content.trim() === "" ? 0 : content.trim().split(/\s+/).length;
+
+    const handleTitleChange = (newTitle: string) => {
+        setTitle(newTitle);
+        debouncedUpdateTitle(selectedNote.id, newTitle);
+    };
+
+    const handleContentChange = (newContent: string) => {
+        setContent(newContent);
+        debouncedUpdateContent(selectedNote.id, newContent);
+    };
+
+    return (
+        <div className="flex h-full flex-col">
+            <div className="flex-1 overflow-auto px-6 py-12">
+                <div
+                    className={`mx-auto flex w-full flex-col gap-2 ${mode === "edit" ? "max-w-[72ch]" : "max-w-180"}`}
+                >
+                    <NoteTitle
+                        title={title}
+                        date={selectedNote.updatedAt}
+                        mode={mode}
+                        onChange={handleTitleChange}
+                    />
+                    {mode === "edit" ? (
+                        <NoteEditor content={content} onChange={handleContentChange} />
+                    ) : (
+                        <NoteViewer content={content} />
+                    )}
+                </div>
+            </div>
+
+            <NoteFooter wordCount={wordCount} />
+        </div>
     );
 }
 

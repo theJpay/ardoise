@@ -4,9 +4,9 @@ function AddNoteButton({ onClick }: { onClick?: () => void }) {
     return (
         <button
             onClick={onClick}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 bg-accent text-editor-bg rounded text-ui-base font-medium hover:opacity-85 transition-opacity"
+            className="bg-accent text-editor-bg text-ui-base flex h-8 w-full items-center justify-center gap-1.5 rounded font-medium transition-opacity hover:opacity-85"
         >
-            <Plus size={18} strokeWidth={1.5} />
+            <Plus size={14} strokeWidth={2} />
             New note
         </button>
     );

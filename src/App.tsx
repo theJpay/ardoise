@@ -5,25 +5,25 @@ import { useRegisterGlobalShortcuts } from "@hooks/useRegisterGlobalShortcuts";
 import { useIsSidebarOpen } from "@stores/editor.store";
 
 function App() {
-    const { isLoading, error } = useInitNotes();
+    const { isLoading } = useInitNotes();
     const { searchRef } = useRegisterGlobalShortcuts();
     const isSidebarOpen = useIsSidebarOpen();
 
     return (
         <div
-            className="grid h-screen bg-bg overflow-hidden transition-[grid-template-columns] duration-250 ease-in-out"
+            className="bg-bg grid h-screen overflow-hidden transition-[grid-template-columns] duration-250 ease-in-out"
             style={{
                 gridTemplateColumns: isSidebarOpen ? "48px 240px 1fr" : "48px 0px 1fr"
             }}
         >
             <Rail />
             <aside
-                className="flex flex-col bg-surface border-r border-border overflow-hidden"
+                className="bg-surface border-border flex flex-col overflow-hidden border-r"
                 aria-label="Sidebar"
             >
-                <SideBar isLoading={isLoading} error={error} searchRef={searchRef} />
+                <SideBar isLoading={isLoading} searchRef={searchRef} />
             </aside>
-            <main className="bg-editor-bg overflow-hidden">
+            <main className="bg-editor-bg h-screen overflow-auto">
                 <Outlet />
             </main>
         </div>

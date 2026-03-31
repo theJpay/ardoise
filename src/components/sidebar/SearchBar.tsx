@@ -1,23 +1,39 @@
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
+
+import type { Ref } from "react";
 
 type SearchBarProps = {
     value: string;
     onChange: (value: string) => void;
-    ref: React.RefObject<HTMLInputElement | null>;
+    ref: Ref<HTMLInputElement>;
 };
 
 function SearchBar({ value, onChange, ref }: SearchBarProps) {
+    const hasValue = value.length > 0;
+
     return (
-        <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-bg border border-border rounded focus-within:border-accent hover:border-muted hover:focus-within:border-accent transition-colors duration-100">
-            <Search size={14} strokeWidth={1.5} className="text-subtle shrink-0" />
+        <div className="bg-bg border-border focus-within:border-accent hover:border-muted hover:focus-within:border-accent flex h-8 items-center gap-2 rounded border px-2.5 transition-colors duration-100">
+            <Search size={12} strokeWidth={1.5} className="text-dim shrink-0" />
             <input
                 type="search"
-                placeholder="Search notes..."
+                placeholder="Search..."
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="flex-1 bg-transparent font-mono text-ui-base text-text placeholder:text-subtle outline-none"
+                className="text-ui-sm text-text placeholder:text-dim flex-1 bg-transparent font-mono outline-none"
                 ref={ref}
             />
+            {hasValue ? (
+                <button
+                    onClick={() => onChange("")}
+                    className="text-subtle hover:text-muted flex shrink-0 items-center"
+                >
+                    <X size={11} strokeWidth={2} />
+                </button>
+            ) : (
+                <span className="text-dim bg-surface border-border-soft shrink-0 rounded-sm border px-1.5 py-px font-mono text-[9px]">
+                    ⌘K
+                </span>
+            )}
         </div>
     );
 }

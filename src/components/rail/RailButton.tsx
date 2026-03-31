@@ -10,7 +10,7 @@ type RailButtonProps = {
 
 function RailButton({ icon, label, isActive, to, onClick }: RailButtonProps) {
     const className = `w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-100 ${
-        isActive ? "text-accent bg-accent-glow" : "text-subtle hover:bg-surface hover:text-muted"
+        isActive ? "text-accent bg-accent-glow" : "text-dim hover:bg-surface hover:text-muted"
     }`;
 
     if (to) {
