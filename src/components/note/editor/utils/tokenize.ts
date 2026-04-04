@@ -26,6 +26,7 @@ function tokenizeLine(line: string): string {
     return (
         tokenizeHeading(line) ??
         tokenizeQuote(line) ??
+        tokenizeTaskList(line) ??
         tokenizeList(line) ??
         tokenizeHr(line) ??
         inlineTokenize(escapeHtml(line))
@@ -63,24 +64,46 @@ function tokenizeQuote(line: string): string | null {
         return null;
     }
     return (
-        `<span class="ed-token-muted">&gt; </span>` +
+        `<span class="ed-token-dim">&gt; </span>` +
         `<span class="ed-quote">${escapeHtml(line.slice(2))}</span>`
     );
 }
 
-function tokenizeList(line: string): string | null {
-    const unordered = line.match(/^([-*]) (.*)$/);
-    if (unordered) {
+function tokenizeTaskList(line: string): string | null {
+    const unchecked = line.match(/^(\s*)- \[ \] (.*)$/);
+    if (unchecked) {
         return (
-            `<span class="ed-token-muted">${escapeHtml(unordered[1])} </span>` +
-            inlineTokenize(escapeHtml(unordered[2]))
+            escapeHtml(unchecked[1]) +
+            `<span class="ed-token-muted">- [ ] </span>` +
+            inlineTokenize(escapeHtml(unchecked[2]))
         );
     }
-    const ordered = line.match(/^(\d+\.) (.*)$/);
+    const checked = line.match(/^(\s*)- \[x\] (.*)$/);
+    if (checked) {
+        return (
+            escapeHtml(checked[1]) +
+            `<span class="ed-token-muted">- [x] </span>` +
+            `<span class="ed-strike">${escapeHtml(checked[2])}</span>`
+        );
+    }
+    return null;
+}
+
+function tokenizeList(line: string): string | null {
+    const unordered = line.match(/^(\s*)([-*]) (.*)$/);
+    if (unordered) {
+        return (
+            escapeHtml(unordered[1]) +
+            `<span class="ed-token-muted">${escapeHtml(unordered[2])} </span>` +
+            inlineTokenize(escapeHtml(unordered[3]))
+        );
+    }
+    const ordered = line.match(/^(\s*)(\d+\.) (.*)$/);
     if (ordered) {
         return (
-            `<span class="ed-token-muted">${escapeHtml(ordered[1])} </span>` +
-            inlineTokenize(escapeHtml(ordered[2]))
+            escapeHtml(ordered[1]) +
+            `<span class="ed-token-muted">${escapeHtml(ordered[2])} </span>` +
+            inlineTokenize(escapeHtml(ordered[3]))
         );
     }
     return null;

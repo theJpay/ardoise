@@ -76,7 +76,13 @@ function Note() {
 
     return (
         <div className="flex h-full flex-col">
-            <Toolbar isBlockActive={isBlockActive} onToggleBlock={toggleBlock} />
+            <div
+                className={`overflow-hidden transition-[height,opacity] duration-200 ease-out ${
+                    mode === "edit" ? "h-10 opacity-100" : "h-0 opacity-0"
+                }`}
+            >
+                <Toolbar isBlockActive={isBlockActive} onToggleBlock={toggleBlock} />
+            </div>
 
             <div className="flex-1 overflow-auto px-6 py-12">
                 <div
