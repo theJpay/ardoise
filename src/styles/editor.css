@@ -42,6 +42,10 @@
     color: var(--color-dim);
 }
 
+.ardoise-editor .ed-code-lang {
+    color: var(--color-accent);
+}
+
 .ardoise-editor .ed-bold {
     color: var(--color-editor-text);
     font-weight: 500;
