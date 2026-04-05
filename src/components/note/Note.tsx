@@ -7,7 +7,7 @@ import { useDebounce } from "@hooks/useDebounce";
 import { useEditorMode } from "@stores/editor.store";
 import { useNotes, useNotesActions } from "@stores/notes.store";
 
-import { NoteEditor, Toolbar, useEditorCommands } from "./editor";
+import { FloatingToolbar, NoteEditor, Toolbar, useEditorCommands } from "./editor";
 import NoteFooter from "./NoteFooter";
 import NoteTitle from "./NoteTitle";
 import { NoteViewer } from "./viewer";
@@ -28,8 +28,9 @@ function Note() {
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
-    const [cursorPosition, setCursorPosition] = useState(0);
+    const [selection, setSelection] = useState({ start: 0, end: 0 });
     const editorRef = useRef<HTMLTextAreaElement>(null);
+    const phantomRef = useRef<HTMLDivElement>(null);
 
     const handleContentChange = (newContent: string) => {
         setContent(newContent);
@@ -39,13 +40,16 @@ function Note() {
     };
 
     const handleCursorChange = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
-        setCursorPosition(e.currentTarget.selectionStart);
+        setSelection({
+            start: e.currentTarget.selectionStart,
+            end: e.currentTarget.selectionEnd
+        });
     };
 
-    const { toggleBlock, isBlockActive } = useEditorCommands(
+    const { toggleBlock, isBlockActive, toggleInline, isInlineActive } = useEditorCommands(
         editorRef,
         content,
-        cursorPosition,
+        selection.start,
         handleContentChange
     );
 
@@ -95,12 +99,22 @@ function Note() {
                         onChange={handleTitleChange}
                     />
                     {mode === "edit" ? (
-                        <NoteEditor
-                            ref={editorRef}
-                            content={content}
-                            onChange={handleContentChange}
-                            onCursorChange={handleCursorChange}
-                        />
+                        <>
+                            <NoteEditor
+                                ref={editorRef}
+                                content={content}
+                                phantomRef={phantomRef}
+                                onChange={handleContentChange}
+                                onCursorChange={handleCursorChange}
+                            />
+                            <FloatingToolbar
+                                editorRef={editorRef}
+                                isInlineActive={isInlineActive}
+                                phantomRef={phantomRef}
+                                selection={selection}
+                                onToggleInline={toggleInline}
+                            />
+                        </>
                     ) : (
                         <NoteViewer content={content} />
                     )}

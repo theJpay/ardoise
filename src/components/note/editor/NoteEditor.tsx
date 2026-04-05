@@ -4,12 +4,13 @@ import { tokenize } from "./utils";
 
 type NoteEditorProps = {
     content: string;
-    onChange: (newContent: string) => void;
+    phantomRef: RefObject<HTMLDivElement | null>;
     ref: RefObject<HTMLTextAreaElement | null>;
+    onChange: (newContent: string) => void;
     onCursorChange: (e: React.SyntheticEvent<HTMLTextAreaElement>) => void;
 };
 
-function NoteEditor({ content, onChange, onCursorChange, ref }: NoteEditorProps) {
+function NoteEditor({ content, phantomRef, ref, onChange, onCursorChange }: NoteEditorProps) {
     const mirrorRef = useRef<HTMLDivElement | null>(null);
     const className =
         "text-ed-body text-editor-text placeholder:text-dim min-h-[60vh] w-full flex-1 resize-none border-none bg-transparent font-mono font-normal whitespace-pre-wrap outline-none";
@@ -28,6 +29,11 @@ function NoteEditor({ content, onChange, onCursorChange, ref }: NoteEditorProps)
                 className={`ardoise-editor ${className} pointer-events-none absolute inset-0 overflow-hidden`}
                 dangerouslySetInnerHTML={{ __html: tokenize(content) }}
             ></div>
+            <div
+                ref={phantomRef}
+                aria-hidden="true"
+                className={`${className} pointer-events-none invisible absolute inset-0 overflow-hidden`}
+            />
             <textarea
                 ref={ref}
                 className={`${className} caret-accent relative text-transparent`}

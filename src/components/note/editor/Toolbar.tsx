@@ -1,9 +1,11 @@
 import { TOOLBAR_ACTIONS } from "./utils/actions";
 import { TOOLBAR_ACTION_ICONS } from "./utils/icons";
 
+import type { BlockActionName } from "./utils/actions";
+
 type ToolbarProps = {
-    isBlockActive: (actionName: string) => boolean;
-    onToggleBlock: (actionName: string) => void;
+    isBlockActive: (actionName: BlockActionName) => boolean;
+    onToggleBlock: (actionName: BlockActionName) => void;
 };
 
 function Toolbar({ isBlockActive, onToggleBlock }: ToolbarProps) {

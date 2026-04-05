@@ -1,3 +1,5 @@
+import { escapeHtml } from "./escapeHtml";
+
 export function tokenize(content: string): string {
     const lines = content.split("\n");
     const result: string[] = [];
@@ -211,8 +213,4 @@ class InlineTokenizer {
         );
         return this;
     }
-}
-
-function escapeHtml(str: string): string {
-    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
