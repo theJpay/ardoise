@@ -72,7 +72,7 @@ function FloatingToolbar({
                         aria-label={label}
                         className={`flex h-7 w-7 items-center justify-center rounded transition-colors duration-100 ${
                             isInlineActive(name)
-                                ? "text-accent"
+                                ? "text-accent hover:bg-accent-glow"
                                 : "text-muted hover:bg-border hover:text-text"
                         }`}
                         onMouseDown={(e) => {
