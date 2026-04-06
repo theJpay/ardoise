@@ -9,6 +9,7 @@ type NoteEditorProps = {
     phantomRef: RefObject<HTMLDivElement | null>;
     ref: RefObject<HTMLTextAreaElement | null>;
     onChange: (newContent: string) => void;
+    onBlur?: () => void;
     onCursorChange: (e: React.SyntheticEvent<HTMLTextAreaElement>) => void;
     onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
 };
@@ -32,6 +33,7 @@ function NoteEditor({
     content,
     phantomRef,
     ref,
+    onBlur,
     onChange,
     onCursorChange,
     onKeyDown
@@ -60,6 +62,7 @@ function NoteEditor({
                 className={`${className} caret-accent relative overflow-hidden text-transparent`}
                 placeholder="Start writing..."
                 value={content}
+                onBlur={onBlur}
                 onChange={(e) => onChange(e.target.value)}
                 onClick={onCursorChange}
                 onKeyDown={onKeyDown}

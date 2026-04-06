@@ -118,6 +118,7 @@ function Note() {
                                 ref={editorRef}
                                 content={content}
                                 phantomRef={phantomRef}
+                                onBlur={() => setSelection({ start: 0, end: 0 })}
                                 onChange={handleContentChange}
                                 onCursorChange={handleCursorChange}
                                 onKeyDown={handleCommandPaletteKeyDown}
