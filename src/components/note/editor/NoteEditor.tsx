@@ -53,6 +53,7 @@ function NoteEditor({ content, phantomRef, ref, onChange, onCursorChange }: Note
                 placeholder="Start writing..."
                 value={content}
                 onChange={(e) => onChange(e.target.value)}
+                onClick={onCursorChange}
                 onSelect={onCursorChange}
             />
         </div>
