@@ -13,19 +13,19 @@ export function useEditorCommands(
 ) {
     const toggleBlock = useCallback(
         (actionName: BlockActionName) => {
-            if (!editorRef.current) {
+            const textarea = getTextarea(editorRef);
+            if (!textarea) {
                 return;
             }
-            const textarea = editorRef.current;
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
+            const { selectionStart, selectionEnd } = textarea;
             const syntax = getSyntax(actionName);
             const result = toggleBlockAtLineStart(textarea, syntax);
             onChange(result.content);
-            requestAnimationFrame(() => {
-                textarea.focus();
-                textarea.setSelectionRange(start + result.cursorOffset, end + result.cursorOffset);
-            });
+            restoreCursor(
+                textarea,
+                selectionStart + result.cursorOffset,
+                selectionEnd + result.cursorOffset
+            );
         },
         [editorRef, onChange]
     );
@@ -40,23 +40,16 @@ export function useEditorCommands(
 
     const toggleInline = useCallback(
         (actionName: InlineActionName) => {
-            if (!editorRef.current) {
+            const textarea = getTextarea(editorRef);
+            if (!textarea) {
                 return;
             }
-            const textarea = editorRef.current;
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
+            const { value, selectionStart: start, selectionEnd: end } = textarea;
             if (start === end) {
                 return;
             }
             const syntax = getSyntax(actionName);
-            const value = textarea.value;
-
-            const markersBefore = countMarkerRun(value, start, syntax[0], "backward");
-            const markersAfter = countMarkerRun(value, end, syntax[0], "forward");
-            const markerCount = Math.min(markersBefore, markersAfter);
-            const isActive =
-                syntax.length === 1 ? markerCount % 2 === 1 : markerCount >= syntax.length;
+            const isActive = isInlineSyntaxActive(value, start, end, syntax);
 
             let newContent: string;
             let newStart: number;
@@ -81,41 +74,46 @@ export function useEditorCommands(
             }
 
             onChange(newContent);
-            requestAnimationFrame(() => {
-                textarea.focus();
-                textarea.setSelectionRange(newStart, newEnd);
-            });
+            restoreCursor(textarea, newStart, newEnd);
         },
         [editorRef, onChange]
     );
 
     const isInlineActive = useCallback(
         (actionName: InlineActionName) => {
-            if (!editorRef.current) {
+            const textarea = getTextarea(editorRef);
+            if (!textarea) {
                 return false;
             }
-            const textarea = editorRef.current;
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            if (start === end) {
+            const { value, selectionStart, selectionEnd } = textarea;
+            if (selectionStart === selectionEnd) {
                 return false;
             }
             const syntax = getSyntax(actionName);
-            const value = textarea.value;
-
-            const markersBefore = countMarkerRun(value, start, syntax[0], "backward");
-            const markersAfter = countMarkerRun(value, end, syntax[0], "forward");
-            const markerCount = Math.min(markersBefore, markersAfter);
-
-            if (syntax.length === 1) {
-                return markerCount % 2 === 1;
-            }
-            return markerCount >= syntax.length;
+            return isInlineSyntaxActive(value, selectionStart, selectionEnd, syntax);
         },
         [editorRef]
     );
 
     return { toggleBlock, isBlockActive, toggleInline, isInlineActive };
+}
+
+function getTextarea(ref: RefObject<HTMLTextAreaElement | null>): HTMLTextAreaElement | null {
+    return ref.current;
+}
+
+function restoreCursor(textarea: HTMLTextAreaElement, start: number, end: number) {
+    requestAnimationFrame(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start, end);
+    });
+}
+
+function isInlineSyntaxActive(value: string, start: number, end: number, syntax: string): boolean {
+    const markersBefore = countMarkerRun(value, start, syntax[0], "backward");
+    const markersAfter = countMarkerRun(value, end, syntax[0], "forward");
+    const count = Math.min(markersBefore, markersAfter);
+    return syntax.length === 1 ? count % 2 === 1 : count >= syntax.length;
 }
 
 function countMarkerRun(
