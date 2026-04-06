@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router";
 
 import { useEditorActions } from "@stores/editor.store";
 import { useNotesActions } from "@stores/notes.store";
+import { UnreachableError } from "@utils";
 
 import { useCreateNote } from "./useCreateNote";
 
@@ -62,12 +63,6 @@ type GlobalKeyboardAction =
     | "deleteNote"
     | "toggleEditMode"
     | "toggleSidebar";
-
-class UnreachableError extends Error {
-    constructor(value: never) {
-        super(`Unreachable case: ${value}`);
-    }
-}
 
 function areActionKeysPressed(action: GlobalKeyboardAction, e: KeyboardEvent) {
     const isMetaKeyPressed = isMetaKey(e);

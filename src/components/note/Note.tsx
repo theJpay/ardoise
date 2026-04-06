@@ -7,7 +7,14 @@ import { useDebounce } from "@hooks/useDebounce";
 import { useEditorMode } from "@stores/editor.store";
 import { useNotes, useNotesActions } from "@stores/notes.store";
 
-import { FloatingToolbar, NoteEditor, Toolbar, useEditorCommands } from "./editor";
+import {
+    CommandPalette,
+    FloatingToolbar,
+    NoteEditor,
+    Toolbar,
+    useCommandPalette,
+    useEditorCommands
+} from "./editor";
 import NoteFooter from "./NoteFooter";
 import NoteTitle from "./NoteTitle";
 import { NoteViewer } from "./viewer";
@@ -52,6 +59,13 @@ function Note() {
         selection.start,
         handleContentChange
     );
+
+    const {
+        state: commandPaletteState,
+        filteredActions: commandPaletteActions,
+        executeCommand,
+        handleKeyDown: handleCommandPaletteKeyDown
+    } = useCommandPalette(editorRef, content, selection.start, handleContentChange);
 
     useEffect(() => {
         if (selectedNote) {
@@ -106,6 +120,7 @@ function Note() {
                                 phantomRef={phantomRef}
                                 onChange={handleContentChange}
                                 onCursorChange={handleCursorChange}
+                                onKeyDown={handleCommandPaletteKeyDown}
                             />
                             <FloatingToolbar
                                 editorRef={editorRef}
@@ -114,6 +129,16 @@ function Note() {
                                 selection={selection}
                                 onToggleInline={toggleInline}
                             />
+                            {commandPaletteState.isOpen && (
+                                <CommandPalette
+                                    editorRef={editorRef}
+                                    filteredActions={commandPaletteActions}
+                                    phantomRef={phantomRef}
+                                    selectedIndex={commandPaletteState.selectedIndex}
+                                    selection={selection}
+                                    onExecute={executeCommand}
+                                />
+                            )}
                         </>
                     ) : (
                         <NoteViewer content={content} />

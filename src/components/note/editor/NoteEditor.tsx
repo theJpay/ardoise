@@ -10,6 +10,7 @@ type NoteEditorProps = {
     ref: RefObject<HTMLTextAreaElement | null>;
     onChange: (newContent: string) => void;
     onCursorChange: (e: React.SyntheticEvent<HTMLTextAreaElement>) => void;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
 };
 
 /**
@@ -27,7 +28,14 @@ function useAutoGrow(ref: RefObject<HTMLTextAreaElement | null>, content: string
     }, [content, ref]);
 }
 
-function NoteEditor({ content, phantomRef, ref, onChange, onCursorChange }: NoteEditorProps) {
+function NoteEditor({
+    content,
+    phantomRef,
+    ref,
+    onChange,
+    onCursorChange,
+    onKeyDown
+}: NoteEditorProps) {
     const mirrorRef = useRef<HTMLDivElement | null>(null);
     const className =
         "text-ed-body text-editor-text placeholder:text-dim w-full resize-none border-none bg-transparent font-mono font-normal whitespace-pre-wrap outline-none";
@@ -54,6 +62,7 @@ function NoteEditor({ content, phantomRef, ref, onChange, onCursorChange }: Note
                 value={content}
                 onChange={(e) => onChange(e.target.value)}
                 onClick={onCursorChange}
+                onKeyDown={onKeyDown}
                 onSelect={onCursorChange}
             />
         </div>

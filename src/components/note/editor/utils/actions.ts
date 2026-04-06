@@ -5,6 +5,14 @@ export type EditorAction = {
     type: "block" | "inline";
 };
 
+export type CommandPaletteAction = {
+    name: string;
+    syntax: string;
+    label: string;
+    description: string;
+    cursorOffset?: number;
+};
+
 export const TOOLBAR_ACTIONS = [
     { name: "heading-1", syntax: "# ", label: "Heading 1", type: "block" },
     { name: "heading-2", syntax: "## ", label: "Heading 2", type: "block" },
@@ -18,10 +26,27 @@ export const FLOATING_TOOLBAR_ACTIONS = [
     { name: "code", syntax: "`", label: "Inline code", type: "inline" }
 ] as const satisfies readonly EditorAction[];
 
+export const COMMAND_PALETTE_ACTIONS = [
+    { name: "heading-1", syntax: "# ", label: "Heading 1", description: "Large section title" },
+    { name: "heading-2", syntax: "## ", label: "Heading 2", description: "Medium section title" },
+    { name: "heading-3", syntax: "### ", label: "Heading 3", description: "Small section title" },
+    {
+        name: "code-block",
+        syntax: "```\n\n```",
+        label: "Code block",
+        description: "Fenced code",
+        cursorOffset: 4
+    },
+    { name: "quote", syntax: "> ", label: "Quote", description: "Block quotation" },
+    { name: "hr", syntax: "---\n", label: "Horizontal rule", description: "Section divider" },
+    { name: "task-list", syntax: "- [ ] ", label: "Task list", description: "Checkbox item" }
+] satisfies readonly CommandPaletteAction[];
+
 export const ALL_ACTIONS = [...TOOLBAR_ACTIONS, ...FLOATING_TOOLBAR_ACTIONS] as const;
 
 export type BlockActionName = (typeof TOOLBAR_ACTIONS)[number]["name"];
 export type InlineActionName = (typeof FLOATING_TOOLBAR_ACTIONS)[number]["name"];
+export type CommandPaletteActionName = (typeof COMMAND_PALETTE_ACTIONS)[number]["name"];
 export type ActionName = (typeof ALL_ACTIONS)[number]["name"];
 
 export const BLOCK_SYNTAXES = TOOLBAR_ACTIONS.map((a) => a.syntax).toSorted(

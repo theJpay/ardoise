@@ -1,0 +1,170 @@
+import { useCallback, useEffect, useReducer } from "react";
+
+import { UnreachableError } from "@utils";
+
+import { COMMAND_PALETTE_ACTIONS } from "./utils/actions";
+
+import type { RefObject } from "react";
+
+type State = {
+    isOpen: boolean;
+    filter: string;
+    selectedIndex: number;
+};
+
+type Action =
+    | { type: "open"; filter: string }
+    | { type: "close" }
+    | { type: "filter"; value: string }
+    | { type: "navigate"; direction: "up" | "down"; count: number };
+
+export function useCommandPalette(
+    editorRef: RefObject<HTMLTextAreaElement | null>,
+    content: string,
+    cursorPosition: number,
+    onChange: (newContent: string) => void
+) {
+    const [state, dispatch] = useReducer(reducer, getInitialState());
+
+    const filteredActions = COMMAND_PALETTE_ACTIONS.filter(
+        (action) =>
+            action.label.toLowerCase().includes(state.filter.toLowerCase()) ||
+            action.name.includes(state.filter.toLowerCase())
+    );
+
+    useEffect(() => {
+        const filter = getSlashContext(content, cursorPosition);
+        if (filter !== null) {
+            if (!state.isOpen) {
+                dispatch({ type: "open", filter });
+            } else {
+                dispatch({ type: "filter", value: filter });
+            }
+        } else if (state.isOpen) {
+            dispatch({ type: "close" });
+        }
+    }, [content, cursorPosition, state.isOpen]);
+
+    const executeCommand = useCallback(
+        (actionName: string) => {
+            const action = COMMAND_PALETTE_ACTIONS.find((a) => a.name === actionName);
+            if (!action || !editorRef.current) {
+                return;
+            }
+            const textarea = editorRef.current;
+            const value = textarea.value;
+            const lineStart = value.lastIndexOf("\n", cursorPosition - 1) + 1;
+
+            const newContent =
+                value.slice(0, lineStart) + action.syntax + value.slice(cursorPosition);
+            const newCursorPos = lineStart + (action.cursorOffset ?? action.syntax.length);
+
+            onChange(newContent);
+            dispatch({ type: "close" });
+
+            requestAnimationFrame(() => {
+                textarea.focus();
+                textarea.setSelectionRange(newCursorPos, newCursorPos);
+            });
+        },
+        [editorRef, cursorPosition, onChange]
+    );
+
+    const dismissAndClean = useCallback(() => {
+        if (!editorRef.current) {
+            return;
+        }
+        const textarea = editorRef.current;
+        const value = textarea.value;
+        const lineStart = value.lastIndexOf("\n", cursorPosition - 1) + 1;
+        const newContent = value.slice(0, lineStart) + value.slice(cursorPosition);
+
+        onChange(newContent);
+        dispatch({ type: "close" });
+
+        requestAnimationFrame(() => {
+            textarea.focus();
+            textarea.setSelectionRange(lineStart, lineStart);
+        });
+    }, [editorRef, cursorPosition, onChange]);
+
+    const handleKeyDown = useCallback(
+        (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+            if (!state.isOpen) {
+                return false;
+            }
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                dispatch({
+                    type: "navigate",
+                    direction: "down",
+                    count: filteredActions.length
+                });
+                return true;
+            }
+            if (e.key === "ArrowUp") {
+                e.preventDefault();
+                dispatch({
+                    type: "navigate",
+                    direction: "up",
+                    count: filteredActions.length
+                });
+                return true;
+            }
+            if (e.key === "Enter" || e.key === "Tab") {
+                e.preventDefault();
+                const selected = filteredActions[state.selectedIndex];
+                if (selected) {
+                    executeCommand(selected.name);
+                }
+                return true;
+            }
+            if (e.key === "Escape") {
+                e.preventDefault();
+                dismissAndClean();
+                return true;
+            }
+            return false;
+        },
+        [state.isOpen, state.selectedIndex, filteredActions, executeCommand, dismissAndClean]
+    );
+
+    return { state, filteredActions, executeCommand, handleKeyDown };
+}
+
+function reducer(state: State, action: Action): State {
+    switch (action.type) {
+        case "open":
+            return { isOpen: true, filter: action.filter, selectedIndex: 0 };
+        case "close":
+            return getInitialState();
+        case "filter":
+            return { ...state, filter: action.value, selectedIndex: 0 };
+        case "navigate": {
+            const offset = action.direction === "down" ? 1 : -1;
+            const next = (state.selectedIndex + offset + action.count) % action.count;
+            return { ...state, selectedIndex: next };
+        }
+        default:
+            throw new UnreachableError(action);
+    }
+}
+
+function getInitialState(): State {
+    return {
+        isOpen: false,
+        filter: "",
+        selectedIndex: 0
+    };
+}
+
+function getSlashContext(value: string, cursorPosition: number): string | null {
+    const lineStart = value.lastIndexOf("\n", cursorPosition - 1) + 1;
+    const lineBeforeCursor = value.slice(lineStart, cursorPosition);
+    const match = lineBeforeCursor.match(/^\/([a-zA-Z-]*)$/);
+    if (!match) {
+        return null;
+    }
+    return match[1];
+}
