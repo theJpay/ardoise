@@ -51,8 +51,8 @@ export const COMMAND_PALETTE_ACTIONS = [
         cursorOffset: 4
     },
     { name: "quote", syntax: "> ", label: "Quote", description: "Block quotation" },
-    { name: "hr", syntax: "---\n", label: "Horizontal rule", description: "Section divider" },
-    { name: "task-list", syntax: "- [ ] ", label: "Task list", description: "Checkbox item" }
+    { name: "task-list", syntax: "- [ ] ", label: "Task list", description: "Checkbox item" },
+    { name: "hr", syntax: "---\n", label: "Horizontal rule", description: "Section divider" }
 ] satisfies readonly CommandPaletteAction[];
 
 export const ALL_ACTIONS = [...TOOLBAR_ACTIONS, ...FLOATING_TOOLBAR_ACTIONS] as const;
