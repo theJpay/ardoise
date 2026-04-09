@@ -56,7 +56,11 @@ export default defineConfig([
                         "type"
                     ],
                     pathGroups: [
-                        { pattern: "@{assets,components,entities,hooks,queries,services,stores,utils}{,/**}", group: "internal" }
+                        {
+                            pattern:
+                                "@{assets,components,entities,hooks,queries,services,stores,utils}{,/**}",
+                            group: "internal"
+                        }
                     ],
                     pathGroupsExcludedImportTypes: ["type"],
                     alphabetize: { order: "asc", caseInsensitive: true },

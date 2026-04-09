@@ -16,8 +16,8 @@ function SearchBar({ value, onChange, ref }: SearchBarProps) {
             <Search className="text-dim shrink-0" size={12} strokeWidth={1.5} />
             <input
                 ref={ref}
-                className="text-ui-sm text-text placeholder:text-dim flex-1 bg-transparent font-mono outline-none"
                 aria-label="Search notes"
+                className="text-ui-sm text-text placeholder:text-dim flex-1 bg-transparent font-mono outline-none"
                 placeholder="Search..."
                 type="search"
                 value={value}

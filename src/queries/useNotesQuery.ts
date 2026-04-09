@@ -6,30 +6,32 @@ import { queryClient } from "../queryClient";
 
 import type { Note } from "@entities";
 
+const NOTES_KEY = ["notes"] as const;
+
 export function useNotesQuery() {
     const { isPending, error, data } = useQuery<Note[]>({
-        queryKey: ["notes"],
+        queryKey: NOTES_KEY,
         queryFn: getNotes
     });
 
     const createNoteMutation = useMutation({
         mutationFn: createNote,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["notes"] });
+            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
         }
     });
 
     const updateNoteMutation = useMutation({
         mutationFn: ({ id, fields }: UpdateMutationArgs) => updateNote(id, fields),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["notes"] });
+            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
         }
     });
 
     const deleteNoteMutation = useMutation({
         mutationFn: deleteNote,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["notes"] });
+            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
         }
     });
 

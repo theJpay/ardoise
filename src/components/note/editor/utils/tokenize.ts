@@ -57,7 +57,7 @@ function tokenizeHeading(line: string): string | null {
     const contentClass = level <= 4 ? "ed-heading" : level === 5 ? "ed-h5" : "ed-h6";
     return (
         `<span class="ed-token-dim">${escapeHtml(hashes)} </span>` +
-        `<span class="${contentClass}">${escapeHtml(content)}</span>`
+        `<span class="${contentClass}">${inlineTokenize(escapeHtml(content))}</span>`
     );
 }
 
