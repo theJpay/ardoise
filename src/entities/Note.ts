@@ -4,4 +4,5 @@ export type Note = {
     title: string;
     createdAt: Date;
     updatedAt: Date;
+    deletedAt: Date | null;
 };

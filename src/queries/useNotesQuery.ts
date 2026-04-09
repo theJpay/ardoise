@@ -47,5 +47,5 @@ export function useNotesQuery() {
 
 type UpdateMutationArgs = {
     id: string;
-    fields: Partial<Omit<Note, "id" | "createdAt" | "updatedAt">>;
+    fields: Partial<Omit<Note, "id" | "createdAt" | "updatedAt" | "deletedAt">>;
 };

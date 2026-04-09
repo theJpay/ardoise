@@ -1,76 +1,50 @@
+import db from "./db";
+
 import type { Note } from "@entities";
 
-type NoteDTO = {
-    id: string;
-    content: string;
-    title: string;
-    createdAt: string;
-    updatedAt: string;
-};
-
 export async function getNotes(): Promise<Note[]> {
-    const localNotes = localStorage.getItem("notes");
-
-    if (!localNotes) {
-        return [];
-    }
-
-    const rawNotes: NoteDTO[] = JSON.parse(localNotes);
-    return rawNotes.map((note) => ({
-        ...note,
-        createdAt: new Date(note.createdAt),
-        updatedAt: new Date(note.updatedAt)
-    }));
+    return await db.notes.filter((note) => note.deletedAt === null).toArray();
 }
 
 export async function createNote(
-    note: Omit<Note, "id" | "createdAt" | "updatedAt">
+    partialNote: Omit<Note, "id" | "createdAt" | "updatedAt" | "deletedAt">
 ): Promise<Note> {
-    const newNote: Note = {
-        ...note,
+    const newNoteId = await db.notes.add({
+        ...partialNote,
         id: crypto.randomUUID(),
         createdAt: new Date(),
-        updatedAt: new Date()
-    };
+        updatedAt: new Date(),
+        deletedAt: null
+    });
 
-    const notes = await getNotes();
-    localStorage.setItem("notes", JSON.stringify([...notes, newNote]));
+    const newNote = await db.notes.get(newNoteId);
 
+    if (!newNote) {
+        throw new Error("Failed to retrieve the newly created note");
+    }
     return newNote;
 }
 
 export async function updateNote(
     id: string,
-    updatedFields: Partial<Omit<Note, "id" | "createdAt" | "updatedAt">>
-): Promise<Note | null> {
-    const notes = await getNotes();
-    const noteIndex = notes.findIndex((n) => n.id === id);
+    updatedFields: Partial<Omit<Note, "id" | "createdAt" | "updatedAt" | "deletedAt">>
+): Promise<Note> {
+    const nbUpdated = await db.notes.update(id, { ...updatedFields, updatedAt: new Date() });
 
-    if (noteIndex === -1) {
-        return null;
+    if (nbUpdated === 0) {
+        throw new Error(`Note with id ${id} not found`);
     }
 
-    const updatedNote = {
-        ...notes[noteIndex],
-        ...updatedFields,
-        updatedAt: new Date()
-    };
+    const updatedNote = await db.notes.get(id);
 
-    notes[noteIndex] = updatedNote;
-    localStorage.setItem("notes", JSON.stringify(notes));
-
+    if (!updatedNote) {
+        throw new Error("Failed to retrieve the updated note");
+    }
     return updatedNote;
 }
 
 export async function deleteNote(id: string): Promise<boolean> {
-    const notes = await getNotes();
-    const newNotes = notes.filter((n) => n.id !== id);
+    const nbUpdated = await db.notes.update(id, { deletedAt: new Date() });
 
-    const hasNoteBeenDeleted = newNotes.length < notes.length;
-    if (!hasNoteBeenDeleted) {
-        return false;
-    }
-
-    localStorage.setItem("notes", JSON.stringify(newNotes));
-    return true;
+    return nbUpdated > 0;
 }
