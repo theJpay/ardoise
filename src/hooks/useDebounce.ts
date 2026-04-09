@@ -1,9 +1,9 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useDebounce<T extends (...args: any[]) => unknown>(
     callback: T,
-    delay: number = 1000
+    delay: number = 300
 ): { debouncedCallback: (...args: Parameters<T>) => void } {
     const timeoutRef = useRef<number>(null);
 
@@ -18,6 +18,14 @@ export function useDebounce<T extends (...args: any[]) => unknown>(
         },
         [callback, delay]
     );
+
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
 
     return { debouncedCallback };
 }

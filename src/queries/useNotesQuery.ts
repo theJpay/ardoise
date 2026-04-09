@@ -39,7 +39,7 @@ export function useNotesQuery() {
         notes: data ?? [],
         createNote: createNoteMutation.mutateAsync,
         updateNote: updateNoteMutation.mutate,
-        deleteNote: deleteNoteMutation.mutate
+        deleteNote: deleteNoteMutation.mutateAsync
     };
 }
 

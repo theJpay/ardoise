@@ -17,6 +17,7 @@ function SearchBar({ value, onChange, ref }: SearchBarProps) {
             <input
                 ref={ref}
                 className="text-ui-sm text-text placeholder:text-dim flex-1 bg-transparent font-mono outline-none"
+                aria-label="Search notes"
                 placeholder="Search..."
                 type="search"
                 value={value}
@@ -24,6 +25,7 @@ function SearchBar({ value, onChange, ref }: SearchBarProps) {
             />
             {hasValue ? (
                 <button
+                    aria-label="Clear search"
                     className="text-subtle hover:text-muted flex shrink-0 items-center"
                     onClick={() => onChange("")}
                 >
