@@ -3,7 +3,11 @@ import db from "./db";
 import type { Note } from "@entities";
 
 export async function getNotes(): Promise<Note[]> {
-    return await db.notes.filter((note) => note.deletedAt === null).toArray();
+    return await db.notes
+        .orderBy("updatedAt")
+        .reverse()
+        .filter((note) => note.deletedAt === null)
+        .toArray();
 }
 
 export async function createNote(
