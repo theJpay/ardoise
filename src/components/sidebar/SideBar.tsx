@@ -1,9 +1,9 @@
 import { FileText, Search } from "lucide-react";
 
 import { AddNoteButton, EmptyState } from "@components/generics";
-import { useCreateNote } from "@hooks/useCreateNote";
+import { useAddNote } from "@hooks/useAddNote";
 import { useNoteSearch } from "@hooks/useNoteSearch";
-import { useNotes } from "@stores/notes.store";
+import { useNotesQuery } from "@queries/useNotesQuery";
 
 import NoteList from "./NoteList";
 import SearchBar from "./SearchBar";
@@ -11,15 +11,14 @@ import SearchBar from "./SearchBar";
 import type { RefObject } from "react";
 
 type SideBarProps = {
-    isLoading: boolean;
     searchRef: RefObject<HTMLInputElement | null>;
 };
 
-function SideBar({ isLoading, searchRef }: SideBarProps) {
-    const notes = useNotes();
+function SideBar({ searchRef }: SideBarProps) {
+    const { notes, isPending } = useNotesQuery();
     const { search, setSearch, filteredNotes } = useNoteSearch(notes);
 
-    const { createNote } = useCreateNote();
+    const { addNote } = useAddNote();
 
     const noNotes = notes.length === 0;
     const noSearchResults = filteredNotes.length === 0 && search.trim() !== "";
@@ -28,13 +27,13 @@ function SideBar({ isLoading, searchRef }: SideBarProps) {
         <div className="flex h-full flex-col">
             <div className="border-border-soft flex shrink-0 flex-col gap-2 border-b p-3">
                 <SearchBar ref={searchRef} value={search} onChange={setSearch} />
-                <AddNoteButton onClick={createNote} />
+                <AddNoteButton onClick={addNote} />
             </div>
 
             <div className="text-ui-xs text-dim shrink-0 px-3 pt-2.5 pb-0.5 font-mono">Notes</div>
 
             <div className="flex flex-1 flex-col overflow-y-auto">
-                {isLoading ? (
+                {isPending ? (
                     <div className="flex flex-col gap-0.5 p-2">
                         {[1, 2, 3].map((i) => (
                             <div key={i} className="bg-elevated h-8 animate-pulse rounded-md" />
@@ -42,7 +41,7 @@ function SideBar({ isLoading, searchRef }: SideBarProps) {
                     </div>
                 ) : noNotes ? (
                     <EmptyState
-                        action={<AddNoteButton onClick={createNote} />}
+                        action={<AddNoteButton onClick={addNote} />}
                         body="Start writing something. It stays on your device."
                         icon={<FileText size={16} strokeWidth={1.5} />}
                         title="No notes yet"

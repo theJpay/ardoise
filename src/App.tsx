@@ -1,12 +1,10 @@
 import { Outlet } from "react-router";
 
 import { Rail, SideBar } from "@components";
-import { useInitNotes } from "@hooks/useInitNotes";
 import { useRegisterGlobalShortcuts } from "@hooks/useRegisterGlobalShortcuts";
 import { useIsSidebarOpen } from "@stores/editor.store";
 
 function App() {
-    const { isLoading } = useInitNotes();
     const { searchRef } = useRegisterGlobalShortcuts();
     const isSidebarOpen = useIsSidebarOpen();
 
@@ -22,7 +20,7 @@ function App() {
                 aria-label="Sidebar"
                 className="bg-surface border-border flex flex-col overflow-hidden border-r"
             >
-                <SideBar isLoading={isLoading} searchRef={searchRef} />
+                <SideBar searchRef={searchRef} />
             </aside>
             <main className="bg-editor-bg h-screen overflow-auto">
                 <Outlet />

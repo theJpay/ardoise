@@ -1,18 +1,18 @@
 import { useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router";
 
+import { useNotesQuery } from "@queries/useNotesQuery";
 import { useEditorActions } from "@stores/editor.store";
-import { useNotesActions } from "@stores/notes.store";
 import { UnreachableError } from "@utils";
 
-import { useCreateNote } from "./useCreateNote";
+import { useAddNote } from "./useAddNote";
 
 export function useRegisterGlobalShortcuts() {
     const navigate = useNavigate();
     const { noteId } = useParams();
-    const { createNote } = useCreateNote();
+    const { addNote } = useAddNote();
+    const { deleteNote } = useNotesQuery();
     const { toggleSidebar, toggleMode } = useEditorActions();
-    const { removeNote } = useNotesActions();
     const searchRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -25,16 +25,16 @@ export function useRegisterGlobalShortcuts() {
                 event.preventDefault();
                 searchRef.current?.focus();
             }
-            if (areActionKeysPressed("createNote", event)) {
+            if (areActionKeysPressed("addNote", event)) {
                 event.preventDefault();
-                createNote();
+                await addNote();
             }
-            if (areActionKeysPressed("deleteNote", event)) {
+            if (areActionKeysPressed("removeNote", event)) {
                 if (!noteId) {
                     return;
                 }
                 event.preventDefault();
-                await removeNote(noteId);
+                await deleteNote(noteId);
                 navigate(`/`);
             }
             if (areActionKeysPressed("toggleSidebar", event)) {
@@ -52,15 +52,15 @@ export function useRegisterGlobalShortcuts() {
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
         };
-    }, [navigate, noteId, removeNote, toggleSidebar, toggleMode, createNote]);
+    }, [navigate, noteId, addNote, deleteNote, toggleSidebar, toggleMode]);
 
     return { searchRef };
 }
 
 type GlobalKeyboardAction =
     | "focusSearch"
-    | "createNote"
-    | "deleteNote"
+    | "addNote"
+    | "removeNote"
     | "toggleEditMode"
     | "toggleSidebar";
 
@@ -70,9 +70,9 @@ function areActionKeysPressed(action: GlobalKeyboardAction, e: KeyboardEvent) {
     switch (action) {
         case "focusSearch":
             return isMetaKeyPressed && e.key.toLowerCase() === "k";
-        case "createNote":
+        case "addNote":
             return !isMetaKeyPressed && e.key.toLowerCase() === "c";
-        case "deleteNote":
+        case "removeNote":
             return isMetaKeyPressed && e.key.toLowerCase() === "backspace";
         case "toggleEditMode":
             return isMetaKeyPressed && e.key.toLowerCase() === "e";

@@ -4,8 +4,8 @@ import { useParams } from "react-router";
 
 import { EmptyState } from "@components/generics";
 import { useDebounce } from "@hooks/useDebounce";
+import { useNotesQuery } from "@queries/useNotesQuery";
 import { useEditorMode } from "@stores/editor.store";
-import { useNotes, useNotesActions } from "@stores/notes.store";
 
 import {
     CommandPalette,
@@ -16,21 +16,22 @@ import {
     useEditorCommands
 } from "./editor";
 import NoteFooter from "./NoteFooter";
+import NoteLoadingSkeleton from "./NoteLoadingSkeleton";
 import NoteTitle from "./NoteTitle";
 import { NoteViewer } from "./viewer";
 
 function Note() {
     const { noteId } = useParams<{ noteId: string }>();
+    const { notes, isPending, updateNote } = useNotesQuery();
 
     const mode = useEditorMode();
-    const selectedNote = useNotes().find((note) => note.id === noteId);
+    const selectedNote = notes.find((note) => note.id === noteId);
 
-    const { updateNote } = useNotesActions();
     const { debouncedCallback: debouncedUpdateTitle } = useDebounce(
-        (noteId: string, title: string) => updateNote(noteId, { title })
+        (noteId: string, title: string) => updateNote({ id: noteId, fields: { title } })
     );
     const { debouncedCallback: debouncedUpdateContent } = useDebounce(
-        (noteId: string, content: string) => updateNote(noteId, { content })
+        (noteId: string, content: string) => updateNote({ id: noteId, fields: { content } })
     );
 
     const [title, setTitle] = useState("");
@@ -74,6 +75,10 @@ function Note() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedNote?.id]);
+
+    if (isPending) {
+        return <NoteLoadingSkeleton />;
+    }
 
     if (!selectedNote) {
         return (
