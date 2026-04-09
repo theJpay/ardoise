@@ -3,6 +3,7 @@ import { useCallback, useEffect, useReducer } from "react";
 import { UnreachableError } from "@utils";
 
 import { COMMAND_PALETTE_ACTIONS } from "./utils/actions";
+import { replaceRange } from "./utils/replaceRange";
 
 import type { RefObject } from "react";
 
@@ -52,20 +53,17 @@ export function useCommandPalette(
                 return;
             }
             const textarea = editorRef.current;
-            const value = textarea.value;
-            const lineStart = value.lastIndexOf("\n", cursorPosition - 1) + 1;
-
-            const newContent =
-                value.slice(0, lineStart) + action.syntax + value.slice(cursorPosition);
+            const lineStart = textarea.value.lastIndexOf("\n", cursorPosition - 1) + 1;
             const newCursorPos = lineStart + (action.cursorOffset ?? action.syntax.length);
 
-            onChange(newContent);
-            dispatch({ type: "close" });
-
-            requestAnimationFrame(() => {
-                textarea.focus();
-                textarea.setSelectionRange(newCursorPos, newCursorPos);
+            replaceRange(textarea, {
+                start: lineStart,
+                end: cursorPosition,
+                text: action.syntax,
+                onChange,
+                cursor: { start: newCursorPos }
             });
+            dispatch({ type: "close" });
         },
         [editorRef, cursorPosition, onChange]
     );
@@ -75,17 +73,16 @@ export function useCommandPalette(
             return;
         }
         const textarea = editorRef.current;
-        const value = textarea.value;
-        const lineStart = value.lastIndexOf("\n", cursorPosition - 1) + 1;
-        const newContent = value.slice(0, lineStart) + value.slice(cursorPosition);
+        const lineStart = textarea.value.lastIndexOf("\n", cursorPosition - 1) + 1;
 
-        onChange(newContent);
-        dispatch({ type: "close" });
-
-        requestAnimationFrame(() => {
-            textarea.focus();
-            textarea.setSelectionRange(lineStart, lineStart);
+        replaceRange(textarea, {
+            start: lineStart,
+            end: cursorPosition,
+            text: "",
+            onChange,
+            cursor: { start: lineStart }
         });
+        dispatch({ type: "close" });
     }, [editorRef, cursorPosition, onChange]);
 
     const handleKeyDown = useCallback(

@@ -37,6 +37,7 @@ function Note() {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [selection, setSelection] = useState({ start: 0, end: 0 });
+    const [focused, setFocused] = useState(false);
     const editorRef = useRef<HTMLTextAreaElement>(null);
     const phantomRef = useRef<HTMLDivElement>(null);
 
@@ -54,12 +55,8 @@ function Note() {
         });
     };
 
-    const { toggleBlock, isBlockActive, toggleInline, isInlineActive } = useEditorCommands(
-        editorRef,
-        content,
-        selection.start,
-        handleContentChange
-    );
+    const { toggleBlock, isBlockActive, toggleInline, isInlineActive, toggleLink } =
+        useEditorCommands(editorRef, content, selection.start, handleContentChange);
 
     const {
         state: commandPaletteState,
@@ -123,21 +120,24 @@ function Note() {
                                 ref={editorRef}
                                 content={content}
                                 phantomRef={phantomRef}
-                                onBlur={() => setSelection({ start: 0, end: 0 })}
+                                onBlur={() => setFocused(false)}
                                 onChange={handleContentChange}
                                 onCursorChange={handleCursorChange}
+                                onFocus={() => setFocused(true)}
                                 onKeyDown={handleCommandPaletteKeyDown}
                             />
                             <FloatingToolbar
-                                editorRef={editorRef}
+                                content={content}
+                                editorFocused={focused}
                                 isInlineActive={isInlineActive}
                                 phantomRef={phantomRef}
                                 selection={selection}
                                 onToggleInline={toggleInline}
+                                onToggleLink={toggleLink}
                             />
                             {commandPaletteState.isOpen && (
                                 <CommandPalette
-                                    editorRef={editorRef}
+                                    content={content}
                                     filteredActions={commandPaletteActions}
                                     phantomRef={phantomRef}
                                     selectedIndex={commandPaletteState.selectedIndex}

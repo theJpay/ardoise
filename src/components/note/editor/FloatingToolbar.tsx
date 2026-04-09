@@ -1,57 +1,54 @@
-import { computePosition, flip, offset } from "@floating-ui/react";
-import { useCallback, useRef } from "react";
+import { Fragment } from "react";
 
-import { FLOATING_TOOLBAR_ACTIONS } from "./utils/actions";
-import { getSelectionRect } from "./utils/getSelectionRect";
+import { useFloatingPosition } from "./useFloatingPosition";
+import { FLOATING_TOOLBAR_ACTION_GROUPS, FLOATING_TOOLBAR_ACTIONS } from "./utils/actions";
 import { FLOATING_TOOLBAR_ACTION_ICONS } from "./utils/icons";
 
 import type { InlineActionName } from "./utils/actions";
 import type { RefObject } from "react";
 
 type FloatingToolbarProps = {
-    editorRef: RefObject<HTMLTextAreaElement | null>;
+    content: string;
+    editorFocused: boolean;
     phantomRef: RefObject<HTMLDivElement | null>;
     selection: { start: number; end: number };
     isInlineActive: (actionName: InlineActionName) => boolean;
     onToggleInline: (actionName: InlineActionName) => void;
+    onToggleLink: () => void;
 };
 
 function FloatingToolbar({
-    editorRef,
+    content,
+    editorFocused,
     phantomRef,
     selection,
     isInlineActive,
-    onToggleInline
+    onToggleInline,
+    onToggleLink
 }: FloatingToolbarProps) {
     const hasSelection = selection.start !== selection.end;
-    const floatingRef = useRef<HTMLDivElement>(null);
+    const visible = hasSelection && editorFocused;
 
-    const setFloatingRef = useCallback(
-        (node: HTMLDivElement | null) => {
-            floatingRef.current = node;
-            if (!node || !hasSelection || !phantomRef.current || !editorRef.current) {
-                return;
-            }
-            const rect = getSelectionRect(phantomRef.current, editorRef.current, selection);
-            if (!rect) {
-                return;
-            }
-            const virtualEl = { getBoundingClientRect: () => rect };
-            computePosition(virtualEl, node, {
-                placement: "top",
-                middleware: [offset(8), flip()]
-            }).then(({ x, y }) => {
-                node.style.transform = `translate(${x}px, ${y}px)`;
-                node.style.opacity = "1";
-                node.style.pointerEvents = "auto";
-            });
-        },
-        [hasSelection, phantomRef, editorRef, selection]
-    );
+    const setFloatingRef = useFloatingPosition({
+        measureRef: phantomRef,
+        content,
+        selection,
+        placement: "top",
+        offset: 8,
+        visible
+    });
 
-    if (!hasSelection) {
+    if (!visible) {
         return null;
     }
+
+    const handleAction = (name: InlineActionName) => {
+        if (name === "link") {
+            onToggleLink();
+        } else {
+            onToggleInline(name);
+        }
+    };
 
     return (
         <div
@@ -65,24 +62,33 @@ function FloatingToolbar({
                 pointerEvents: "none"
             }}
         >
-            {FLOATING_TOOLBAR_ACTIONS.map(({ name, label }, index) => (
-                <div key={name} className="flex items-center">
-                    {index === 2 && <div className="bg-border mx-0.5 h-3.5 w-px" />}
-                    <button
-                        aria-label={label}
-                        className={`flex h-7 w-7 items-center justify-center rounded transition-colors duration-100 ${
-                            isInlineActive(name)
-                                ? "text-accent hover:bg-accent-glow"
-                                : "text-muted hover:bg-border hover:text-text"
-                        }`}
-                        onMouseDown={(e) => {
-                            e.preventDefault();
-                            onToggleInline(name);
-                        }}
-                    >
-                        {FLOATING_TOOLBAR_ACTION_ICONS[name]}
-                    </button>
-                </div>
+            {FLOATING_TOOLBAR_ACTION_GROUPS.map((group, groupIndex) => (
+                <Fragment key={groupIndex}>
+                    {groupIndex > 0 && <div className="bg-border mx-0.5 h-3.5 w-px" />}
+                    {group.map((name) => {
+                        const action = FLOATING_TOOLBAR_ACTIONS.find((a) => a.name === name);
+                        if (!action) {
+                            return null;
+                        }
+                        return (
+                            <button
+                                key={name}
+                                aria-label={action.label}
+                                className={`flex h-7 w-7 items-center justify-center rounded transition-colors duration-100 ${
+                                    isInlineActive(name)
+                                        ? "text-accent hover:bg-accent-glow"
+                                        : "text-muted hover:bg-border hover:text-text"
+                                }`}
+                                onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    handleAction(name);
+                                }}
+                            >
+                                {FLOATING_TOOLBAR_ACTION_ICONS[name]}
+                            </button>
+                        );
+                    })}
+                </Fragment>
             ))}
         </div>
     );

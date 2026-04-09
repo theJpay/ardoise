@@ -1,14 +1,11 @@
-import { computePosition, flip, offset } from "@floating-ui/react";
-import { useCallback, useRef } from "react";
-
-import { getSelectionRect } from "./utils/getSelectionRect";
+import { useFloatingPosition } from "./useFloatingPosition";
 import { COMMAND_PALETTE_ACTION_ICONS } from "./utils/icons";
 
 import type { CommandPaletteAction } from "./utils/actions";
 import type { RefObject } from "react";
 
 type CommandPaletteProps = {
-    editorRef: RefObject<HTMLTextAreaElement | null>;
+    content: string;
     filteredActions: readonly CommandPaletteAction[];
     phantomRef: RefObject<HTMLDivElement | null>;
     selectedIndex: number;
@@ -17,36 +14,20 @@ type CommandPaletteProps = {
 };
 
 function CommandPalette({
-    editorRef,
+    content,
     filteredActions,
     phantomRef,
     selectedIndex,
     selection,
     onExecute
 }: CommandPaletteProps) {
-    const floatingRef = useRef<HTMLDivElement>(null);
-
-    const setFloatingRef = useCallback(
-        (node: HTMLDivElement | null) => {
-            floatingRef.current = node;
-            if (!node || !phantomRef.current || !editorRef.current) {
-                return;
-            }
-            const rect = getSelectionRect(phantomRef.current, editorRef.current, selection);
-            if (!rect) {
-                return;
-            }
-            const virtualEl = { getBoundingClientRect: () => rect };
-            computePosition(virtualEl, node, {
-                placement: "bottom-start",
-                middleware: [offset(4), flip()]
-            }).then(({ x, y }) => {
-                node.style.transform = `translate(${x}px, ${y}px)`;
-                node.style.opacity = "1";
-            });
-        },
-        [phantomRef, editorRef, selection]
-    );
+    const setFloatingRef = useFloatingPosition({
+        measureRef: phantomRef,
+        content,
+        selection,
+        placement: "bottom-start",
+        offset: 4
+    });
 
     if (filteredActions.length === 0) {
         return null;
@@ -77,9 +58,6 @@ function CommandPalette({
                         onMouseDown={(e) => {
                             e.preventDefault();
                             onExecute(action.name);
-                        }}
-                        onMouseEnter={() => {
-                            /* selectedIndex is controlled by parent via keyboard */
                         }}
                     >
                         <div

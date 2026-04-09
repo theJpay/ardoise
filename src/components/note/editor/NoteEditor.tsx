@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { tokenize } from "./utils";
 
@@ -10,6 +10,7 @@ type NoteEditorProps = {
     ref: RefObject<HTMLTextAreaElement | null>;
     onChange: (newContent: string) => void;
     onBlur?: () => void;
+    onFocus?: () => void;
     onCursorChange: (e: React.SyntheticEvent<HTMLTextAreaElement>) => void;
     onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
 };
@@ -34,6 +35,7 @@ function NoteEditor({
     phantomRef,
     ref,
     onBlur,
+    onFocus,
     onChange,
     onCursorChange,
     onKeyDown
@@ -43,6 +45,7 @@ function NoteEditor({
         "text-ed-body text-editor-text placeholder:text-dim w-full resize-none border-none bg-transparent font-mono font-normal whitespace-pre-wrap outline-none";
 
     useAutoGrow(ref, content);
+    const tokenizedHtml = useMemo(() => tokenize(content), [content]);
 
     return (
         <div className="relative w-full">
@@ -50,7 +53,7 @@ function NoteEditor({
                 ref={mirrorRef}
                 aria-hidden="true"
                 className={`ardoise-editor ${className} pointer-events-none absolute inset-0`}
-                dangerouslySetInnerHTML={{ __html: tokenize(content) }}
+                dangerouslySetInnerHTML={{ __html: tokenizedHtml }}
             ></div>
             <div
                 ref={phantomRef}
@@ -65,6 +68,7 @@ function NoteEditor({
                 onBlur={onBlur}
                 onChange={(e) => onChange(e.target.value)}
                 onClick={onCursorChange}
+                onFocus={onFocus}
                 onKeyDown={onKeyDown}
                 onSelect={onCursorChange}
             />

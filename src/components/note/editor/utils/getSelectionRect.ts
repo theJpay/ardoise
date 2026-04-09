@@ -3,20 +3,18 @@ import { escapeHtml } from "./escapeHtml";
 type Selection = { start: number; end: number };
 
 export function getSelectionRect(
-    phantomEl: HTMLDivElement,
-    textareaEl: HTMLTextAreaElement,
+    measureEl: HTMLDivElement,
+    content: string,
     selection: Selection
 ): DOMRect | null {
-    const text = textareaEl.value;
-    const before = escapeHtml(text.slice(0, selection.start));
-    const selected = escapeHtml(text.slice(selection.start, selection.end));
-    const after = escapeHtml(text.slice(selection.end));
+    const before = escapeHtml(content.slice(0, selection.start));
+    const selected = escapeHtml(content.slice(selection.start, selection.end));
+    const after = escapeHtml(content.slice(selection.end));
 
-    phantomEl.innerHTML = `${before}<span id="sel-start"></span>${selected}<span id="sel-end"></span>${after}`;
-    phantomEl.scrollTop = textareaEl.scrollTop;
+    measureEl.innerHTML = `${before}<span id="sel-start"></span>${selected}<span id="sel-end"></span>${after}`;
 
-    const startMarker = phantomEl.querySelector("#sel-start");
-    const endMarker = phantomEl.querySelector("#sel-end");
+    const startMarker = measureEl.querySelector("#sel-start");
+    const endMarker = measureEl.querySelector("#sel-end");
     if (!startMarker || !endMarker) {
         return null;
     }

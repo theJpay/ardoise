@@ -1,7 +1,9 @@
 import { BLOCK_SYNTAXES } from "./actions";
 
 type ToggleResult = {
-    content: string;
+    rangeStart: number;
+    rangeEnd: number;
+    text: string;
     cursorOffset: number;
 };
 
@@ -16,21 +18,26 @@ export function toggleBlockAtLineStart(
 
     if (activeSyntax === syntax) {
         return {
-            content: value.slice(0, lineStart) + value.slice(lineStart + syntax.length),
+            rangeStart: lineStart,
+            rangeEnd: lineStart + syntax.length,
+            text: "",
             cursorOffset: -syntax.length
         };
     }
 
     if (activeSyntax) {
         return {
-            content:
-                value.slice(0, lineStart) + syntax + value.slice(lineStart + activeSyntax.length),
+            rangeStart: lineStart,
+            rangeEnd: lineStart + activeSyntax.length,
+            text: syntax,
             cursorOffset: syntax.length - activeSyntax.length
         };
     }
 
     return {
-        content: value.slice(0, lineStart) + syntax + value.slice(lineStart),
+        rangeStart: lineStart,
+        rangeEnd: lineStart,
+        text: syntax,
         cursorOffset: syntax.length
     };
 }

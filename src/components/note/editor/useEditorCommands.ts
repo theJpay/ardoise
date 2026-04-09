@@ -1,6 +1,14 @@
 import { useCallback } from "react";
 
-import { getSyntax, isBlockSyntaxActiveAtPosition, toggleBlockAtLineStart } from "./utils";
+import {
+    getSyntax,
+    isBlockSyntaxActiveAtPosition,
+    isInlineSyntaxActive,
+    isInsideCodeBlock,
+    replaceRange,
+    toggleBlockAtLineStart,
+    toggleCodeBlock
+} from "./utils";
 
 import type { BlockActionName, InlineActionName } from "./utils/actions";
 import type { RefObject } from "react";
@@ -13,79 +21,88 @@ export function useEditorCommands(
 ) {
     const toggleBlock = useCallback(
         (actionName: BlockActionName) => {
-            const textarea = getTextarea(editorRef);
-            if (!textarea) {
+            if (!editorRef.current) {
                 return;
             }
-            const { selectionStart, selectionEnd } = textarea;
+            const textarea = editorRef.current;
             const syntax = getSyntax(actionName);
-            const result = toggleBlockAtLineStart(textarea, syntax);
-            onChange(result.content);
-            restoreCursor(
-                textarea,
-                selectionStart + result.cursorOffset,
-                selectionEnd + result.cursorOffset
-            );
+
+            if (actionName === "code-block") {
+                toggleCodeBlock(textarea, onChange);
+            } else {
+                const { selectionStart, selectionEnd } = textarea;
+                const result = toggleBlockAtLineStart(textarea, syntax);
+                replaceRange(textarea, {
+                    start: result.rangeStart,
+                    end: result.rangeEnd,
+                    text: result.text,
+                    onChange,
+                    cursor: {
+                        start: selectionStart + result.cursorOffset,
+                        end: selectionEnd + result.cursorOffset
+                    }
+                });
+            }
         },
         [editorRef, onChange]
     );
 
     const isBlockActive = useCallback(
         (actionName: BlockActionName) => {
+            const pos = editorRef.current?.selectionStart ?? cursorPosition;
+            if (actionName === "code-block") {
+                return isInsideCodeBlock(content, pos);
+            }
             const syntax = getSyntax(actionName);
-            return isBlockSyntaxActiveAtPosition(content, cursorPosition, syntax);
+            return isBlockSyntaxActiveAtPosition(content, pos, syntax);
         },
-        [content, cursorPosition]
+        [editorRef, content, cursorPosition]
     );
 
     const toggleInline = useCallback(
         (actionName: InlineActionName) => {
-            const textarea = getTextarea(editorRef);
-            if (!textarea) {
+            if (!editorRef.current) {
                 return;
             }
+            const textarea = editorRef.current;
             const { value, selectionStart: start, selectionEnd: end } = textarea;
             if (start === end) {
                 return;
             }
             const syntax = getSyntax(actionName);
+            const selected = value.slice(start, end);
             const isActive = isInlineSyntaxActive(value, start, end, syntax);
 
-            let newContent: string;
-            let newStart: number;
-            let newEnd: number;
-
             if (isActive) {
-                newContent =
-                    value.slice(0, start - syntax.length) +
-                    value.slice(start, end) +
-                    value.slice(end + syntax.length);
-                newStart = start - syntax.length;
-                newEnd = end - syntax.length;
+                replaceRange(textarea, {
+                    start: start - syntax.length,
+                    end: end + syntax.length,
+                    text: selected,
+                    onChange,
+                    cursor: { start: start - syntax.length, end: end - syntax.length }
+                });
             } else {
-                newContent =
-                    value.slice(0, start) +
-                    syntax +
-                    value.slice(start, end) +
-                    syntax +
-                    value.slice(end);
-                newStart = start + syntax.length;
-                newEnd = end + syntax.length;
+                replaceRange(textarea, {
+                    start,
+                    end,
+                    text: syntax + selected + syntax,
+                    onChange,
+                    cursor: { start: start + syntax.length, end: end + syntax.length }
+                });
             }
-
-            onChange(newContent);
-            restoreCursor(textarea, newStart, newEnd);
         },
         [editorRef, onChange]
     );
 
     const isInlineActive = useCallback(
         (actionName: InlineActionName) => {
-            const textarea = getTextarea(editorRef);
-            if (!textarea) {
+            if (actionName === "link") {
                 return false;
             }
-            const { value, selectionStart, selectionEnd } = textarea;
+            if (!editorRef.current) {
+                return false;
+            }
+            const { value, selectionStart, selectionEnd } = editorRef.current;
             if (selectionStart === selectionEnd) {
                 return false;
             }
@@ -95,40 +112,37 @@ export function useEditorCommands(
         [editorRef]
     );
 
-    return { toggleBlock, isBlockActive, toggleInline, isInlineActive };
-}
+    const toggleLink = useCallback(() => {
+        if (!editorRef.current) {
+            return;
+        }
+        const textarea = editorRef.current;
+        const { value, selectionStart: start, selectionEnd: end } = textarea;
+        if (start === end) {
+            return;
+        }
+        const selected = value.slice(start, end);
+        const isUrl = /^https?:\/\//.test(selected);
 
-function getTextarea(ref: RefObject<HTMLTextAreaElement | null>): HTMLTextAreaElement | null {
-    return ref.current;
-}
+        if (isUrl) {
+            replaceRange(textarea, {
+                start,
+                end,
+                text: `[](${selected})`,
+                onChange,
+                cursor: { start: start + 1 }
+            });
+        } else {
+            const urlStart = start + selected.length + 3;
+            replaceRange(textarea, {
+                start,
+                end,
+                text: `[${selected}](url)`,
+                onChange,
+                cursor: { start: urlStart, end: urlStart + 3 }
+            });
+        }
+    }, [editorRef, onChange]);
 
-function restoreCursor(textarea: HTMLTextAreaElement, start: number, end: number) {
-    requestAnimationFrame(() => {
-        textarea.focus();
-        textarea.setSelectionRange(start, end);
-    });
-}
-
-function isInlineSyntaxActive(value: string, start: number, end: number, syntax: string): boolean {
-    const markersBefore = countMarkerRun(value, start, syntax[0], "backward");
-    const markersAfter = countMarkerRun(value, end, syntax[0], "forward");
-    const count = Math.min(markersBefore, markersAfter);
-    return syntax.length === 1 ? count % 2 === 1 : count >= syntax.length;
-}
-
-function countMarkerRun(
-    text: string,
-    position: number,
-    char: string,
-    direction: "forward" | "backward"
-): number {
-    let count = 0;
-    let i = direction === "backward" ? position - 1 : position;
-    const step = direction === "backward" ? -1 : 1;
-
-    while (i >= 0 && i < text.length && text[i] === char) {
-        count++;
-        i += step;
-    }
-    return count;
+    return { toggleBlock, isBlockActive, toggleInline, isInlineActive, toggleLink };
 }

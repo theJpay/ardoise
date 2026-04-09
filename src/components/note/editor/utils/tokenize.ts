@@ -67,7 +67,7 @@ function tokenizeQuote(line: string): string | null {
     }
     return (
         `<span class="ed-token-dim">&gt; </span>` +
-        `<span class="ed-quote">${escapeHtml(line.slice(2))}</span>`
+        `<span class="ed-quote">${inlineTokenize(escapeHtml(line.slice(2)))}</span>`
     );
 }
 
@@ -80,7 +80,7 @@ function tokenizeTaskList(line: string): string | null {
             inlineTokenize(escapeHtml(unchecked[2]))
         );
     }
-    const checked = line.match(/^(\s*)- \[x\] (.*)$/);
+    const checked = line.match(/^(\s*)- \[[xX]\] (.*)$/);
     if (checked) {
         return (
             escapeHtml(checked[1]) +
