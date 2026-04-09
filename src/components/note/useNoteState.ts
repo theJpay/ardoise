@@ -3,17 +3,28 @@ import { useEffect, useRef, useState } from "react";
 import { useDebounce } from "@hooks/useDebounce";
 import { useNotesMutations, useNotesQuery } from "@queries/useNotesQuery";
 
+// Future: "recording" will be added when voice input is implemented
+export type SaveStatus = "saved" | "writing";
+
 export function useNoteState(noteId: string | undefined) {
     const { notes, isPending } = useNotesQuery();
     const { updateNote } = useNotesMutations();
 
     const selectedNote = notes.find((note) => note.id === noteId);
 
+    const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
+
     const { debouncedCallback: debouncedUpdateTitle } = useDebounce(
-        (noteId: string, title: string) => updateNote({ id: noteId, fields: { title } })
+        async (noteId: string, title: string) => {
+            await updateNote({ id: noteId, fields: { title } });
+            setSaveStatus("saved");
+        }
     );
     const { debouncedCallback: debouncedUpdateContent } = useDebounce(
-        (noteId: string, content: string) => updateNote({ id: noteId, fields: { content } })
+        async (noteId: string, content: string) => {
+            await updateNote({ id: noteId, fields: { content } });
+            setSaveStatus("saved");
+        }
     );
 
     const [title, setTitle] = useState("");
@@ -25,6 +36,7 @@ export function useNoteState(noteId: string | undefined) {
 
     const handleContentChange = (newContent: string) => {
         setContent(newContent);
+        setSaveStatus("writing");
         if (selectedNote) {
             debouncedUpdateContent(selectedNote.id, newContent);
         }
@@ -39,6 +51,7 @@ export function useNoteState(noteId: string | undefined) {
 
     const handleTitleChange = (newTitle: string) => {
         setTitle(newTitle);
+        setSaveStatus("writing");
         if (selectedNote) {
             debouncedUpdateTitle(selectedNote.id, newTitle);
         }
@@ -64,6 +77,7 @@ export function useNoteState(noteId: string | undefined) {
         editorRef,
         phantomRef,
         wordCount,
+        saveStatus,
         handleContentChange,
         handleCursorChange,
         handleTitleChange,

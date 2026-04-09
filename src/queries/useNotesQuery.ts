@@ -44,7 +44,7 @@ export function useNotesMutations() {
     });
     return {
         createNote: createNoteMutation.mutateAsync,
-        updateNote: updateNoteMutation.mutate,
+        updateNote: updateNoteMutation.mutateAsync,
         deleteNote: deleteNoteMutation.mutateAsync
     };
 }

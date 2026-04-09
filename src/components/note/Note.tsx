@@ -32,6 +32,7 @@ function Note() {
         editorRef,
         phantomRef,
         wordCount,
+        saveStatus,
         handleContentChange,
         handleCursorChange,
         handleTitleChange,
@@ -120,7 +121,7 @@ function Note() {
                 </div>
             </div>
 
-            <NoteFooter wordCount={wordCount} />
+            <NoteFooter saveStatus={saveStatus} wordCount={wordCount} />
         </div>
     );
 }
