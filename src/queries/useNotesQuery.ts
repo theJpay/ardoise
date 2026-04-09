@@ -14,6 +14,14 @@ export function useNotesQuery() {
         queryFn: getNotes
     });
 
+    return {
+        isPending,
+        error,
+        notes: data ?? []
+    };
+}
+
+export function useNotesMutations() {
     const createNoteMutation = useMutation({
         mutationFn: createNote,
         onSuccess: () => {
@@ -34,11 +42,7 @@ export function useNotesQuery() {
             queryClient.invalidateQueries({ queryKey: NOTES_KEY });
         }
     });
-
     return {
-        isPending,
-        error,
-        notes: data ?? [],
         createNote: createNoteMutation.mutateAsync,
         updateNote: updateNoteMutation.mutate,
         deleteNote: deleteNoteMutation.mutateAsync

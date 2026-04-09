@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router";
 
-import { useNotesQuery } from "@queries/useNotesQuery";
+import { useNotesMutations } from "@queries/useNotesQuery";
 
 export function useAddNote() {
     const navigate = useNavigate();
-    const { createNote } = useNotesQuery();
+    const { createNote } = useNotesMutations();
 
     const addNote = async () => {
         const newNote = await createNote({ title: "", content: "" });

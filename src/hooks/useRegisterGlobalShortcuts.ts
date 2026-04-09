@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router";
 
-import { useNotesQuery } from "@queries/useNotesQuery";
+import { useNotesMutations } from "@queries/useNotesQuery";
 import { useEditorActions } from "@stores/editor.store";
 import { UnreachableError } from "@utils";
 
@@ -11,7 +11,7 @@ export function useRegisterGlobalShortcuts() {
     const navigate = useNavigate();
     const { noteId } = useParams();
     const { addNote } = useAddNote();
-    const { deleteNote } = useNotesQuery();
+    const { deleteNote } = useNotesMutations();
     const { toggleSidebar, toggleMode } = useEditorActions();
     const searchRef = useRef<HTMLInputElement>(null);
 

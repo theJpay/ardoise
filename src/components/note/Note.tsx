@@ -4,7 +4,7 @@ import { useParams } from "react-router";
 
 import { EmptyState } from "@components/generics";
 import { useDebounce } from "@hooks/useDebounce";
-import { useNotesQuery } from "@queries/useNotesQuery";
+import { useNotesMutations, useNotesQuery } from "@queries/useNotesQuery";
 import { useEditorMode } from "@stores/editor.store";
 
 import {
@@ -22,7 +22,8 @@ import { NoteViewer } from "./viewer";
 
 function Note() {
     const { noteId } = useParams<{ noteId: string }>();
-    const { notes, isPending, updateNote } = useNotesQuery();
+    const { notes, isPending } = useNotesQuery();
+    const { updateNote } = useNotesMutations();
 
     const mode = useEditorMode();
     const selectedNote = notes.find((note) => note.id === noteId);
