@@ -1,6 +1,8 @@
 import { File } from "lucide-react";
 import { Link, useParams } from "react-router";
 
+import { useDeletionState } from "@stores/deletion.store";
+
 import type { Note } from "@entities";
 
 type NoteItemProps = {
@@ -9,14 +11,18 @@ type NoteItemProps = {
 
 function NoteItem({ note }: NoteItemProps) {
     const { noteId } = useParams();
+    const { deletingNoteId } = useDeletionState();
     const isActive = noteId === note.id;
+    const isExiting = deletingNoteId === note.id;
 
     return (
         <Link
-            className={`text-text box-border flex h-8 items-center border-l-2 transition-colors duration-100 ${
-                isActive
-                    ? "border-accent bg-elevated pr-2.5 pl-6"
-                    : "hover:bg-elevated border-transparent pr-2.5 pl-6.5"
+            className={`text-text box-border flex h-8 items-center border-l-2 transition-all duration-150 ease-out ${
+                isExiting
+                    ? "pointer-events-none -translate-y-1 opacity-0"
+                    : isActive
+                      ? "border-accent bg-elevated pr-2.5 pl-6"
+                      : "hover:bg-elevated border-transparent pr-2.5 pl-6.5"
             }`}
             to={`/notes/${note.id}`}
         >

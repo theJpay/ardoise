@@ -2,8 +2,10 @@ import { FileX } from "lucide-react";
 import { useParams } from "react-router";
 
 import { EmptyState } from "@components/generics";
+import { useDeletionState } from "@stores/deletion.store";
 import { useEditorMode } from "@stores/editor.store";
 
+import DeleteBanner from "./DeleteBanner";
 import {
     CommandPalette,
     FloatingToolbar,
@@ -21,6 +23,7 @@ import { NoteViewer } from "./viewer";
 function Note() {
     const { noteId } = useParams<{ noteId: string }>();
     const mode = useEditorMode();
+    const { armed, noteTitle: armedNoteTitle } = useDeletionState();
 
     const {
         isPending,
@@ -73,7 +76,11 @@ function Note() {
                 <Toolbar isBlockActive={isBlockActive} onToggleBlock={toggleBlock} />
             </div>
 
-            <div className="flex-1 overflow-auto px-6 py-12">
+            {armed ? <DeleteBanner noteTitle={armedNoteTitle} /> : <div className="h-9 shrink-0" />}
+
+            <div
+                className={`flex-1 overflow-auto px-6 py-12 transition-opacity duration-150 ${armed ? "opacity-40" : ""}`}
+            >
                 <div
                     className={`mx-auto flex w-full flex-col gap-2 ${mode === "edit" ? "max-w-[72ch]" : "max-w-180"}`}
                 >

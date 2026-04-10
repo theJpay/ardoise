@@ -1,22 +1,35 @@
 import { useEffect, useRef } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 
-import { useNotesMutations } from "@queries/useNotesQuery";
+import { useNotesQuery } from "@queries/useNotesQuery";
 import { useEditorActions } from "@stores/editor.store";
 import { UnreachableError } from "@utils";
 
 import { useAddNote } from "./useAddNote";
+import { useDeleteConfirmation } from "./useDeleteConfirmation";
 
 export function useRegisterGlobalShortcuts() {
-    const navigate = useNavigate();
     const { noteId } = useParams();
+    const { notes } = useNotesQuery();
     const { addNote } = useAddNote();
-    const { deleteNote } = useNotesMutations();
+    const {
+        armed,
+        noteId: armedNoteId,
+        armDelete,
+        confirmDelete,
+        cancelDelete
+    } = useDeleteConfirmation();
     const { toggleSidebar, toggleMode } = useEditorActions();
     const searchRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const handleKeyDown = async (event: KeyboardEvent) => {
+            if (armed && event.key === "Escape") {
+                event.preventDefault();
+                cancelDelete();
+                return;
+            }
+
             if (isTyping(event)) {
                 return;
             }
@@ -34,8 +47,12 @@ export function useRegisterGlobalShortcuts() {
                     return;
                 }
                 event.preventDefault();
-                await deleteNote(noteId);
-                navigate(`/`);
+                if (armed && armedNoteId === noteId) {
+                    await confirmDelete();
+                } else {
+                    const note = notes.find((n) => n.id === noteId);
+                    armDelete(noteId, note?.title ?? "");
+                }
             }
             if (areActionKeysPressed("toggleSidebar", event)) {
                 event.preventDefault();
@@ -52,7 +69,18 @@ export function useRegisterGlobalShortcuts() {
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
         };
-    }, [navigate, noteId, addNote, deleteNote, toggleSidebar, toggleMode]);
+    }, [
+        noteId,
+        notes,
+        armed,
+        armedNoteId,
+        addNote,
+        armDelete,
+        confirmDelete,
+        cancelDelete,
+        toggleSidebar,
+        toggleMode
+    ]);
 
     return { searchRef };
 }
