@@ -44,9 +44,7 @@ function CommandPalette({
                 opacity: 0
             }}
         >
-            <div className="text-dim px-2 py-1.5 font-mono text-[9px] tracking-[0.14em] uppercase">
-                / commands
-            </div>
+            <div className="text-ui-xs text-subtle px-2 py-1.5 font-mono">/ commands</div>
             <div className="max-h-66 overflow-y-auto">
                 {filteredActions.map((action, index) => (
                     <div
@@ -68,8 +66,8 @@ function CommandPalette({
                             {COMMAND_PALETTE_ACTION_ICONS[action.name]}
                         </div>
                         <div>
-                            <div className="text-text font-sans text-[13px]">{action.label}</div>
-                            <div className="text-dim font-mono text-[9px]">
+                            <div className="text-ui-base text-text font-sans">{action.label}</div>
+                            <div className="text-ui-sm text-subtle font-mono">
                                 {action.description}
                             </div>
                         </div>

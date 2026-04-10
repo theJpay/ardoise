@@ -28,7 +28,7 @@ function Toolbar({ isBlockActive, onToggleBlock }: ToolbarProps) {
                                 className={`flex h-7 w-7 items-center justify-center rounded transition-colors duration-100 ${
                                     isBlockActive(name)
                                         ? "text-accent bg-accent-glow hover:bg-accent-tag"
-                                        : "text-dim hover:bg-surface hover:text-muted"
+                                        : "text-subtle hover:bg-surface hover:text-muted"
                                 }`}
                                 onMouseDown={(e) => {
                                     e.preventDefault();

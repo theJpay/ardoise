@@ -21,7 +21,7 @@ function NoteItem({ note }: NoteItemProps) {
             to={`/notes/${note.id}`}
         >
             <File
-                className={`mr-2 shrink-0 ${isActive ? "text-accent" : "text-dim"}`}
+                className={`mr-2 shrink-0 ${isActive ? "text-accent" : "text-subtle"}`}
                 size={13}
                 strokeWidth={1.5}
             />

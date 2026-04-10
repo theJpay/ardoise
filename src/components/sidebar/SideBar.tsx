@@ -30,7 +30,9 @@ function SideBar({ searchRef }: SideBarProps) {
                 <AddNoteButton onClick={addNote} />
             </div>
 
-            <div className="text-ui-xs text-dim shrink-0 px-3 pt-2.5 pb-0.5 font-mono">Notes</div>
+            <div className="text-ui-xs text-subtle shrink-0 px-3 pt-2.5 pb-0.5 font-mono">
+                Notes
+            </div>
 
             <div className="flex flex-1 flex-col overflow-y-auto">
                 {isPending ? (

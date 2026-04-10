@@ -26,7 +26,7 @@ function NoteTitle({ title, date, mode, onChange }: NoteTitleProps) {
                     {title || "Untitled"}
                 </h1>
             )}
-            <div className="text-subtle mb-7 font-mono text-[11px] tracking-[0.04em]">
+            <div className="text-ui-sm text-subtle mb-7 font-mono">
                 {new Intl.DateTimeFormat("en", {
                     dateStyle: "medium",
                     timeStyle: "short"

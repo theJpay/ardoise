@@ -21,7 +21,7 @@ function EditorModeToggler() {
                     className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-100 ${
                         mode === "edit"
                             ? "bg-accent-glow text-accent"
-                            : "text-dim hover:bg-elevated hover:text-muted"
+                            : "text-subtle hover:bg-elevated hover:text-muted"
                     }`}
                     onClick={toggleMode}
                 >
@@ -32,7 +32,7 @@ function EditorModeToggler() {
                     className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-100 ${
                         mode === "preview"
                             ? "bg-accent-glow text-accent"
-                            : "text-dim hover:bg-elevated hover:text-muted"
+                            : "text-subtle hover:bg-elevated hover:text-muted"
                     }`}
                     onClick={toggleMode}
                 >

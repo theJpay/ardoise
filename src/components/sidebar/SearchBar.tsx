@@ -13,7 +13,7 @@ function SearchBar({ value, onChange, ref }: SearchBarProps) {
 
     return (
         <div className="bg-bg border-border focus-within:border-accent hover:border-muted hover:focus-within:border-accent flex h-8 items-center gap-2 rounded border px-2.5 transition-colors duration-100">
-            <Search className="text-dim shrink-0" size={12} strokeWidth={1.5} />
+            <Search className="text-subtle shrink-0" size={12} strokeWidth={1.5} />
             <input
                 ref={ref}
                 aria-label="Search notes"
@@ -32,7 +32,7 @@ function SearchBar({ value, onChange, ref }: SearchBarProps) {
                     <X size={11} strokeWidth={2} />
                 </button>
             ) : (
-                <span className="text-dim bg-surface border-border-soft shrink-0 rounded-sm border px-1.5 py-px font-mono text-[9px]">
+                <span className="text-ui-xs text-subtle bg-surface border-border-soft shrink-0 rounded-sm border px-1 py-px font-mono">
                     ⌘K
                 </span>
             )}

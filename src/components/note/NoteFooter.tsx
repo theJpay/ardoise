@@ -12,11 +12,11 @@ function NoteFooter({ saveStatus, wordCount }: NoteFooterProps) {
 
     return (
         <div className="border-border-soft flex h-8 shrink-0 items-center justify-between border-t px-5">
-            <span className="text-subtle font-mono text-[11px] tracking-[0.04em]">
+            <span className="text-ui-sm text-subtle font-mono">
                 {wordCount} words · {readTime} min read
             </span>
             <div className="flex items-center gap-4">
-                <span className="text-subtle font-mono text-[10px] tracking-[0.04em]">
+                <span className="text-ui-sm text-subtle font-mono">
                     ⌘B sidebar · ⌘E mode · / commands
                 </span>
                 <EditorStatus status={saveStatus} />

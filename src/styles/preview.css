@@ -252,7 +252,7 @@
     color: #9a8870;
 }
 .ardoise-preview .hljs-comment {
-    color: var(--color-dim);
+    color: var(--color-subtle);
     font-style: italic;
 }
 .ardoise-preview .hljs-number {
