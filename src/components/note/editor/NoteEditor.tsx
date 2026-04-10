@@ -48,30 +48,38 @@ function NoteEditor({
     const tokenizedHtml = useMemo(() => tokenize(content), [content]);
 
     return (
-        <div className="relative w-full">
-            <div
-                ref={mirrorRef}
-                aria-hidden="true"
-                className={`ardoise-editor ${className} pointer-events-none absolute inset-0`}
-                dangerouslySetInnerHTML={{ __html: tokenizedHtml }}
-            ></div>
-            <div
-                ref={phantomRef}
-                aria-hidden="true"
-                className={`${className} pointer-events-none invisible absolute inset-0`}
-            />
-            <textarea
-                ref={ref}
-                className={`${className} caret-accent relative overflow-hidden text-transparent`}
-                placeholder="Start writing..."
-                value={content}
-                onBlur={onBlur}
-                onChange={(e) => onChange(e.target.value)}
-                onClick={onCursorChange}
-                onFocus={onFocus}
-                onKeyDown={onKeyDown}
-                onSelect={onCursorChange}
-            />
+        <div className="w-full">
+            <div className="relative">
+                <div
+                    ref={mirrorRef}
+                    aria-hidden="true"
+                    className={`ardoise-editor ${className} pointer-events-none absolute inset-0`}
+                    dangerouslySetInnerHTML={{ __html: tokenizedHtml }}
+                ></div>
+                <div
+                    ref={phantomRef}
+                    aria-hidden="true"
+                    className={`${className} pointer-events-none invisible absolute inset-0`}
+                />
+                <textarea
+                    ref={ref}
+                    className={`${className} caret-accent relative overflow-hidden text-transparent`}
+                    placeholder="Start writing..."
+                    value={content}
+                    onBlur={onBlur}
+                    onChange={(e) => onChange(e.target.value)}
+                    onClick={onCursorChange}
+                    onFocus={onFocus}
+                    onKeyDown={onKeyDown}
+                    onSelect={onCursorChange}
+                />
+            </div>
+            {content.length === 0 && (
+                <div className="text-dim mt-1 font-mono text-[13px]">
+                    Type <span className="text-accent-dim">/</span> to insert headings, code blocks,
+                    and more
+                </div>
+            )}
         </div>
     );
 }
