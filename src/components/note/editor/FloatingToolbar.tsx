@@ -76,7 +76,7 @@ function FloatingToolbar({
                                 aria-label={action.label}
                                 className={`flex h-7 w-7 items-center justify-center rounded transition-colors duration-100 ${
                                     isInlineActive(name)
-                                        ? "text-accent hover:bg-accent-glow"
+                                        ? "text-accent hover:bg-accent-surface-hover"
                                         : "text-muted hover:bg-border hover:text-text"
                                 }`}
                                 onMouseDown={(e) => {

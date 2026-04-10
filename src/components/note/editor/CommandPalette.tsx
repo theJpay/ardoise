@@ -51,7 +51,7 @@ function CommandPalette({
                         key={action.name}
                         ref={(el) => scrollSelectedIntoView(el, index === selectedIndex)}
                         className={`flex cursor-pointer items-center gap-2.5 rounded-sm px-2 py-1.5 transition-colors duration-100 ${
-                            index === selectedIndex ? "bg-accent-glow" : ""
+                            index === selectedIndex ? "bg-accent-surface" : ""
                         }`}
                         onMouseDown={(e) => {
                             e.preventDefault();

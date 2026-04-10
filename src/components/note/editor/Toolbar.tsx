@@ -27,7 +27,7 @@ function Toolbar({ isBlockActive, onToggleBlock }: ToolbarProps) {
                                 aria-label={action.label}
                                 className={`flex h-7 w-7 items-center justify-center rounded transition-colors duration-100 ${
                                     isBlockActive(name)
-                                        ? "text-accent bg-accent-glow hover:bg-accent-tag"
+                                        ? "text-accent bg-accent-surface hover:bg-accent-surface-hover"
                                         : "text-subtle hover:bg-surface hover:text-muted"
                                 }`}
                                 onMouseDown={(e) => {

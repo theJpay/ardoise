@@ -14,10 +14,14 @@
     --color-dim: #484440;
     --color-accent: #6e9a78;
     --color-accent-dim: #3d5c44;
-    --color-accent-glow: rgba(110, 154, 120, 0.1);
-    --color-accent-tag: rgba(110, 154, 120, 0.13);
+    --color-accent-hover: #5d8a67;
+    --color-accent-surface: #1e2e22;
+    --color-accent-surface-hover: #243528;
     --color-recording: #c87070;
     --color-danger: #c0625a;
+    --color-danger-surface: #2a1c1b;
+    --color-danger-surface-hover: #331f1e;
+    --color-danger-border: #3d2422;
 
     --font-sans: "IBM Plex Sans", system-ui, sans-serif;
     --font-mono: "IBM Plex Mono", monospace;
@@ -48,6 +52,15 @@
     ::-webkit-scrollbar-thumb {
         border-radius: 2px;
         background-color: var(--color-border);
+    }
+}
+
+@keyframes timer-deplete {
+    from {
+        transform: scaleX(1);
+    }
+    to {
+        transform: scaleX(0);
     }
 }
 
