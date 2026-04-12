@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 
 import { EmptyState } from "@components/generics";
 import { useDeletionState } from "@stores/deletion.store";
-import { useEditorMode } from "@stores/editor.store";
+import { useEditorActions, useEditorMode } from "@stores/editor.store";
 
 import DeleteBanner from "./DeleteBanner";
 import {
@@ -17,12 +17,14 @@ import {
 import NoteFooter from "./NoteFooter";
 import NoteLoadingSkeleton from "./NoteLoadingSkeleton";
 import NoteTitle from "./NoteTitle";
+import StorageErrorBanner from "./StorageErrorBanner";
 import { useNoteState } from "./useNoteState";
 import { NoteViewer } from "./viewer";
 
 function Note() {
     const { noteId } = useParams<{ noteId: string }>();
     const mode = useEditorMode();
+    const { toggleMode } = useEditorActions();
     const { armed, noteTitle: armedNoteTitle } = useDeletionState();
 
     const {
@@ -36,6 +38,8 @@ function Note() {
         phantomRef,
         wordCount,
         saveStatus,
+        saveError,
+        retrySave,
         handleContentChange,
         handleCursorChange,
         handleTitleChange,
@@ -76,7 +80,13 @@ function Note() {
                 <Toolbar isBlockActive={isBlockActive} onToggleBlock={toggleBlock} />
             </div>
 
-            {armed ? <DeleteBanner noteTitle={armedNoteTitle} /> : <div className="h-9 shrink-0" />}
+            {armed ? (
+                <DeleteBanner noteTitle={armedNoteTitle} />
+            ) : saveError ? (
+                <StorageErrorBanner onRetry={retrySave} />
+            ) : (
+                <div className="h-9 shrink-0" />
+            )}
 
             <div
                 className={`flex-1 overflow-auto px-6 py-12 transition-opacity duration-150 ${armed ? "opacity-40" : ""}`}
@@ -123,7 +133,7 @@ function Note() {
                             )}
                         </>
                     ) : (
-                        <NoteViewer content={content} />
+                        <NoteViewer content={content} onSwitchToWrite={toggleMode} />
                     )}
                 </div>
             </div>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useDebounce } from "@hooks/useDebounce";
 import { useNotesMutations, useNotesQuery } from "@queries/useNotesQuery";
@@ -13,19 +13,48 @@ export function useNoteState(noteId: string | undefined) {
     const selectedNote = notes.find((note) => note.id === noteId);
 
     const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
+    const [saveError, setSaveError] = useState(false);
+    const lastFailedUpdate = useRef<{ id: string; fields: Record<string, string> } | null>(null);
 
     const { debouncedCallback: debouncedUpdateTitle } = useDebounce(
         async (noteId: string, title: string) => {
-            await updateNote({ id: noteId, fields: { title } });
-            setSaveStatus("saved");
+            try {
+                await updateNote({ id: noteId, fields: { title } });
+                setSaveStatus("saved");
+                setSaveError(false);
+            } catch {
+                setSaveError(true);
+                lastFailedUpdate.current = { id: noteId, fields: { title } };
+            }
         }
     );
     const { debouncedCallback: debouncedUpdateContent } = useDebounce(
         async (noteId: string, content: string) => {
-            await updateNote({ id: noteId, fields: { content } });
-            setSaveStatus("saved");
+            try {
+                await updateNote({ id: noteId, fields: { content } });
+                setSaveStatus("saved");
+                setSaveError(false);
+            } catch {
+                setSaveError(true);
+                lastFailedUpdate.current = { id: noteId, fields: { content } };
+            }
         }
     );
+
+    const retrySave = useCallback(async () => {
+        if (!lastFailedUpdate.current) {
+            return;
+        }
+        try {
+            const { id, fields } = lastFailedUpdate.current;
+            await updateNote({ id, fields });
+            setSaveStatus("saved");
+            setSaveError(false);
+            lastFailedUpdate.current = null;
+        } catch {
+            // Still failing — keep the error state
+        }
+    }, [updateNote]);
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
@@ -78,6 +107,8 @@ export function useNoteState(noteId: string | undefined) {
         phantomRef,
         wordCount,
         saveStatus,
+        saveError,
+        retrySave,
         handleContentChange,
         handleCursorChange,
         handleTitleChange,
