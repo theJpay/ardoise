@@ -1,3 +1,5 @@
+import { getNoteTitle } from "@utils";
+
 import type { EditorMode } from "@stores/editor.store";
 
 type NoteTitleProps = {
@@ -24,7 +26,7 @@ function NoteTitle({ title, date, mode, onChange }: NoteTitleProps) {
                 </div>
             ) : (
                 <h1 className="text-text w-full font-sans text-[24px] leading-tight font-medium tracking-[-0.03em]">
-                    {title || "Untitled"}
+                    {getNoteTitle(title)}
                 </h1>
             )}
             <div className="text-ui-sm text-subtle mb-7 font-mono">

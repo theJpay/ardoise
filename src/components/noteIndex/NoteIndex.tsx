@@ -1,9 +1,14 @@
+import { useEffect } from "react";
+
 import { AddNoteButton } from "@components/generics";
 import LogoMark from "@components/rail/LogoMark";
 import { useAddNote } from "@hooks/useAddNote";
 import { useNotesQuery } from "@queries/useNotesQuery";
 
 function NoteIndex() {
+    useEffect(() => {
+        document.title = "Ardoise";
+    }, []);
     const { notes, isPending } = useNotesQuery();
     const { addNote } = useAddNote();
 

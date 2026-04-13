@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { useParams } from "react-router";
 
 import { useDeletionState } from "@stores/deletion.store";
 import { useEditorActions, useEditorMode } from "@stores/editor.store";
+import { getNoteTitle } from "@utils";
 
 import DeleteBanner from "./DeleteBanner";
 import {
@@ -64,6 +66,12 @@ function Note() {
         }
         handleSmartKeys(e);
     };
+
+    useEffect(() => {
+        if (selectedNote) {
+            document.title = `${getNoteTitle(title)} — Ardoise`;
+        }
+    }, [title, selectedNote]);
 
     if (isPending) {
         return <NoteLoadingSkeleton />;
