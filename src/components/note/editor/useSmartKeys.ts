@@ -73,16 +73,8 @@ export function useSmartKeys(
 
         const { value, selectionStart, selectionEnd } = textarea;
 
-        if (isInsideCodeBlock(value, selectionStart)) {
-            e.preventDefault();
-            replaceRange(textarea, {
-                start: selectionStart,
-                end: selectionEnd,
-                text: "  ",
-                onChange,
-                cursor: { start: selectionStart + 2 }
-            });
-            return true;
+        if (!shouldInterceptTab(value, selectionStart, selectionEnd)) {
+            return false;
         }
 
         e.preventDefault();
@@ -151,4 +143,20 @@ function nextOrderedPrefix(line: string): string | null {
 function dedentLine(line: string): string {
     const spaces = line.match(/^ {1,2}/)?.[0].length ?? 0;
     return line.slice(spaces);
+}
+
+function shouldInterceptTab(value: string, selectionStart: number, selectionEnd: number): boolean {
+    if (isInsideCodeBlock(value, selectionStart)) {
+        return true;
+    }
+
+    const firstLineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
+    const selectedText = value.slice(firstLineStart, selectionEnd);
+    const lines = selectedText.split("\n");
+
+    return lines.some((line) => isListLine(line));
+}
+
+function isListLine(line: string): boolean {
+    return /^\s*([-*]|\d+\.) /.test(line) || /^\s*- \[([ x])\] /.test(line);
 }
