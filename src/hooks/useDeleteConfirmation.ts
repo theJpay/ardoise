@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useNavigate } from "react-router";
 
+import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useNotesMutations } from "@queries/useNotesQuery";
 import { useDeletionActions, useDeletionState } from "@stores/deletion.store";
 
@@ -8,7 +8,7 @@ const CONFIRM_TIMEOUT = 3000;
 const EXIT_ANIMATION_DURATION = 150;
 
 export function useDeleteConfirmation() {
-    const navigate = useNavigate();
+    const { navigate } = useAppNavigate();
     const { deleteNote } = useNotesMutations();
     const { armed, noteId, noteTitle } = useDeletionState();
     const { arm, cancel, setDeleting, reset } = useDeletionActions();

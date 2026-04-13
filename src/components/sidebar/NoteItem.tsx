@@ -1,6 +1,7 @@
 import { File } from "lucide-react";
 import { Link, useParams } from "react-router";
 
+import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useDeletionState } from "@stores/deletion.store";
 
 import type { Note } from "@entities";
@@ -11,6 +12,7 @@ type NoteItemProps = {
 
 function NoteItem({ note }: NoteItemProps) {
     const { noteId } = useParams();
+    const { buildLink } = useAppNavigate();
     const { deletingNoteId } = useDeletionState();
     const isActive = noteId === note.id;
     const isExiting = deletingNoteId === note.id;
@@ -24,7 +26,7 @@ function NoteItem({ note }: NoteItemProps) {
                       ? "border-accent bg-elevated pr-2.5 pl-6"
                       : "hover:bg-elevated border-transparent pr-2.5 pl-6.5"
             }`}
-            to={`/notes/${note.id}`}
+            to={buildLink(`/notes/${note.id}`)}
         >
             <File
                 className={`mr-2 shrink-0 ${isActive ? "text-accent" : "text-subtle"}`}
