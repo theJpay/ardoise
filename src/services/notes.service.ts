@@ -52,3 +52,7 @@ export async function deleteNote(id: string): Promise<boolean> {
 
     return nbUpdated > 0;
 }
+
+export async function hardDeleteNote(id: string): Promise<void> {
+    await db.notes.delete(id);
+}

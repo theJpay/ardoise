@@ -51,7 +51,7 @@ export function useRegisterGlobalShortcuts() {
                     await confirmDelete();
                 } else {
                     const note = notes.find((n) => n.id === noteId);
-                    armDelete(noteId, note?.title ?? "");
+                    armDelete(noteId, note?.title ?? "", note?.content ?? "");
                 }
             }
             if (areActionKeysPressed("toggleSidebar", event)) {

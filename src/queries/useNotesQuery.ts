@@ -1,6 +1,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { createNote, deleteNote, getNotes, updateNote } from "@services/notes.service";
+import {
+    createNote,
+    deleteNote,
+    getNotes,
+    hardDeleteNote,
+    updateNote
+} from "@services/notes.service";
 
 import { queryClient } from "../queryClient";
 
@@ -42,10 +48,19 @@ export function useNotesMutations() {
             queryClient.invalidateQueries({ queryKey: NOTES_KEY });
         }
     });
+
+    const hardDeleteNoteMutation = useMutation({
+        mutationFn: hardDeleteNote,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
+        }
+    });
+
     return {
         createNote: createNoteMutation.mutateAsync,
         updateNote: updateNoteMutation.mutateAsync,
-        deleteNote: deleteNoteMutation.mutateAsync
+        deleteNote: deleteNoteMutation.mutateAsync,
+        hardDeleteNote: hardDeleteNoteMutation.mutateAsync
     };
 }
 

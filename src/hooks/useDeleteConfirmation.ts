@@ -9,7 +9,7 @@ const EXIT_ANIMATION_DURATION = 150;
 
 export function useDeleteConfirmation() {
     const { navigate } = useAppNavigate();
-    const { deleteNote } = useNotesMutations();
+    const { deleteNote, hardDeleteNote } = useNotesMutations();
     const { armed, noteId, noteTitle } = useDeletionState();
     const { arm, cancel, setDeleting, reset } = useDeletionActions();
     const timerRef = useRef<number | null>(null);
@@ -21,15 +21,33 @@ export function useDeleteConfirmation() {
         }
     }, []);
 
+    const executeDelete = useCallback(
+        async (id: string, { hard }: { hard: boolean }) => {
+            setDeleting(id);
+            setTimeout(async () => {
+                if (hard) {
+                    await hardDeleteNote(id);
+                } else {
+                    await deleteNote(id);
+                }
+                reset();
+                navigate("/notes");
+            }, EXIT_ANIMATION_DURATION);
+        },
+        [setDeleting, deleteNote, hardDeleteNote, reset, navigate]
+    );
+
     const armDelete = useCallback(
-        (id: string, title: string) => {
+        (id: string, title: string, content: string) => {
+            if (isNoteEmpty(title, content)) {
+                executeDelete(id, { hard: true });
+                return;
+            }
             clearTimer();
             arm(id, title);
-            timerRef.current = setTimeout(() => {
-                cancel();
-            }, CONFIRM_TIMEOUT);
+            timerRef.current = setTimeout(cancel, CONFIRM_TIMEOUT);
         },
-        [arm, cancel, clearTimer]
+        [arm, cancel, clearTimer, executeDelete]
     );
 
     const confirmDelete = useCallback(async () => {
@@ -37,14 +55,8 @@ export function useDeleteConfirmation() {
             return;
         }
         clearTimer();
-        setDeleting(noteId);
-
-        setTimeout(async () => {
-            await deleteNote(noteId);
-            reset();
-            navigate("/notes");
-        }, EXIT_ANIMATION_DURATION);
-    }, [noteId, clearTimer, setDeleting, deleteNote, reset, navigate]);
+        await executeDelete(noteId, { hard: false });
+    }, [noteId, clearTimer, executeDelete]);
 
     const cancelDelete = useCallback(() => {
         clearTimer();
@@ -56,4 +68,8 @@ export function useDeleteConfirmation() {
     }, [clearTimer]);
 
     return { armed, noteId, noteTitle, armDelete, confirmDelete, cancelDelete };
+}
+
+function isNoteEmpty(title: string, content: string): boolean {
+    return title.trim() === "" && content.trim() === "";
 }
