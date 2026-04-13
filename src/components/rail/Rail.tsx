@@ -15,7 +15,7 @@ function Rail() {
             aria-label="Application navigation"
             className="bg-bg border-border flex h-screen w-12 shrink-0 flex-col items-center border-r py-3.5"
         >
-            <LogoMark />
+            <LogoMark className="text-accent" />
 
             <div className="mt-4 flex w-full flex-col items-center gap-0.5 px-1">
                 <EditorModeToggler />
