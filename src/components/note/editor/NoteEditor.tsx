@@ -76,8 +76,8 @@ function NoteEditor({
             </div>
             {content.length === 0 && (
                 <div className="text-ed-body text-subtle font-mono">
-                    Type <span className="text-accent-dim">/</span> to insert headings, code blocks,
-                    and more
+                    Type <span className="text-accent">/</span> to insert headings, code blocks, and
+                    more
                 </div>
             )}
         </div>
