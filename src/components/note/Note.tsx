@@ -12,7 +12,8 @@ import {
     NoteEditor,
     Toolbar,
     useCommandPalette,
-    useEditorCommands
+    useEditorCommands,
+    useSmartKeys
 } from "./editor";
 import NoteFooter from "./NoteFooter";
 import NoteLoadingSkeleton from "./NoteLoadingSkeleton";
@@ -55,6 +56,15 @@ function Note() {
         executeCommand,
         handleKeyDown: handleCommandPaletteKeyDown
     } = useCommandPalette(editorRef, content, selection.start, handleContentChange);
+
+    const { handleKeyDown: handleSmartKeys } = useSmartKeys(editorRef, handleContentChange);
+
+    const handleEditorKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (handleCommandPaletteKeyDown(e)) {
+            return;
+        }
+        handleSmartKeys(e);
+    };
 
     if (isPending) {
         return <NoteLoadingSkeleton />;
@@ -110,7 +120,7 @@ function Note() {
                                 onChange={handleContentChange}
                                 onCursorChange={handleCursorChange}
                                 onFocus={() => setFocused(true)}
-                                onKeyDown={handleCommandPaletteKeyDown}
+                                onKeyDown={handleEditorKeyDown}
                             />
                             <FloatingToolbar
                                 content={content}
