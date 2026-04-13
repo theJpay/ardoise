@@ -1,7 +1,5 @@
-import { FileX } from "lucide-react";
 import { useParams } from "react-router";
 
-import { EmptyState } from "@components/generics";
 import { useDeletionState } from "@stores/deletion.store";
 import { useEditorActions, useEditorMode } from "@stores/editor.store";
 
@@ -17,6 +15,7 @@ import {
 } from "./editor";
 import NoteFooter from "./NoteFooter";
 import NoteLoadingSkeleton from "./NoteLoadingSkeleton";
+import NoteNotFound from "./NoteNotFound";
 import NoteTitle from "./NoteTitle";
 import StorageErrorBanner from "./StorageErrorBanner";
 import { useNoteState } from "./useNoteState";
@@ -71,13 +70,7 @@ function Note() {
     }
 
     if (!selectedNote) {
-        return (
-            <EmptyState
-                body="This note may have been deleted."
-                icon={<FileX size={16} strokeWidth={1.5} />}
-                title="Note not found"
-            />
-        );
+        return <NoteNotFound />;
     }
 
     return (

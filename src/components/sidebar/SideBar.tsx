@@ -1,10 +1,9 @@
-import { FileText, Search } from "lucide-react";
-
-import { AddNoteButton, EmptyState } from "@components/generics";
+import { AddNoteButton } from "@components/generics";
 import { useAddNote } from "@hooks/useAddNote";
 import { useNoteSearch } from "@hooks/useNoteSearch";
 import { useNotesQuery } from "@queries/useNotesQuery";
 
+import InlineHint from "./InlineHint";
 import NoteList from "./NoteList";
 import SearchBar from "./SearchBar";
 
@@ -42,17 +41,14 @@ function SideBar({ searchRef }: SideBarProps) {
                         ))}
                     </div>
                 ) : noNotes ? (
-                    <EmptyState
-                        action={<AddNoteButton onClick={addNote} />}
-                        body="Start writing something. It stays on your device."
-                        icon={<FileText size={16} strokeWidth={1.5} />}
+                    <InlineHint
+                        subtitle="Start writing with the button above."
                         title="No notes yet"
                     />
                 ) : noSearchResults ? (
-                    <EmptyState
-                        body={`Nothing matches "${search}". Try a different search.`}
-                        icon={<Search size={16} strokeWidth={1.5} />}
-                        title="No results"
+                    <InlineHint
+                        subtitle="Try a different search."
+                        title={`No results for "${search.length > 20 ? search.slice(0, 20) + "…" : search}"`}
                     />
                 ) : (
                     <NoteList notes={filteredNotes} />
