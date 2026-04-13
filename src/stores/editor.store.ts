@@ -5,6 +5,7 @@ type EditorStore = {
     mode: EditorMode;
     isSidebarOpen: boolean;
     actions: {
+        setMode: (mode: EditorMode) => void;
         toggleMode: () => void;
         toggleSidebar: () => void;
     };
@@ -17,6 +18,7 @@ const useEditorStore = create<EditorStore>((set) => ({
     isSidebarOpen: true,
 
     actions: {
+        setMode: (mode: EditorMode) => set({ mode }),
         toggleMode: () => {
             set((state) => ({
                 mode: state.mode === "edit" ? "preview" : "edit"

@@ -15,6 +15,7 @@ function NoteTitle({ title, date, mode, onChange }: NoteTitleProps) {
                     <span className="text-dim font-medium">#&nbsp;</span>
                     <input
                         aria-label="Note title"
+                        autoFocus={!title}
                         className="text-editor-text placeholder:text-dim w-full border-none bg-transparent font-mono font-medium outline-none"
                         placeholder="Untitled"
                         value={title}
