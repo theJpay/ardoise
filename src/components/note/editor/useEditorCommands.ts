@@ -13,6 +13,8 @@ import {
 import type { BlockActionName, InlineActionName } from "./utils/actions";
 import type { RefObject } from "react";
 
+const MULTI_LINE_SYNTAXES = ["> "];
+
 export function useEditorCommands(
     editorRef: RefObject<HTMLTextAreaElement | null>,
     content: string,
@@ -29,6 +31,8 @@ export function useEditorCommands(
 
             if (actionName === "code-block") {
                 toggleCodeBlock(textarea, onChange);
+            } else if (isMultiLineSelection(textarea) && canToggleMultiLine(syntax)) {
+                toggleBlockMultiLine(textarea, syntax, onChange);
             } else {
                 const { selectionStart, selectionEnd } = textarea;
                 const result = toggleBlockAtLineStart(textarea, syntax);
@@ -145,4 +149,46 @@ export function useEditorCommands(
     }, [editorRef, onChange]);
 
     return { toggleBlock, isBlockActive, toggleInline, isInlineActive, toggleLink };
+}
+
+function isMultiLineSelection(textarea: HTMLTextAreaElement): boolean {
+    const { value, selectionStart, selectionEnd } = textarea;
+    return (
+        selectionStart !== selectionEnd && value.slice(selectionStart, selectionEnd).includes("\n")
+    );
+}
+
+function canToggleMultiLine(syntax: string): boolean {
+    return MULTI_LINE_SYNTAXES.includes(syntax);
+}
+
+function toggleBlockMultiLine(
+    textarea: HTMLTextAreaElement,
+    syntax: string,
+    onChange: (value: string) => void
+) {
+    const { value, selectionStart, selectionEnd } = textarea;
+    const firstLineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
+    const selectedText = value.slice(firstLineStart, selectionEnd);
+    const lines = selectedText.split("\n");
+
+    const allHaveSyntax = lines.every((line) => line.startsWith(syntax));
+
+    const modifiedLines = lines.map((line) =>
+        allHaveSyntax ? line.slice(syntax.length) : syntax + line
+    );
+
+    const newText = modifiedLines.join("\n");
+    const offset = allHaveSyntax ? -syntax.length : syntax.length;
+
+    replaceRange(textarea, {
+        start: firstLineStart,
+        end: firstLineStart + selectedText.length,
+        text: newText,
+        onChange,
+        cursor: {
+            start: selectionStart + offset,
+            end: firstLineStart + newText.length
+        }
+    });
 }
