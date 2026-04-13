@@ -55,6 +55,7 @@ function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
         }).then(({ x, y }) => {
             if (tooltipRef.current) {
                 tooltipRef.current.style.transform = `translate(${x}px, ${y}px)`;
+                tooltipRef.current.style.opacity = "1";
             }
         });
     }, [visible, anchorRef]);
@@ -66,7 +67,7 @@ function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
     return (
         <div
             ref={tooltipRef}
-            className="bg-elevated border-border fixed top-0 left-0 z-50 max-w-60 rounded-md border px-3.5 py-2.5 shadow-lg transition-opacity duration-200"
+            className="bg-elevated border-border fixed top-0 left-0 z-50 max-w-60 rounded-md border px-3.5 py-2.5 opacity-0 shadow-lg transition-opacity duration-200"
             onMouseEnter={dismiss}
         >
             <div className="text-ui-base text-text mb-1 font-sans font-medium">
