@@ -1,13 +1,12 @@
 import { BookOpen, PenLine } from "lucide-react";
 import { useRef } from "react";
 
-import { useEditorActions, useEditorMode } from "@stores/editor.store";
+import { useEditorMode } from "@hooks/useEditorMode";
 
 import ModeToggleTooltip from "./ModeToggleTooltip";
 
 function EditorModeToggler() {
-    const mode = useEditorMode();
-    const { toggleMode } = useEditorActions();
+    const { mode, toggleMode } = useEditorMode();
     const containerRef = useRef<HTMLDivElement>(null);
 
     return (

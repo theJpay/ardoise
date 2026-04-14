@@ -1,6 +1,6 @@
 import { CircleHelp, File, PanelLeft, Settings } from "lucide-react";
 
-import { useEditorActions, useIsSidebarOpen } from "@stores/editor.store";
+import { useIsSidebarOpen, useLayoutActions } from "@stores/layout.store";
 
 import EditorModeToggler from "./EditorModeToggle";
 import LogoMark from "./LogoMark";
@@ -8,7 +8,7 @@ import RailButton from "./RailButton";
 
 function Rail() {
     const isSidebarOpen = useIsSidebarOpen();
-    const { toggleSidebar } = useEditorActions();
+    const { toggleSidebar } = useLayoutActions();
 
     return (
         <nav

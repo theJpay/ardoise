@@ -1,6 +1,6 @@
 import { getNoteTitle } from "@utils";
 
-import type { EditorMode } from "@stores/editor.store";
+import type { EditorMode } from "@hooks/useEditorMode";
 
 type NoteTitleProps = {
     title: string;

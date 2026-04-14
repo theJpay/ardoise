@@ -2,7 +2,7 @@ import { Outlet } from "react-router";
 
 import { Rail, SideBar } from "@components";
 import { useRegisterGlobalShortcuts } from "@hooks/useRegisterGlobalShortcuts";
-import { useIsSidebarOpen } from "@stores/editor.store";
+import { useIsSidebarOpen } from "@stores/layout.store";
 
 function App() {
     const { searchRef } = useRegisterGlobalShortcuts();

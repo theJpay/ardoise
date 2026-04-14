@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 import { useParams } from "react-router";
 
+import { useEditorMode } from "@hooks/useEditorMode";
 import { useNotesQuery } from "@queries/useNotesQuery";
-import { useEditorActions } from "@stores/editor.store";
+import { useLayoutActions } from "@stores/layout.store";
 import { UnreachableError } from "@utils";
 
 import { useAddNote } from "./useAddNote";
@@ -19,7 +20,8 @@ export function useRegisterGlobalShortcuts() {
         confirmDelete,
         cancelDelete
     } = useDeleteConfirmation();
-    const { toggleSidebar, toggleMode } = useEditorActions();
+    const { toggleMode } = useEditorMode();
+    const { toggleSidebar } = useLayoutActions();
     const searchRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {

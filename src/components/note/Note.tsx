@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useParams } from "react-router";
 
+import { useEditorMode } from "@hooks/useEditorMode";
 import { useDeletionState } from "@stores/deletion.store";
-import { useEditorActions, useEditorMode } from "@stores/editor.store";
 import { getNoteTitle } from "@utils";
 
 import DeleteBanner from "./DeleteBanner";
@@ -25,8 +25,7 @@ import { NoteViewer } from "./viewer";
 
 function Note() {
     const { noteId } = useParams<{ noteId: string }>();
-    const mode = useEditorMode();
-    const { toggleMode } = useEditorActions();
+    const { mode, toggleMode } = useEditorMode();
     const { armed, noteTitle: armedNoteTitle } = useDeletionState();
 
     const {
