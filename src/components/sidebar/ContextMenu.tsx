@@ -1,9 +1,9 @@
-import { computePosition, flip, offset, shift } from "@floating-ui/react";
 import { Copy, Trash2 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { NoteEntity } from "@entities";
 import { useAppNavigate } from "@hooks/useAppNavigate";
+import { useFloatingMenu } from "@hooks/useFloatingMenu";
 import { useNotesMutations } from "@queries/useNotesQuery";
 import { useDeletionActions } from "@stores/deletion.store";
 
@@ -19,32 +19,14 @@ type ContextMenuProps = {
 };
 
 function ContextMenu({ note, position, onClose }: ContextMenuProps) {
-    const menuRef = useRef<HTMLDivElement>(null);
+    const { ref: menuRef, setRef } = useFloatingMenu({
+        anchor: { type: "coordinates", x: position.x, y: position.y }
+    });
     const { duplicateNote, deleteNote, hardDeleteNote } = useNotesMutations();
     const { setDeleting, reset } = useDeletionActions();
     const { navigate } = useAppNavigate();
     const [armed, setArmed] = useState(false);
     const timerRef = useRef<number | null>(null);
-
-    const setMenuRef = useCallback(
-        (node: HTMLDivElement | null) => {
-            menuRef.current = node;
-            if (!node) {
-                return;
-            }
-            const virtualEl = {
-                getBoundingClientRect: () => new DOMRect(position.x, position.y, 0, 0)
-            };
-            computePosition(virtualEl, node, {
-                placement: "bottom-start",
-                middleware: [offset(4), flip(), shift({ padding: 8 })]
-            }).then(({ x, y }) => {
-                node.style.transform = `translate(${x}px, ${y}px)`;
-                node.style.opacity = "1";
-            });
-        },
-        [position]
-    );
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -67,7 +49,7 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
                 clearTimeout(timerRef.current);
             }
         };
-    }, [onClose]);
+    }, [onClose, menuRef]);
 
     const handleDuplicate = async () => {
         await duplicateNote(note.id);
@@ -99,8 +81,8 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
 
     return (
         <div
-            ref={setMenuRef}
-            className="bg-elevated border-border shadow-float fixed top-0 left-0 z-50 w-48 rounded border p-1 opacity-0"
+            ref={setRef}
+            className="bg-elevated border-border shadow-float fixed top-0 left-0 z-50 w-48 rounded border p-1"
         >
             <button
                 className="text-ui-base text-muted hover:bg-accent-surface hover:text-text flex w-full items-center gap-2 rounded-sm px-2.5 py-1.5 font-sans transition-colors"

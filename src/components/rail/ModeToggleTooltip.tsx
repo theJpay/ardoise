@@ -1,6 +1,4 @@
-import { computePosition, offset } from "@floating-ui/react";
-import { useEffect, useRef } from "react";
-
+import { useFloatingMenu } from "@hooks/useFloatingMenu";
 import { useOnboardingActions, useShowModeTooltip } from "@stores/onboarding.store";
 
 import type { RefObject } from "react";
@@ -12,22 +10,11 @@ type ModeToggleTooltipProps = {
 function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
     const visible = useShowModeTooltip();
     const { dismissModeTooltip } = useOnboardingActions();
-    const tooltipRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (!visible || !anchorRef.current || !tooltipRef.current) {
-            return;
-        }
-        computePosition(anchorRef.current, tooltipRef.current, {
-            placement: "right",
-            middleware: [offset(12)]
-        }).then(({ x, y }) => {
-            if (tooltipRef.current) {
-                tooltipRef.current.style.transform = `translate(${x}px, ${y}px)`;
-                tooltipRef.current.style.opacity = "1";
-            }
-        });
-    }, [visible, anchorRef]);
+    const { setRef } = useFloatingMenu({
+        anchor: { type: "element", ref: anchorRef },
+        placement: "right",
+        offset: 12
+    });
 
     if (!visible) {
         return null;
@@ -35,8 +22,8 @@ function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
 
     return (
         <div
-            ref={tooltipRef}
-            className="bg-elevated border-border shadow-float fixed top-0 left-0 z-50 max-w-65 rounded-md border px-3.5 py-3 opacity-0 transition-opacity duration-200"
+            ref={setRef}
+            className="bg-elevated border-border shadow-float fixed top-0 left-0 z-50 max-w-65 rounded-md border px-3.5 py-3 transition-opacity duration-200"
         >
             <div className="text-ui-base text-text mb-1 font-sans font-medium">
                 Switch between Write and Read
