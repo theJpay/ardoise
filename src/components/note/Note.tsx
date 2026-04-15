@@ -3,7 +3,6 @@ import { useParams } from "react-router";
 
 import { useEditorMode } from "@hooks/useEditorMode";
 import { useDeletionState } from "@stores/deletion.store";
-import { getNoteTitle } from "@utils";
 
 import DeleteBanner from "./DeleteBanner";
 import {
@@ -68,7 +67,7 @@ function Note() {
 
     useEffect(() => {
         if (selectedNote) {
-            document.title = `${getNoteTitle(title)} — Ardoise`;
+            document.title = `${title.trim() || "Untitled"} — Ardoise`;
         }
     }, [title, selectedNote]);
 

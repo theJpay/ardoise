@@ -2,6 +2,7 @@ import { computePosition, flip, offset, shift } from "@floating-ui/react";
 import { Copy, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { NoteEntity } from "@entities";
 import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useNotesMutations } from "@queries/useNotesQuery";
 import { useDeletionActions } from "@stores/deletion.store";
@@ -85,9 +86,8 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
         onClose();
         setDeleting(note.id);
 
-        const isEmpty = note.title.trim() === "" && note.content.trim() === "";
         setTimeout(async () => {
-            if (isEmpty) {
+            if (NoteEntity.isEmpty(note)) {
                 await hardDeleteNote(note.id);
             } else {
                 await deleteNote(note.id);

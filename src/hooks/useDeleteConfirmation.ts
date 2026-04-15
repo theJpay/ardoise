@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef } from "react";
 
+import { NoteEntity } from "@entities";
 import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useNotesMutations } from "@queries/useNotesQuery";
 import { useDeletionActions, useDeletionState } from "@stores/deletion.store";
+
+import type { Note } from "@entities";
 
 const CONFIRM_TIMEOUT = 3000;
 const EXIT_ANIMATION_DURATION = 150;
@@ -38,13 +41,13 @@ export function useDeleteConfirmation() {
     );
 
     const armDelete = useCallback(
-        (id: string, title: string, content: string) => {
-            if (isNoteEmpty(title, content)) {
-                executeDelete(id, { hard: true });
+        (note: Note) => {
+            if (NoteEntity.isEmpty(note)) {
+                executeDelete(note.id, { hard: true });
                 return;
             }
             clearTimer();
-            arm(id, title);
+            arm(note.id, note.title);
             timerRef.current = setTimeout(cancel, CONFIRM_TIMEOUT);
         },
         [arm, cancel, clearTimer, executeDelete]
@@ -68,8 +71,4 @@ export function useDeleteConfirmation() {
     }, [clearTimer]);
 
     return { armed, noteId, noteTitle, armDelete, confirmDelete, cancelDelete };
-}
-
-function isNoteEmpty(title: string, content: string): boolean {
-    return title.trim() === "" && content.trim() === "";
 }

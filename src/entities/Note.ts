@@ -6,3 +6,14 @@ export type Note = {
     updatedAt: Date;
     deletedAt: Date | null;
 };
+
+const WORDS_PER_MINUTE = 200;
+
+export const NoteEntity = {
+    isEmpty: (note: Note) => note.title.trim() === "" && note.content.trim() === "",
+    getTitle: (note: Note) => note.title.trim() || "Untitled",
+    getWordCount: (note: Note) =>
+        note.content.trim() === "" ? 0 : note.content.trim().split(/\s+/).length,
+    getReadTime: (note: Note) =>
+        Math.max(1, Math.ceil(NoteEntity.getWordCount(note) / WORDS_PER_MINUTE))
+};
