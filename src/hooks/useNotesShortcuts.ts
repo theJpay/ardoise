@@ -9,7 +9,7 @@ import { UnreachableError } from "@utils";
 import { useAddNote } from "./useAddNote";
 import { useDeleteConfirmation } from "./useDeleteConfirmation";
 
-export function useRegisterGlobalShortcuts() {
+export function useNotesShortcuts() {
     const { noteId } = useParams();
     const { notes } = useNotesQuery();
     const { addNote } = useAddNote();

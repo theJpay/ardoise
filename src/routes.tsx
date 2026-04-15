@@ -1,23 +1,38 @@
 import { createBrowserRouter, Navigate } from "react-router";
 
-import { Note, NoteIndex } from "@components";
+import { Note, NoteIndex, NotesPage } from "@components/pages/notes";
+import { SettingsPage } from "@components/pages/settings";
 
 import App from "./App.tsx";
 
 export const router = createBrowserRouter([
     {
-        path: "/notes",
+        path: "/",
         Component: App,
         children: [
             {
                 index: true,
-                element: <NoteIndex />
+                element: <Navigate to="/notes" replace />
             },
-            { path: ":noteId", element: <Note /> }
+            {
+                path: "notes",
+                element: <NotesPage />,
+                children: [
+                    { index: true, element: <NoteIndex /> },
+                    { path: ":noteId", element: <Note /> }
+                ]
+            },
+            {
+                path: "settings",
+                element: <SettingsPage />,
+                children: [
+                    { index: true, element: <Navigate to="/settings/general" replace /> },
+                    { path: "general", element: <div>General</div> },
+                    { path: "privacy", element: <div>Privacy</div> },
+                    { path: "export", element: <div>Export</div> },
+                    { path: "danger", element: <div>Danger zone</div> }
+                ]
+            }
         ]
-    },
-    {
-        path: "/",
-        element: <Navigate to="/notes" replace />
     }
 ]);
