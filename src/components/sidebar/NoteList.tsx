@@ -10,17 +10,23 @@ type NoteListProps = {
 };
 
 type MenuState = {
-    noteId: string;
+    note: Note;
     position: { x: number; y: number };
 } | null;
 
 function NoteList({ notes }: NoteListProps) {
     const [menu, setMenu] = useState<MenuState>(null);
 
-    const handleContextMenu = useCallback((e: React.MouseEvent, noteId: string) => {
-        e.preventDefault();
-        setMenu({ noteId, position: { x: e.clientX, y: e.clientY } });
-    }, []);
+    const handleContextMenu = useCallback(
+        (e: React.MouseEvent, noteId: string) => {
+            e.preventDefault();
+            const note = notes.find((n) => n.id === noteId);
+            if (note) {
+                setMenu({ note, position: { x: e.clientX, y: e.clientY } });
+            }
+        },
+        [notes]
+    );
 
     const handleCloseMenu = useCallback(() => {
         setMenu(null);
@@ -36,11 +42,7 @@ function NoteList({ notes }: NoteListProps) {
                 ))}
             </ul>
             {menu && (
-                <ContextMenu
-                    noteId={menu.noteId}
-                    position={menu.position}
-                    onClose={handleCloseMenu}
-                />
+                <ContextMenu note={menu.note} position={menu.position} onClose={handleCloseMenu} />
             )}
         </>
     );
