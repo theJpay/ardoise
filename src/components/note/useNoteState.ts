@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { NoteEntity } from "@entities";
 import { useDebounce } from "@hooks/useDebounce";
 import { useNotesMutations, useNotesQuery } from "@queries/useNotesQuery";
 
@@ -78,6 +79,10 @@ export function useNoteState(noteId: string | undefined) {
         });
     };
 
+    const resetSelection = () => {
+        setSelection({ start: 0, end: 0 });
+    };
+
     const handleTitleChange = (newTitle: string) => {
         setTitle(newTitle);
         setSaveStatus("writing");
@@ -94,6 +99,12 @@ export function useNoteState(noteId: string | undefined) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedNote?.id]);
 
+    useEffect(() => {
+        if (selectedNote) {
+            document.title = `${NoteEntity.getTitle({ title })} — Ardoise`;
+        }
+    }, [title, selectedNote]);
+
     return {
         isPending,
         selectedNote,
@@ -106,6 +117,7 @@ export function useNoteState(noteId: string | undefined) {
         saveStatus,
         saveError,
         retrySave,
+        resetSelection,
         handleContentChange,
         handleCursorChange,
         handleTitleChange,

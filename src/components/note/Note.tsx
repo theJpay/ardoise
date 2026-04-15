@@ -1,7 +1,5 @@
-import { useEffect } from "react";
 import { useParams } from "react-router";
 
-import { NoteEntity } from "@entities";
 import { useEditorMode } from "@hooks/useEditorMode";
 import { useDeletionState } from "@stores/deletion.store";
 
@@ -40,6 +38,7 @@ function Note() {
         saveStatus,
         saveError,
         retrySave,
+        resetSelection,
         handleContentChange,
         handleCursorChange,
         handleTitleChange,
@@ -64,12 +63,6 @@ function Note() {
         }
         handleSmartKeys(e);
     };
-
-    useEffect(() => {
-        if (selectedNote) {
-            document.title = `${NoteEntity.getTitle({ title })} — Ardoise`;
-        }
-    }, [title, selectedNote]);
 
     if (isPending) {
         return <NoteLoadingSkeleton />;
@@ -115,7 +108,10 @@ function Note() {
                                 ref={editorRef}
                                 content={content}
                                 phantomRef={phantomRef}
-                                onBlur={() => setFocused(false)}
+                                onBlur={() => {
+                                    setFocused(false);
+                                    resetSelection();
+                                }}
                                 onChange={handleContentChange}
                                 onCursorChange={handleCursorChange}
                                 onFocus={() => setFocused(true)}
