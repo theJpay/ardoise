@@ -105,6 +105,19 @@ export function useNoteState(noteId: string | undefined) {
         }
     }, [title, selectedNote]);
 
+    useEffect(() => {
+        if (saveStatus !== "writing") {
+            return;
+        }
+
+        const handler = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+        };
+
+        window.addEventListener("beforeunload", handler);
+        return () => window.removeEventListener("beforeunload", handler);
+    }, [saveStatus]);
+
     return {
         isPending,
         selectedNote,
