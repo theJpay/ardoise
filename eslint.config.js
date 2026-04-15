@@ -35,6 +35,7 @@ export default defineConfig([
             "prettier/prettier": "error",
             "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
             curly: "error",
+            "react-hooks/refs": "off",
             "react/jsx-sort-props": [
                 "warn",
                 {

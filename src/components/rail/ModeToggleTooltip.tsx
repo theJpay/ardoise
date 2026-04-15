@@ -10,7 +10,7 @@ type ModeToggleTooltipProps = {
 function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
     const visible = useShowModeTooltip();
     const { dismissModeTooltip } = useOnboardingActions();
-    const { setRef } = useFloatingMenu({
+    const { refs, floatingStyles } = useFloatingMenu({
         anchor: { type: "element", ref: anchorRef },
         placement: "right",
         offset: 12
@@ -22,8 +22,9 @@ function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
 
     return (
         <div
-            ref={setRef}
-            className="bg-elevated border-border shadow-float fixed top-0 left-0 z-50 max-w-65 rounded-md border px-3.5 py-3 transition-opacity duration-200"
+            ref={refs.setFloating}
+            className="bg-elevated border-border shadow-float z-50 max-w-65 rounded-md border px-3.5 py-3 transition-opacity duration-200"
+            style={floatingStyles}
         >
             <div className="text-ui-base text-text mb-1 font-sans font-medium">
                 Switch between Write and Read

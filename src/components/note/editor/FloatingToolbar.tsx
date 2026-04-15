@@ -29,7 +29,7 @@ function FloatingToolbar({
     const hasSelection = selection.start !== selection.end;
     const visible = hasSelection && editorFocused;
 
-    const setFloatingRef = useFloatingPosition({
+    const { refs, floatingStyles } = useFloatingPosition({
         measureRef: phantomRef,
         content,
         selection,
@@ -52,15 +52,9 @@ function FloatingToolbar({
 
     return (
         <div
-            ref={setFloatingRef}
+            ref={refs.setFloating}
             className="bg-elevated border-border shadow-float z-50 flex items-center gap-px rounded-md border p-1 transition-opacity duration-150"
-            style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                opacity: 0,
-                pointerEvents: "none"
-            }}
+            style={floatingStyles}
         >
             {FLOATING_TOOLBAR_ACTION_GROUPS.map((group, groupIndex) => (
                 <Fragment key={groupIndex}>

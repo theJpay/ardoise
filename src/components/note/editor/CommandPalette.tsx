@@ -21,7 +21,7 @@ function CommandPalette({
     selection,
     onExecute
 }: CommandPaletteProps) {
-    const setFloatingRef = useFloatingPosition({
+    const { refs, floatingStyles } = useFloatingPosition({
         measureRef: phantomRef,
         content,
         selection,
@@ -35,14 +35,9 @@ function CommandPalette({
 
     return (
         <div
-            ref={setFloatingRef}
+            ref={refs.setFloating}
             className="bg-elevated border-border shadow-float z-50 w-58 rounded border p-1"
-            style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                opacity: 0
-            }}
+            style={floatingStyles}
         >
             <div className="text-ui-xs text-subtle px-2 py-1.5 font-mono">/ commands</div>
             <div className="max-h-66 overflow-y-auto">

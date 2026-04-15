@@ -1,7 +1,7 @@
-import { computePosition, flip, offset, shift } from "@floating-ui/react";
-import { useCallback, useRef } from "react";
+import { autoUpdate, flip, offset, shift, useFloating } from "@floating-ui/react";
+import { useEffect, useMemo } from "react";
 
-import type { Middleware, Placement } from "@floating-ui/react";
+import type { Placement, ReferenceType } from "@floating-ui/react";
 import type { RefObject } from "react";
 
 type Anchor =
@@ -12,43 +12,31 @@ type UseFloatingMenuOptions = {
     anchor: Anchor;
     placement?: Placement;
     offset?: number;
-    middleware?: Middleware[];
 };
 
 export function useFloatingMenu({
     anchor,
     placement = "bottom-start",
-    offset: offsetValue = 4,
-    middleware: extraMiddleware = []
+    offset: offsetValue = 4
 }: UseFloatingMenuOptions) {
-    const menuRef = useRef<HTMLDivElement>(null);
+    const reference = useMemo<ReferenceType | null>(() => {
+        if (anchor.type === "coordinates") {
+            return {
+                getBoundingClientRect: () => new DOMRect(anchor.x, anchor.y, 0, 0)
+            };
+        }
+        return anchor.ref.current;
+    }, [anchor]);
 
-    const setRef = useCallback(
-        (node: HTMLDivElement | null) => {
-            menuRef.current = node;
-            if (!node) {
-                return;
-            }
+    const { refs, floatingStyles } = useFloating<ReferenceType>({
+        placement,
+        middleware: [offset(offsetValue), flip(), shift({ padding: 8 })],
+        whileElementsMounted: autoUpdate
+    });
 
-            const reference =
-                anchor.type === "coordinates"
-                    ? { getBoundingClientRect: () => new DOMRect(anchor.x, anchor.y, 0, 0) }
-                    : anchor.ref.current;
+    useEffect(() => {
+        refs.setReference(reference);
+    }, [reference, refs]);
 
-            if (!reference) {
-                return;
-            }
-
-            computePosition(reference, node, {
-                placement,
-                middleware: [offset(offsetValue), flip(), shift({ padding: 8 }), ...extraMiddleware]
-            }).then(({ x, y }) => {
-                node.style.transform = `translate(${x}px, ${y}px)`;
-                node.style.opacity = "1";
-            });
-        },
-        [anchor, placement, offsetValue, extraMiddleware]
-    );
-
-    return { ref: menuRef, setRef };
+    return { refs, floatingStyles };
 }

@@ -19,7 +19,7 @@ type ContextMenuProps = {
 };
 
 function ContextMenu({ note, position, onClose }: ContextMenuProps) {
-    const { ref: menuRef, setRef } = useFloatingMenu({
+    const { refs, floatingStyles } = useFloatingMenu({
         anchor: { type: "coordinates", x: position.x, y: position.y }
     });
     const { duplicateNote, deleteNote, hardDeleteNote } = useNotesMutations();
@@ -30,7 +30,7 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+            if (refs.floating.current && !refs.floating.current.contains(e.target as Node)) {
                 onClose();
             }
         };
@@ -49,7 +49,7 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
                 clearTimeout(timerRef.current);
             }
         };
-    }, [onClose, menuRef]);
+    }, [refs.floating, onClose]);
 
     const handleDuplicate = async () => {
         await duplicateNote(note.id);
@@ -81,8 +81,9 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
 
     return (
         <div
-            ref={setRef}
-            className="bg-elevated border-border shadow-float fixed top-0 left-0 z-50 w-48 rounded border p-1"
+            ref={refs.setFloating}
+            className="bg-elevated border-border shadow-float z-50 w-48 rounded border p-1"
+            style={floatingStyles}
         >
             <button
                 className="text-ui-base text-muted hover:bg-accent-surface hover:text-text flex w-full items-center gap-2 rounded-sm px-2.5 py-1.5 font-sans transition-colors"
