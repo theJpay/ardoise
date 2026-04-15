@@ -36,7 +36,7 @@ function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
     return (
         <div
             ref={tooltipRef}
-            className="bg-elevated border-border fixed top-0 left-0 z-50 max-w-65 rounded-md border px-3.5 py-3 opacity-0 shadow-lg transition-opacity duration-200"
+            className="bg-elevated border-border shadow-float fixed top-0 left-0 z-50 max-w-65 rounded-md border px-3.5 py-3 opacity-0 transition-opacity duration-200"
         >
             <div className="text-ui-base text-text mb-1 font-sans font-medium">
                 Switch between Write and Read

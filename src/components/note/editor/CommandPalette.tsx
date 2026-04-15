@@ -36,7 +36,7 @@ function CommandPalette({
     return (
         <div
             ref={setFloatingRef}
-            className="bg-elevated border-border z-50 w-58 rounded border p-1 shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
+            className="bg-elevated border-border shadow-float z-50 w-58 rounded border p-1"
             style={{
                 position: "fixed",
                 top: 0,

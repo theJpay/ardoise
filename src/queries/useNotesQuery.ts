@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
     createNote,
     deleteNote,
+    duplicateNote,
     getNotes,
     hardDeleteNote,
     updateNote
@@ -35,6 +36,13 @@ export function useNotesMutations() {
         }
     });
 
+    const duplicateNoteMutation = useMutation({
+        mutationFn: duplicateNote,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
+        }
+    });
+
     const updateNoteMutation = useMutation({
         mutationFn: ({ id, fields }: UpdateMutationArgs) => updateNote(id, fields),
         onSuccess: () => {
@@ -58,6 +66,7 @@ export function useNotesMutations() {
 
     return {
         createNote: createNoteMutation.mutateAsync,
+        duplicateNote: duplicateNoteMutation.mutateAsync,
         updateNote: updateNoteMutation.mutateAsync,
         deleteNote: deleteNoteMutation.mutateAsync,
         hardDeleteNote: hardDeleteNoteMutation.mutateAsync

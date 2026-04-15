@@ -53,7 +53,7 @@ function FloatingToolbar({
     return (
         <div
             ref={setFloatingRef}
-            className="bg-elevated border-border z-50 flex items-center gap-px rounded-md border p-1 shadow-[0_8px_24px_rgba(0,0,0,0.5)] transition-opacity duration-150"
+            className="bg-elevated border-border shadow-float z-50 flex items-center gap-px rounded-md border p-1 transition-opacity duration-150"
             style={{
                 position: "fixed",
                 top: 0,

@@ -29,6 +29,18 @@ export async function createNote(
     return newNote;
 }
 
+export async function duplicateNote(id: string): Promise<Note> {
+    const original = await db.notes.get(id);
+    if (!original) {
+        throw new Error(`Note with id ${id} not found`);
+    }
+
+    return createNote({
+        title: original.title,
+        content: original.content
+    });
+}
+
 export async function updateNote(
     id: string,
     updatedFields: Partial<Omit<Note, "id" | "createdAt" | "updatedAt" | "deletedAt">>
