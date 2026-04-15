@@ -94,8 +94,6 @@ export function useNoteState(noteId: string | undefined) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedNote?.id]);
 
-    const wordCount = content.trim() === "" ? 0 : content.trim().split(/\s+/).length;
-
     return {
         isPending,
         selectedNote,
@@ -105,7 +103,6 @@ export function useNoteState(noteId: string | undefined) {
         focused,
         editorRef,
         phantomRef,
-        wordCount,
         saveStatus,
         saveError,
         retrySave,

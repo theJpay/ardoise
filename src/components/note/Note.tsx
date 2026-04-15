@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useParams } from "react-router";
 
+import { NoteEntity } from "@entities";
 import { useEditorMode } from "@hooks/useEditorMode";
 import { useDeletionState } from "@stores/deletion.store";
 
@@ -36,7 +37,6 @@ function Note() {
         focused,
         editorRef,
         phantomRef,
-        wordCount,
         saveStatus,
         saveError,
         retrySave,
@@ -67,7 +67,7 @@ function Note() {
 
     useEffect(() => {
         if (selectedNote) {
-            document.title = `${title.trim() || "Untitled"} — Ardoise`;
+            document.title = `${NoteEntity.getTitle({ title })} — Ardoise`;
         }
     }, [title, selectedNote]);
 
@@ -147,7 +147,7 @@ function Note() {
                 </div>
             </div>
 
-            <NoteFooter saveStatus={saveStatus} wordCount={wordCount} />
+            <NoteFooter noteContent={content} saveStatus={saveStatus} />
         </div>
     );
 }
