@@ -1,18 +1,27 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useSearchParams } from "react-router";
 
 export type EditorMode = "edit" | "preview";
 
+const VALID_MODES: string[] = ["edit", "preview"];
+
 export function useEditorMode() {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const mode: EditorMode = searchParams.get("mode") === "preview" ? "preview" : "edit";
+    const rawMode = searchParams.get("mode");
+    const mode: EditorMode = rawMode === "preview" ? "preview" : "edit";
+
+    useCleanInvalidMode(rawMode);
 
     const setMode = useCallback(
         (newMode: EditorMode) => {
             setSearchParams((prev) => {
                 const next = new URLSearchParams(prev);
-                next.set("mode", newMode);
+                if (newMode === "edit") {
+                    next.delete("mode");
+                } else {
+                    next.set("mode", newMode);
+                }
                 return next;
             });
         },
@@ -24,4 +33,18 @@ export function useEditorMode() {
     }, [mode, setMode]);
 
     return { mode, setMode, toggleMode };
+}
+
+function useCleanInvalidMode(rawMode: string | null) {
+    const [, setSearchParams] = useSearchParams();
+
+    useEffect(() => {
+        if (rawMode !== null && !VALID_MODES.includes(rawMode)) {
+            setSearchParams((prev) => {
+                const next = new URLSearchParams(prev);
+                next.delete("mode");
+                return next;
+            });
+        }
+    }, [rawMode, setSearchParams]);
 }
