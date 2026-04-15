@@ -53,6 +53,9 @@ export function useEditorCommands(
 
     const isBlockActive = useCallback(
         (actionName: BlockActionName) => {
+            if (document.activeElement !== editorRef.current) {
+                return false;
+            }
             const pos = editorRef.current?.selectionStart ?? cursorPosition;
             if (actionName === "code-block") {
                 return isInsideCodeBlock(content, pos);
