@@ -88,6 +88,20 @@
     letter-spacing: -0.01em;
 }
 
+@utility text-ui-h2 {
+    font-size: 18px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    font-weight: 500;
+}
+
+@utility text-ui-h1 {
+    font-size: 20px;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+}
+
 @utility text-ed-body {
     font-size: 15px;
     line-height: 1.8;

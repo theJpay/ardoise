@@ -25,9 +25,9 @@ function NoteTitle({ title, date, mode, onChange }: NoteTitleProps) {
                     />
                 </div>
             ) : (
-                <h1 className="text-text w-full font-sans text-[24px] leading-tight font-medium tracking-[-0.03em]">
-                    {NoteEntity.getTitle({ title })}
-                </h1>
+                <div className="ardoise-preview">
+                    <h1>{NoteEntity.getTitle({ title })}</h1>
+                </div>
             )}
             <div className="text-ui-sm text-subtle mb-7 font-mono">
                 {new Intl.DateTimeFormat("en", {
