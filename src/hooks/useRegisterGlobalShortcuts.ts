@@ -32,14 +32,35 @@ export function useRegisterGlobalShortcuts() {
                 return;
             }
 
+            if (areActionKeysPressed("save", event)) {
+                event.preventDefault();
+                return;
+            }
+            if (areActionKeysPressed("toggleSidebar", event)) {
+                event.preventDefault();
+                toggleSidebar();
+                return;
+            }
+            if (areActionKeysPressed("toggleMode", event)) {
+                event.preventDefault();
+                toggleMode();
+                return;
+            }
+            if (areActionKeysPressed("focusSearch", event)) {
+                event.preventDefault();
+                searchRef.current?.focus();
+                return;
+            }
+            if (areActionKeysPressed("newNoteGlobal", event)) {
+                event.preventDefault();
+                await addNote();
+                return;
+            }
+
             if (isTyping(event)) {
                 return;
             }
 
-            if (areActionKeysPressed("focusSearch", event)) {
-                event.preventDefault();
-                searchRef.current?.focus();
-            }
             if (areActionKeysPressed("addNote", event)) {
                 event.preventDefault();
                 await addNote();
@@ -57,14 +78,6 @@ export function useRegisterGlobalShortcuts() {
                         armDelete(note);
                     }
                 }
-            }
-            if (areActionKeysPressed("toggleSidebar", event)) {
-                event.preventDefault();
-                toggleSidebar();
-            }
-            if (areActionKeysPressed("toggleEditMode", event)) {
-                event.preventDefault();
-                toggleMode();
             }
         };
 
@@ -90,26 +103,33 @@ export function useRegisterGlobalShortcuts() {
 }
 
 type GlobalKeyboardAction =
+    | "save"
+    | "toggleSidebar"
+    | "toggleMode"
     | "focusSearch"
+    | "newNoteGlobal"
     | "addNote"
-    | "removeNote"
-    | "toggleEditMode"
-    | "toggleSidebar";
+    | "removeNote";
 
 function areActionKeysPressed(action: GlobalKeyboardAction, e: KeyboardEvent) {
-    const isMetaKeyPressed = isMetaKey(e);
+    const meta = isMetaKey(e);
+    const key = e.key.toLowerCase();
 
     switch (action) {
-        case "focusSearch":
-            return isMetaKeyPressed && e.key.toLowerCase() === "k";
-        case "addNote":
-            return !isMetaKeyPressed && e.key.toLowerCase() === "c";
-        case "removeNote":
-            return isMetaKeyPressed && e.key.toLowerCase() === "backspace";
-        case "toggleEditMode":
-            return isMetaKeyPressed && e.key.toLowerCase() === "e";
+        case "save":
+            return meta && !e.shiftKey && !e.altKey && key === "s";
         case "toggleSidebar":
-            return isMetaKeyPressed && e.key.toLowerCase() === "b";
+            return meta && e.shiftKey && !e.altKey && key === "b";
+        case "toggleMode":
+            return meta && e.shiftKey && !e.altKey && key === "m";
+        case "focusSearch":
+            return meta && e.shiftKey && !e.altKey && key === "f";
+        case "newNoteGlobal":
+            return meta && !e.shiftKey && e.altKey && key === "n";
+        case "addNote":
+            return !meta && !e.shiftKey && !e.altKey && key === "c";
+        case "removeNote":
+            return meta && !e.shiftKey && !e.altKey && key === "backspace";
         default:
             throw new UnreachableError(action);
     }
