@@ -1,4 +1,6 @@
-import { Search, X } from "lucide-react";
+import { ArrowBigUp, Command, Search, X } from "lucide-react";
+
+import { ShortcutKey } from "@components/generics";
 
 import type { RefObject } from "react";
 
@@ -17,7 +19,7 @@ function SearchBar({ value, onChange, ref }: SearchBarProps) {
             <input
                 ref={ref}
                 aria-label="Search notes"
-                className="text-ui-sm text-text placeholder:text-dim flex-1 bg-transparent font-mono outline-none"
+                className="text-ui-sm text-text placeholder:text-dim min-w-0 flex-1 bg-transparent font-mono outline-none"
                 placeholder="Search..."
                 type="search"
                 value={value}
@@ -32,9 +34,11 @@ function SearchBar({ value, onChange, ref }: SearchBarProps) {
                     <X size={11} strokeWidth={2} />
                 </button>
             ) : (
-                <span className="text-ui-xs text-subtle bg-surface border-border-soft shrink-0 rounded-sm border px-1 py-px font-mono">
-                    ⌘K
-                </span>
+                <div className="flex shrink-0 items-center gap-0.5">
+                    <ShortcutKey content={Command} />
+                    <ShortcutKey content={ArrowBigUp} />
+                    <ShortcutKey content="F" />
+                </div>
             )}
         </div>
     );

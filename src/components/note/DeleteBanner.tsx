@@ -1,3 +1,6 @@
+import { Command, Delete } from "lucide-react";
+
+import { ShortcutKey } from "@components/generics";
 import { NoteEntity } from "@entities";
 
 type DeleteBannerProps = {
@@ -12,12 +15,8 @@ function DeleteBanner({ noteTitle }: DeleteBannerProps) {
             </span>
             <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1">
-                    <kbd className="text-danger border-danger-border text-ui-xs inline-flex h-4.5 min-w-5 items-center justify-center rounded-sm border bg-transparent px-1">
-                        ⌘
-                    </kbd>
-                    <kbd className="text-danger border-danger-border text-ui-xs inline-flex h-4.5 min-w-5 items-center justify-center rounded-sm border bg-transparent px-1">
-                        ⌫
-                    </kbd>
+                    <ShortcutKey bg="danger" content={Command} />
+                    <ShortcutKey bg="danger" content={Delete} />
                     <span className="text-danger text-ui-sm ml-1">to confirm</span>
                 </div>
                 <span className="text-subtle text-ui-sm">·</span>

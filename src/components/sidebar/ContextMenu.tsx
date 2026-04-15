@@ -1,6 +1,7 @@
-import { Copy, Trash2 } from "lucide-react";
+import { Command, Copy, Delete, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import { ShortcutKey } from "@components/generics";
 import { NoteEntity } from "@entities";
 import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useFloatingMenu } from "@hooks/useFloatingMenu";
@@ -104,7 +105,14 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
                     {armed ? "Delete?" : "Delete"}
                 </span>
                 <span className="text-ui-sm text-subtle font-mono">
-                    {armed ? "click again" : "⌘⌫"}
+                    {armed ? (
+                        "click again"
+                    ) : (
+                        <span className="flex items-center gap-0.5">
+                            <ShortcutKey content={Command} />
+                            <ShortcutKey content={Delete} />
+                        </span>
+                    )}
                 </span>
                 {armed && (
                     <span

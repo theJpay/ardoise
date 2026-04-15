@@ -1,3 +1,6 @@
+import { ArrowBigUp, Command } from "lucide-react";
+
+import { ShortcutKey } from "@components/generics";
 import { useFloatingMenu } from "@hooks/useFloatingMenu";
 import { useOnboardingActions, useShowModeTooltip } from "@stores/onboarding.store";
 
@@ -34,12 +37,9 @@ function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
             </div>
             <div className="mt-2 flex items-center justify-between">
                 <div className="text-ui-sm text-subtle flex items-center gap-1 font-mono">
-                    <kbd className="text-ui-xs bg-surface border-border rounded-sm border px-1 py-px">
-                        ⌘
-                    </kbd>
-                    <kbd className="text-ui-xs bg-surface border-border rounded-sm border px-1 py-px">
-                        E
-                    </kbd>
+                    <ShortcutKey content={Command} />
+                    <ShortcutKey content={ArrowBigUp} />
+                    <ShortcutKey content="M" />
                     <span className="ml-1">to toggle</span>
                 </div>
                 <button

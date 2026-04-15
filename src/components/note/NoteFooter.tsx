@@ -1,3 +1,6 @@
+import { ArrowBigUp, Command } from "lucide-react";
+
+import { ShortcutKey } from "@components/generics";
 import { NoteEntity } from "@entities";
 
 import EditorStatus from "./EditorStatus";
@@ -19,9 +22,20 @@ function NoteFooter({ noteContent, saveStatus }: NoteFooterProps) {
                 {wordCount} words · {readTime} min read
             </span>
             <div className="flex items-center gap-4">
-                <span className="text-ui-sm text-subtle font-mono">
-                    ⌘B sidebar · ⌘E mode · / commands
-                </span>
+                <div className="text-ui-sm text-subtle flex items-center gap-1 font-mono">
+                    <ShortcutKey content={Command} />
+                    <ShortcutKey content={ArrowBigUp} />
+                    <ShortcutKey content="B" />
+                    <span>sidebar</span>
+                    <span className="text-dim">·</span>
+                    <ShortcutKey content={Command} />
+                    <ShortcutKey content={ArrowBigUp} />
+                    <ShortcutKey content="M" />
+                    <span>mode</span>
+                    <span className="text-dim">·</span>
+                    <ShortcutKey content="/" />
+                    <span>commands</span>
+                </div>
                 <EditorStatus status={saveStatus} />
             </div>
         </div>
