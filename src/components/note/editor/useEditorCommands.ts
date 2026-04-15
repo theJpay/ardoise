@@ -73,9 +73,6 @@ export function useEditorCommands(
             }
             const textarea = editorRef.current;
             const { value, selectionStart: start, selectionEnd: end } = textarea;
-            if (start === end) {
-                return;
-            }
             const syntax = getSyntax(actionName);
             const selected = value.slice(start, end);
             const isActive = isInlineSyntaxActive(value, start, end, syntax);
@@ -125,9 +122,6 @@ export function useEditorCommands(
         }
         const textarea = editorRef.current;
         const { value, selectionStart: start, selectionEnd: end } = textarea;
-        if (start === end) {
-            return;
-        }
         const selected = value.slice(start, end);
         const isUrl = /^https?:\/\//.test(selected);
 

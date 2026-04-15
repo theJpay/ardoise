@@ -7,6 +7,7 @@ import DeleteBanner from "./DeleteBanner";
 import {
     CommandPalette,
     FloatingToolbar,
+    handleFormattingShortcut,
     NoteEditor,
     Toolbar,
     useCommandPalette,
@@ -58,6 +59,9 @@ function Note() {
     const { handleKeyDown: handleSmartKeys } = useSmartKeys(editorRef, handleContentChange);
 
     const handleEditorKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (handleFormattingShortcut(e, toggleInline, toggleLink)) {
+            return;
+        }
         if (handleCommandPaletteKeyDown(e)) {
             return;
         }
