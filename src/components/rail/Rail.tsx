@@ -1,5 +1,6 @@
 import { CircleHelp, File, PanelLeft, Settings } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
+import { useMatch } from "react-router";
 
 import { useIsSidebarOpen, useLayoutActions } from "@stores/layout.store";
 
@@ -14,6 +15,7 @@ function Rail() {
     const [isShortcutPanelOpen, setIsShortcutPanelOpen] = useState(false);
     const helpRef = useRef<HTMLDivElement>(null);
     const closeShortcutPanel = useCallback(() => setIsShortcutPanelOpen(false), []);
+    const isOnNotes = useMatch("/notes/*");
 
     return (
         <nav
@@ -23,7 +25,7 @@ function Rail() {
             <LogoMark className="text-accent" />
 
             <div className="mt-4 flex w-full flex-col items-center gap-0.5 px-1">
-                <EditorModeToggler />
+                <EditorModeToggler disabled={!isOnNotes} />
             </div>
 
             <div className="bg-border-soft my-3 h-px w-5" />
@@ -31,7 +33,6 @@ function Rail() {
             <div className="flex w-full flex-col items-center gap-0.5 px-1">
                 <RailButton
                     icon={<File size={16} strokeWidth={1.5} />}
-                    isActive={true}
                     label="My notes"
                     to="/notes"
                 />
@@ -54,6 +55,7 @@ function Rail() {
                     onClose={closeShortcutPanel}
                 />
                 <RailButton
+                    disabled={!isOnNotes}
                     icon={<PanelLeft size={16} strokeWidth={1.5} />}
                     isActive={isSidebarOpen}
                     label="Toggle sidebar"

@@ -43,6 +43,10 @@
         cursor: pointer;
     }
 
+    button:disabled {
+        cursor: default;
+    }
+
     ::-webkit-scrollbar {
         width: 3px;
     }

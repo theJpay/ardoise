@@ -5,9 +5,20 @@ import { useEditorMode } from "@hooks/useEditorMode";
 
 import ModeToggleTooltip from "./ModeToggleTooltip";
 
-function EditorModeToggler() {
+type EditorModeTogglerProps = {
+    disabled?: boolean;
+};
+
+function EditorModeToggler({ disabled }: EditorModeTogglerProps) {
     const { mode, toggleMode } = useEditorMode();
     const containerRef = useRef<HTMLDivElement>(null);
+
+    const buttonClass = (isActive: boolean) =>
+        `flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-100 disabled:bg-transparent disabled:text-dim ${
+            isActive
+                ? "bg-accent-surface text-accent hover:bg-accent-surface-hover"
+                : "text-subtle hover:bg-elevated hover:text-muted"
+        }`;
 
     return (
         <>
@@ -17,28 +28,22 @@ function EditorModeToggler() {
             >
                 <button
                     aria-label="Write mode"
-                    className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-100 ${
-                        mode === "edit"
-                            ? "bg-accent-surface text-accent hover:bg-accent-surface-hover"
-                            : "text-subtle hover:bg-elevated hover:text-muted"
-                    }`}
+                    className={buttonClass(mode === "edit")}
+                    disabled={disabled}
                     onClick={toggleMode}
                 >
                     <PenLine aria-hidden="true" size={15} strokeWidth={1.5} />
                 </button>
                 <button
                     aria-label="Preview mode"
-                    className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-100 ${
-                        mode === "preview"
-                            ? "bg-accent-surface text-accent hover:bg-accent-surface-hover"
-                            : "text-subtle hover:bg-elevated hover:text-muted"
-                    }`}
+                    className={buttonClass(mode === "preview")}
+                    disabled={disabled}
                     onClick={toggleMode}
                 >
                     <BookOpen aria-hidden="true" size={15} strokeWidth={1.5} />
                 </button>
             </div>
-            <ModeToggleTooltip anchorRef={containerRef} />
+            {!disabled && <ModeToggleTooltip anchorRef={containerRef} />}
         </>
     );
 }
