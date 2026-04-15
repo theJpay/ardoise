@@ -12,37 +12,37 @@ export function handleFormattingShortcut(
         return false;
     }
 
-    const key = e.key.toLowerCase();
+    const code = e.nativeEvent.code;
 
-    if (!e.shiftKey && !e.altKey && key === "b") {
+    if (!e.shiftKey && !e.altKey && code === "KeyB") {
         e.preventDefault();
         e.stopPropagation();
         toggleInline("bold");
         return true;
     }
 
-    if (!e.shiftKey && !e.altKey && key === "i") {
+    if (!e.shiftKey && !e.altKey && code === "KeyI") {
         e.preventDefault();
         e.stopPropagation();
         toggleInline("italic");
         return true;
     }
 
-    if (e.shiftKey && !e.altKey && key === "x") {
+    if (e.shiftKey && !e.altKey && code === "KeyX") {
         e.preventDefault();
         e.stopPropagation();
         toggleInline("strikethrough");
         return true;
     }
 
-    if (!e.shiftKey && !e.altKey && key === "e") {
+    if (!e.shiftKey && !e.altKey && code === "KeyE") {
         e.preventDefault();
         e.stopPropagation();
         toggleInline("code");
         return true;
     }
 
-    if (!e.shiftKey && !e.altKey && key === "k") {
+    if (!e.shiftKey && !e.altKey && code === "KeyK") {
         e.preventDefault();
         e.stopPropagation();
         toggleLink();
