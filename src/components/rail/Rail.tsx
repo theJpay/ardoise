@@ -1,14 +1,19 @@
 import { CircleHelp, File, PanelLeft, Settings } from "lucide-react";
+import { useCallback, useRef, useState } from "react";
 
 import { useIsSidebarOpen, useLayoutActions } from "@stores/layout.store";
 
 import EditorModeToggler from "./EditorModeToggle";
 import LogoMark from "./LogoMark";
 import RailButton from "./RailButton";
+import { ShortcutPanel } from "./shortcutPanel";
 
 function Rail() {
     const isSidebarOpen = useIsSidebarOpen();
     const { toggleSidebar } = useLayoutActions();
+    const [isShortcutPanelOpen, setIsShortcutPanelOpen] = useState(false);
+    const helpRef = useRef<HTMLDivElement>(null);
+    const closeShortcutPanel = useCallback(() => setIsShortcutPanelOpen(false), []);
 
     return (
         <nav
@@ -35,9 +40,18 @@ function Rail() {
             <div className="flex-1" />
 
             <div className="flex w-full flex-col items-center gap-0.5 px-1">
-                <RailButton
-                    icon={<CircleHelp size={16} strokeWidth={1.5} />}
-                    label="Keyboard shortcuts"
+                <div ref={helpRef}>
+                    <RailButton
+                        icon={<CircleHelp size={16} strokeWidth={1.5} />}
+                        isActive={isShortcutPanelOpen}
+                        label="Keyboard shortcuts"
+                        onClick={() => setIsShortcutPanelOpen(!isShortcutPanelOpen)}
+                    />
+                </div>
+                <ShortcutPanel
+                    anchorRef={helpRef}
+                    isOpen={isShortcutPanelOpen}
+                    onClose={closeShortcutPanel}
                 />
                 <RailButton
                     icon={<PanelLeft size={16} strokeWidth={1.5} />}

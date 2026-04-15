@@ -2,17 +2,18 @@ import type { LucideIcon } from "lucide-react";
 
 type ShortcutKeyProps = {
     content: string | LucideIcon;
-    bg?: "surface" | "bg" | "danger";
+    variant?: "surface" | "bg" | "danger" | "soon";
 };
 
 const VARIANT_CLASSES = {
     surface: "bg-surface border-border-soft text-subtle",
     bg: "bg-bg border-border text-subtle",
-    danger: "bg-transparent border-danger-border text-danger"
+    danger: "bg-transparent border-danger-border text-danger",
+    soon: "bg-transparent border-border-soft text-dim"
 } as const;
 
-function ShortcutKey({ content: Content, bg = "surface" }: ShortcutKeyProps) {
-    const variantClass = VARIANT_CLASSES[bg];
+function ShortcutKey({ content: Content, variant = "surface" }: ShortcutKeyProps) {
+    const variantClass = VARIANT_CLASSES[variant];
 
     return (
         <kbd
