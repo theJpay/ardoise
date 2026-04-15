@@ -4,6 +4,8 @@ import { NoteEntity } from "@entities";
 import { useDebounce } from "@hooks/useDebounce";
 import { useNotesMutations, useNotesQuery } from "@queries/useNotesQuery";
 
+import type { Note } from "@entities";
+
 // Future: "recording" will be added when voice input is implemented
 export type SaveStatus = "saved" | "writing";
 
@@ -91,32 +93,9 @@ export function useNoteState(noteId: string | undefined) {
         }
     };
 
-    useEffect(() => {
-        if (selectedNote) {
-            setTitle(selectedNote.title);
-            setContent(selectedNote.content);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedNote?.id]);
-
-    useEffect(() => {
-        if (selectedNote) {
-            document.title = `${NoteEntity.getTitle({ title })} — Ardoise`;
-        }
-    }, [title, selectedNote]);
-
-    useEffect(() => {
-        if (saveStatus !== "writing") {
-            return;
-        }
-
-        const handler = (e: BeforeUnloadEvent) => {
-            e.preventDefault();
-        };
-
-        window.addEventListener("beforeunload", handler);
-        return () => window.removeEventListener("beforeunload", handler);
-    }, [saveStatus]);
+    useSyncNoteToLocalState(selectedNote, setTitle, setContent);
+    useDocumentTitle(title, selectedNote);
+    useWarnUnsavedChanges(saveStatus);
 
     return {
         isPending,
@@ -136,4 +115,41 @@ export function useNoteState(noteId: string | undefined) {
         handleTitleChange,
         setFocused
     };
+}
+
+function useSyncNoteToLocalState(
+    selectedNote: Note | undefined,
+    setTitle: (title: string) => void,
+    setContent: (content: string) => void
+) {
+    useEffect(() => {
+        if (selectedNote) {
+            setTitle(selectedNote.title);
+            setContent(selectedNote.content);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedNote?.id]);
+}
+
+function useDocumentTitle(title: string, selectedNote: Note | undefined) {
+    useEffect(() => {
+        if (selectedNote) {
+            document.title = `${NoteEntity.getTitle({ title })} — Ardoise`;
+        }
+    }, [title, selectedNote]);
+}
+
+function useWarnUnsavedChanges(saveStatus: SaveStatus) {
+    useEffect(() => {
+        if (saveStatus === "saved") {
+            return;
+        }
+
+        const handler = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+        };
+
+        window.addEventListener("beforeunload", handler);
+        return () => window.removeEventListener("beforeunload", handler);
+    }, [saveStatus]);
 }
