@@ -1,8 +1,9 @@
+import SettingsSection from "./SettingsSection";
+
 function PrivacySection() {
     return (
-        <div>
-            <h1 className="text-ui-h1 text-text mb-5 font-sans">Privacy</h1>
-            <div className="text-ui-sm bg-surface text-muted flex flex-col gap-3 rounded p-4 font-mono">
+        <SettingsSection title="Privacy">
+            <div className="text-ui-base text-muted flex flex-col gap-3 font-mono">
                 <p>
                     Your notes are stored
                     <span className="text-accent"> locally on this device</span>. Nothing is sent to
@@ -12,7 +13,7 @@ function PrivacySection() {
                     <span className="text-accent">Ardoise cannot read your notes.</span>
                 </p>
             </div>
-        </div>
+        </SettingsSection>
     );
 }
 
