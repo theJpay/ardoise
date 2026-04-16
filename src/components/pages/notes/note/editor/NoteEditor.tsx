@@ -8,6 +8,7 @@ type NoteEditorProps = {
     content: string;
     phantomRef: RefObject<HTMLDivElement | null>;
     ref: RefObject<HTMLTextAreaElement | null>;
+    spellCheck: boolean;
     onChange: (newContent: string) => void;
     onBlur?: () => void;
     onFocus?: () => void;
@@ -34,6 +35,7 @@ function NoteEditor({
     content,
     phantomRef,
     ref,
+    spellCheck,
     onBlur,
     onFocus,
     onChange,
@@ -65,6 +67,7 @@ function NoteEditor({
                     ref={ref}
                     className={`${className} caret-accent relative overflow-hidden text-transparent`}
                     placeholder="Start writing..."
+                    spellCheck={spellCheck}
                     value={content}
                     onBlur={onBlur}
                     onChange={(e) => onChange(e.target.value)}

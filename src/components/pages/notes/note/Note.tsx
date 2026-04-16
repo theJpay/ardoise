@@ -1,6 +1,7 @@
 import { useParams } from "react-router";
 
 import { useEditorMode } from "@hooks/useEditorMode";
+import { useSettingsQuery } from "@queries/useSettingsQuery";
 import { useDeletionState } from "@stores/deletion.store";
 
 import DeleteBanner from "./DeleteBanner";
@@ -26,6 +27,7 @@ function Note() {
     const { noteId } = useParams<{ noteId: string }>();
     const { mode, toggleMode } = useEditorMode();
     const { armed, noteTitle: armedNoteTitle } = useDeletionState();
+    const { settings } = useSettingsQuery();
 
     const {
         isPending,
@@ -112,6 +114,7 @@ function Note() {
                                 ref={editorRef}
                                 content={content}
                                 phantomRef={phantomRef}
+                                spellCheck={settings.spellcheck}
                                 onBlur={() => {
                                     setFocused(false);
                                     resetSelection();
