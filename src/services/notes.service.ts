@@ -68,3 +68,7 @@ export async function deleteNote(id: string): Promise<boolean> {
 export async function hardDeleteNote(id: string): Promise<void> {
     await db.notes.delete(id);
 }
+
+export async function hardDeleteAllNotes(): Promise<void> {
+    await db.notes.clear();
+}

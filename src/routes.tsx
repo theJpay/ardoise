@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router";
 
 import { Note, NoteIndex, NotesPage } from "@components/pages/notes";
 import {
+    DangerZoneSection,
     ExportSection,
     GeneralSection,
     PrivacySection,
@@ -35,7 +36,7 @@ export const router = createBrowserRouter([
                     { path: "general", element: <GeneralSection /> },
                     { path: "privacy", element: <PrivacySection /> },
                     { path: "export", element: <ExportSection /> },
-                    { path: "danger", element: <div>Danger zone</div> }
+                    { path: "danger", element: <DangerZoneSection /> }
                 ]
             }
         ]

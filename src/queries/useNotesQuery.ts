@@ -5,6 +5,7 @@ import {
     deleteNote,
     duplicateNote,
     getNotes,
+    hardDeleteAllNotes,
     hardDeleteNote,
     updateNote
 } from "@services/notes.service";
@@ -64,12 +65,20 @@ export function useNotesMutations() {
         }
     });
 
+    const hardDeleteAllNotesMutation = useMutation({
+        mutationFn: hardDeleteAllNotes,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
+        }
+    });
+
     return {
         createNote: createNoteMutation.mutateAsync,
         duplicateNote: duplicateNoteMutation.mutateAsync,
         updateNote: updateNoteMutation.mutateAsync,
         deleteNote: deleteNoteMutation.mutateAsync,
-        hardDeleteNote: hardDeleteNoteMutation.mutateAsync
+        hardDeleteNote: hardDeleteNoteMutation.mutateAsync,
+        hardDeleteAllNotes: hardDeleteAllNotesMutation.mutateAsync
     };
 }
 
