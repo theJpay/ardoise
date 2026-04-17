@@ -1,7 +1,12 @@
 import { createBrowserRouter, Navigate } from "react-router";
 
 import { Note, NoteIndex, NotesPage } from "@components/pages/notes";
-import { GeneralSection, PrivacySection, SettingsPage } from "@components/pages/settings";
+import {
+    ExportSection,
+    GeneralSection,
+    PrivacySection,
+    SettingsPage
+} from "@components/pages/settings";
 
 import App from "./App.tsx";
 
@@ -29,7 +34,7 @@ export const router = createBrowserRouter([
                     { index: true, element: <Navigate to="/settings/general" replace /> },
                     { path: "general", element: <GeneralSection /> },
                     { path: "privacy", element: <PrivacySection /> },
-                    { path: "export", element: <div>Export</div> },
+                    { path: "export", element: <ExportSection /> },
                     { path: "danger", element: <div>Danger zone</div> }
                 ]
             }
