@@ -27,7 +27,9 @@ function GeneralSection() {
                         onChange={(spellcheck) => updateSettings({ ...settings, spellcheck })}
                     />
                 </SettingsRow>
-                <SettingsRow description="Light and dark mode" label="Theme" />
+                <SettingsRow badge="soon" description="Light and dark mode" label="Theme">
+                    <Toggle checked={false} disabled onChange={() => {}} />
+                </SettingsRow>
             </div>
         </SettingsSection>
     );
