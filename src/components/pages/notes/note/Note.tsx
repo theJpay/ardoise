@@ -37,6 +37,7 @@ function Note() {
         selection,
         focused,
         editorRef,
+        titleRef,
         phantomRef,
         saveStatus,
         saveError,
@@ -104,6 +105,7 @@ function Note() {
                 >
                     <NoteTitle
                         date={selectedNote.updatedAt}
+                        inputRef={titleRef}
                         mode={mode}
                         title={title}
                         onChange={handleTitleChange}

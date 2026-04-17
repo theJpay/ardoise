@@ -64,6 +64,7 @@ export function useNoteState(noteId: string | undefined) {
     const [selection, setSelection] = useState({ start: 0, end: 0 });
     const [focused, setFocused] = useState(false);
     const editorRef = useRef<HTMLTextAreaElement>(null);
+    const titleRef = useRef<HTMLInputElement>(null);
     const phantomRef = useRef<HTMLDivElement>(null);
 
     const handleContentChange = (newContent: string) => {
@@ -96,6 +97,7 @@ export function useNoteState(noteId: string | undefined) {
     useSyncNoteToLocalState(selectedNote, setTitle, setContent);
     useDocumentTitle(title, selectedNote);
     useWarnUnsavedChanges(saveStatus);
+    useFocusOnLoad(titleRef, editorRef, selectedNote);
 
     return {
         isPending,
@@ -105,6 +107,7 @@ export function useNoteState(noteId: string | undefined) {
         selection,
         focused,
         editorRef,
+        titleRef,
         phantomRef,
         saveStatus,
         saveError,
@@ -152,4 +155,22 @@ function useWarnUnsavedChanges(saveStatus: SaveStatus) {
         window.addEventListener("beforeunload", handler);
         return () => window.removeEventListener("beforeunload", handler);
     }, [saveStatus]);
+}
+
+function useFocusOnLoad(
+    titleRef: React.RefObject<HTMLInputElement | null>,
+    editorRef: React.RefObject<HTMLTextAreaElement | null>,
+    selectedNote: Note | undefined
+) {
+    useEffect(() => {
+        if (!selectedNote) {
+            return;
+        }
+        if (selectedNote.title.trim() === "") {
+            titleRef.current?.focus();
+        } else {
+            editorRef.current?.focus();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedNote?.id]);
 }

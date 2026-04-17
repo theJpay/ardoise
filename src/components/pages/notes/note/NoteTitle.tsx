@@ -1,23 +1,25 @@
 import { NoteEntity } from "@entities";
 
 import type { EditorMode } from "@hooks/useEditorMode";
+import type { RefObject } from "react";
 
 type NoteTitleProps = {
     title: string;
     date: Date;
     mode: EditorMode;
+    inputRef?: RefObject<HTMLInputElement | null>;
     onChange: (newTitle: string) => void;
 };
 
-function NoteTitle({ title, date, mode, onChange }: NoteTitleProps) {
+function NoteTitle({ title, date, mode, inputRef, onChange }: NoteTitleProps) {
     return (
         <>
             {mode === "edit" ? (
                 <div className="text-ed-body flex items-baseline font-mono">
                     <span className="text-dim font-medium">#&nbsp;</span>
                     <input
+                        ref={inputRef}
                         aria-label="Note title"
-                        autoFocus={!title}
                         className="text-editor-text placeholder:text-dim w-full border-none bg-transparent font-mono font-medium outline-none"
                         placeholder="Untitled"
                         value={title}
