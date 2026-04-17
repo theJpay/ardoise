@@ -113,23 +113,23 @@ type GlobalKeyboardAction =
 
 function areActionKeysPressed(action: GlobalKeyboardAction, e: KeyboardEvent) {
     const meta = isMetaKey(e);
-    const code = e.code;
+    const key = e.key.toLowerCase();
 
     switch (action) {
         case "save":
-            return meta && !e.shiftKey && !e.altKey && code === "KeyS";
+            return meta && !e.shiftKey && !e.altKey && key === "s";
         case "toggleSidebar":
-            return meta && e.shiftKey && !e.altKey && code === "KeyB";
+            return meta && e.shiftKey && !e.altKey && key === "b";
         case "toggleMode":
-            return meta && e.shiftKey && !e.altKey && code === "KeyM";
+            return meta && e.shiftKey && !e.altKey && key === "m";
         case "focusSearch":
-            return meta && e.shiftKey && !e.altKey && code === "KeyF";
+            return meta && e.shiftKey && !e.altKey && key === "f";
         case "newNoteGlobal":
-            return meta && !e.shiftKey && e.altKey && code === "KeyN";
+            return meta && !e.shiftKey && e.altKey && e.code === "KeyN";
         case "addNote":
-            return !meta && !e.shiftKey && !e.altKey && code === "KeyC";
+            return !meta && !e.shiftKey && !e.altKey && key === "c";
         case "removeNote":
-            return meta && !e.shiftKey && !e.altKey && code === "Backspace";
+            return meta && !e.shiftKey && !e.altKey && key === "backspace";
         default:
             throw new UnreachableError(action);
     }
