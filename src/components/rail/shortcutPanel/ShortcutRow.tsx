@@ -9,11 +9,7 @@ function ShortcutRow({ shortcut }: { shortcut: Shortcut }) {
                 shortcut.soon ? "" : "hover:bg-accent-surface"
             }`}
         >
-            <span
-                className={`text-ui-base font-light ${
-                    shortcut.soon ? "text-dim" : "text-text"
-                }`}
-            >
+            <span className={`text-ui-base font-light ${shortcut.soon ? "text-dim" : "text-text"}`}>
                 {shortcut.label}
                 {shortcut.soon && <Badge label="soon" />}
             </span>

@@ -4,105 +4,105 @@ import { isInsideCodeBlock, replaceRange } from "./utils";
 
 import type { RefObject } from "react";
 
-export function useSmartKeys(
-    editorRef: RefObject<HTMLTextAreaElement | null>,
-    onChange: (newContent: string) => void
-) {
+type OnChange = (newContent: string) => void;
+
+export function useSmartKeys(editorRef: RefObject<HTMLTextAreaElement | null>, onChange: OnChange) {
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLTextAreaElement>): boolean => {
+            const textarea = editorRef.current;
+            if (!textarea) {
+                return false;
+            }
             if (e.key === "Enter" && !e.shiftKey) {
-                return handleSmartEnter(e);
+                return handleSmartEnter(e, textarea, onChange);
             }
             if (e.key === "Tab") {
-                return handleSmartTab(e);
+                return handleSmartTab(e, textarea, onChange);
             }
             return false;
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [editorRef, onChange]
     );
 
-    function handleSmartEnter(e: React.KeyboardEvent<HTMLTextAreaElement>): boolean {
-        const textarea = editorRef.current;
-        if (!textarea) {
-            return false;
-        }
-
-        const { value, selectionStart, selectionEnd } = textarea;
-        if (selectionStart !== selectionEnd) {
-            return false;
-        }
-
-        const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
-        const line = value.slice(lineStart, selectionStart);
-
-        const continuation = getListContinuation(line);
-        if (!continuation) {
-            return false;
-        }
-
-        e.preventDefault();
-
-        if (continuation === "break") {
-            replaceRange(textarea, {
-                start: lineStart,
-                end: selectionStart,
-                text: "",
-                onChange,
-                cursor: { start: lineStart }
-            });
-        } else {
-            const insert = `\n${continuation}`;
-            replaceRange(textarea, {
-                start: selectionStart,
-                end: selectionStart,
-                text: insert,
-                onChange,
-                cursor: { start: selectionStart + insert.length }
-            });
-        }
-
-        return true;
-    }
-
-    function handleSmartTab(e: React.KeyboardEvent<HTMLTextAreaElement>): boolean {
-        const textarea = editorRef.current;
-        if (!textarea) {
-            return false;
-        }
-
-        const { value, selectionStart, selectionEnd } = textarea;
-
-        if (!shouldInterceptTab(value, selectionStart, selectionEnd)) {
-            return false;
-        }
-
-        e.preventDefault();
-
-        const firstLineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
-        const selectedText = value.slice(firstLineStart, selectionEnd);
-        const lines = selectedText.split("\n");
-
-        const modifiedLines = lines.map((line) => (e.shiftKey ? dedentLine(line) : "  " + line));
-
-        const firstLineOffset = modifiedLines[0].length - lines[0].length;
-        const newText = modifiedLines.join("\n");
-
-        replaceRange(textarea, {
-            start: firstLineStart,
-            end: firstLineStart + selectedText.length,
-            text: newText,
-            onChange,
-            cursor: {
-                start: Math.max(firstLineStart, selectionStart + firstLineOffset),
-                end: firstLineStart + newText.length
-            }
-        });
-
-        return true;
-    }
-
     return { handleKeyDown };
+}
+
+function handleSmartEnter(
+    e: React.KeyboardEvent<HTMLTextAreaElement>,
+    textarea: HTMLTextAreaElement,
+    onChange: OnChange
+): boolean {
+    const { value, selectionStart, selectionEnd } = textarea;
+    if (selectionStart !== selectionEnd) {
+        return false;
+    }
+
+    const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
+    const line = value.slice(lineStart, selectionStart);
+
+    const continuation = getListContinuation(line);
+    if (!continuation) {
+        return false;
+    }
+
+    e.preventDefault();
+
+    if (continuation === "break") {
+        replaceRange(textarea, {
+            start: lineStart,
+            end: selectionStart,
+            text: "",
+            onChange,
+            cursor: { start: lineStart }
+        });
+    } else {
+        const insert = `\n${continuation}`;
+        replaceRange(textarea, {
+            start: selectionStart,
+            end: selectionStart,
+            text: insert,
+            onChange,
+            cursor: { start: selectionStart + insert.length }
+        });
+    }
+
+    return true;
+}
+
+function handleSmartTab(
+    e: React.KeyboardEvent<HTMLTextAreaElement>,
+    textarea: HTMLTextAreaElement,
+    onChange: OnChange
+): boolean {
+    const { value, selectionStart, selectionEnd } = textarea;
+
+    if (!shouldInterceptTab(value, selectionStart, selectionEnd)) {
+        return false;
+    }
+
+    e.preventDefault();
+
+    const firstLineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
+    const selectedText = value.slice(firstLineStart, selectionEnd);
+    const lines = selectedText.split("\n");
+
+    const modifiedLines = lines.map((line) => (e.shiftKey ? dedentLine(line) : "  " + line));
+
+    const firstLineOffset = modifiedLines[0].length - lines[0].length;
+    const newText = modifiedLines.join("\n");
+
+    replaceRange(textarea, {
+        start: firstLineStart,
+        end: firstLineStart + selectedText.length,
+        text: newText,
+        onChange,
+        cursor: {
+            start: Math.max(firstLineStart, selectionStart + firstLineOffset),
+            end: firstLineStart + newText.length
+        }
+    });
+
+    return true;
 }
 
 function getListContinuation(line: string): string | "break" | null {

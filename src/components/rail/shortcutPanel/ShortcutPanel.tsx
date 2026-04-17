@@ -59,9 +59,7 @@ function ShortcutPanel({ anchorRef, isOpen, onClose }: ShortcutPanelProps) {
             style={floatingStyles}
         >
             <div className="border-border-soft flex items-center justify-between border-b px-4 py-3">
-                <span className="text-ui-base text-text font-medium">
-                    Keyboard shortcuts
-                </span>
+                <span className="text-ui-base text-text font-medium">Keyboard shortcuts</span>
                 <button
                     className="text-subtle hover:bg-surface hover:text-muted flex size-5.5 items-center justify-center rounded transition-colors"
                     onClick={onClose}
