@@ -1,15 +1,19 @@
 import { useCallback, useEffect } from "react";
 import { useSearchParams } from "react-router";
 
+import { useSettingsQuery } from "@queries/useSettingsQuery";
+
 export type EditorMode = "edit" | "preview";
 
 const VALID_MODES: string[] = ["edit", "preview"];
 
 export function useEditorMode() {
     const [searchParams, setSearchParams] = useSearchParams();
+    const { settings } = useSettingsQuery();
 
     const rawMode = searchParams.get("mode");
-    const mode: EditorMode = rawMode === "preview" ? "preview" : "edit";
+    const mode: EditorMode =
+        rawMode === "preview" ? "preview" : rawMode === "edit" ? "edit" : settings.defaultMode;
 
     useCleanInvalidMode(rawMode);
 
@@ -17,7 +21,7 @@ export function useEditorMode() {
         (newMode: EditorMode) => {
             setSearchParams((prev) => {
                 const next = new URLSearchParams(prev);
-                if (newMode === "edit") {
+                if (newMode === settings.defaultMode) {
                     next.delete("mode");
                 } else {
                     next.set("mode", newMode);
@@ -25,7 +29,7 @@ export function useEditorMode() {
                 return next;
             });
         },
-        [setSearchParams]
+        [setSearchParams, settings.defaultMode]
     );
 
     const toggleMode = useCallback(() => {
