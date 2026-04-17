@@ -29,8 +29,8 @@ function FirstLaunchScreen({ onCreateNote }: { onCreateNote: () => void }) {
         <div className="flex h-full flex-col items-center justify-center gap-5">
             <LogoMark className="text-accent" size={48} />
             <div className="flex flex-col items-center gap-1.5 text-center">
-                <h2 className="text-ui-h2 text-muted font-sans">Your notes, on your device.</h2>
-                <p className="text-ui-xs text-subtle font-mono">Nothing leaves this machine.</p>
+                <h2 className="text-ui-h2 text-muted">Your notes, on your device.</h2>
+                <p className="text-ui-xs text-subtle">Nothing leaves this machine.</p>
             </div>
             <Button icon={Plus} label="New note" onClick={onCreateNote} />
         </div>

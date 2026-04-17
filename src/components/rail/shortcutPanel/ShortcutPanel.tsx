@@ -59,7 +59,7 @@ function ShortcutPanel({ anchorRef, isOpen, onClose }: ShortcutPanelProps) {
             style={floatingStyles}
         >
             <div className="border-border-soft flex items-center justify-between border-b px-4 py-3">
-                <span className="text-ui-base text-text font-sans font-medium">
+                <span className="text-ui-base text-text font-medium">
                     Keyboard shortcuts
                 </span>
                 <button

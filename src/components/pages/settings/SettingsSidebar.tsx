@@ -14,7 +14,7 @@ function SettingsSidebar() {
                 <NavLink
                     key={item.to}
                     className={({ isActive }) =>
-                        `text-ui-base flex h-8 items-center border-l-2 px-4 font-sans transition-colors ${
+                        `text-ui-base flex h-8 items-center border-l-2 px-4 transition-colors ${
                             isActive
                                 ? "bg-elevated text-text border-accent pl-3.5"
                                 : "text-muted hover:bg-elevated hover:text-text border-transparent"
@@ -27,7 +27,7 @@ function SettingsSidebar() {
             ))}
             <NavLink
                 className={({ isActive }) =>
-                    `text-ui-base flex h-8 items-center border-l-2 px-4 font-sans transition-colors ${
+                    `text-ui-base flex h-8 items-center border-l-2 px-4 transition-colors ${
                         isActive
                             ? "bg-danger-surface text-danger border-danger pl-3.5"
                             : "text-danger hover:bg-danger-surface border-transparent"

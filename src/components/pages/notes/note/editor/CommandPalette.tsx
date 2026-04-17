@@ -61,7 +61,7 @@ function CommandPalette({
                             {COMMAND_PALETTE_ACTION_ICONS[action.name]}
                         </div>
                         <div>
-                            <div className="text-ui-base text-text font-sans">{action.label}</div>
+                            <div className="text-ui-base text-text">{action.label}</div>
                             <div className="text-ui-sm text-subtle font-mono">
                                 {action.description}
                             </div>

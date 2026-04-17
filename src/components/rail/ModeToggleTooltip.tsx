@@ -29,10 +29,10 @@ function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
             className="bg-elevated border-border shadow-float z-50 max-w-65 rounded-md border px-3.5 py-3 transition-opacity duration-200"
             style={floatingStyles}
         >
-            <div className="text-ui-base text-text mb-1 font-sans font-medium">
+            <div className="text-ui-base text-text mb-1 font-medium">
                 Switch between Write and Read
             </div>
-            <div className="text-ui-sm text-muted font-mono leading-[1.6]">
+            <div className="text-ui-sm text-muted font-mono">
                 Write mode for editing raw markdown. Read mode for distraction-free reading.
             </div>
             <div className="mt-2 flex items-center justify-between">

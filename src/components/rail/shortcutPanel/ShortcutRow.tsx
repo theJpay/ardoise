@@ -10,7 +10,7 @@ function ShortcutRow({ shortcut }: { shortcut: Shortcut }) {
             }`}
         >
             <span
-                className={`text-ui-base font-sans font-light ${
+                className={`text-ui-base font-light ${
                     shortcut.soon ? "text-dim" : "text-text"
                 }`}
             >
