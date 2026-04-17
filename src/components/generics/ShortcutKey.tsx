@@ -1,3 +1,7 @@
+import { Command, Option } from "lucide-react";
+
+import { isMac } from "@utils";
+
 import type { LucideIcon } from "lucide-react";
 
 type ShortcutKeyProps = {
@@ -12,16 +16,33 @@ const VARIANT_CLASSES = {
     soon: "bg-transparent border-border-soft text-dim"
 } as const;
 
-function ShortcutKey({ content: Content, variant = "surface" }: ShortcutKeyProps) {
+const NON_MAC_FALLBACKS = new Map<LucideIcon, string>([
+    [Command, "Ctrl"],
+    [Option, "Alt"]
+]);
+
+function ShortcutKey({ content, variant = "surface" }: ShortcutKeyProps) {
     const variantClass = VARIANT_CLASSES[variant];
+    const resolved = resolveContent(content);
 
     return (
         <kbd
-            className={`text-ui-xs inline-flex size-4.5 items-center justify-center rounded-sm border font-mono ${variantClass}`}
+            className={`text-ui-xs inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-sm border px-1 font-mono ${variantClass}`}
         >
-            {typeof Content === "string" ? Content : <Content size={11} strokeWidth={2} />}
+            {typeof resolved === "string" ? resolved : renderIcon(resolved)}
         </kbd>
     );
+}
+
+function resolveContent(content: string | LucideIcon): string | LucideIcon {
+    if (typeof content === "string" || isMac()) {
+        return content;
+    }
+    return NON_MAC_FALLBACKS.get(content) ?? content;
+}
+
+function renderIcon(Icon: LucideIcon) {
+    return <Icon size={11} strokeWidth={2} />;
 }
 
 export default ShortcutKey;
