@@ -1,6 +1,7 @@
+import { Plus } from "lucide-react";
 import { useEffect } from "react";
 
-import { AddNoteButton } from "@components/generics";
+import { Button } from "@components/generics";
 import LogoMark from "@components/rail/LogoMark";
 import { useAddNote } from "@hooks/useAddNote";
 import { useNotesQuery } from "@queries/useNotesQuery";
@@ -31,7 +32,7 @@ function FirstLaunchScreen({ onCreateNote }: { onCreateNote: () => void }) {
                 <h2 className="text-ui-h2 text-muted font-sans">Your notes, on your device.</h2>
                 <p className="text-ui-xs text-subtle font-mono">Nothing leaves this machine.</p>
             </div>
-            <AddNoteButton onClick={onCreateNote} />
+            <Button icon={Plus} label="New note" onClick={onCreateNote} />
         </div>
     );
 }

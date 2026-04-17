@@ -1,4 +1,6 @@
-import { AddNoteButton } from "@components/generics";
+import { Plus } from "lucide-react";
+
+import { Button } from "@components/generics";
 import { useAddNote } from "@hooks/useAddNote";
 import { useNoteSearch } from "@hooks/useNoteSearch";
 import { useNotesQuery } from "@queries/useNotesQuery";
@@ -26,7 +28,7 @@ function SideBar({ searchRef }: SideBarProps) {
         <div className="flex h-full flex-col">
             <div className="border-border-soft flex shrink-0 flex-col gap-2 border-b p-3">
                 <SearchBar ref={searchRef} value={search} onChange={setSearch} />
-                <AddNoteButton onClick={addNote} />
+                <Button icon={Plus} label="New note" onClick={addNote} />
             </div>
 
             <div className="text-ui-xs text-subtle shrink-0 px-3 pt-2.5 pb-0.5 font-mono">
