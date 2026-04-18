@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router";
 
+import { ErrorFallback } from "@components";
 import { Note, NoteIndex, NotesPage } from "@components/pages/notes";
 import {
     DangerZoneSection,
@@ -15,6 +16,7 @@ export const router = createBrowserRouter([
     {
         path: "/",
         Component: App,
+        errorElement: <ErrorFallback />,
         children: [
             {
                 index: true,
