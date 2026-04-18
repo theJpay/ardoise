@@ -65,6 +65,7 @@ function NoteEditor({
                 />
                 <textarea
                     ref={ref}
+                    aria-label="Note content"
                     className={`${className} caret-accent relative overflow-hidden text-transparent`}
                     placeholder="Start writing..."
                     spellCheck={spellCheck}
