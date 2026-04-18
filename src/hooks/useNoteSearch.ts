@@ -5,8 +5,8 @@ import type { Note } from "@entities";
 export function useNoteSearch(notes: Note[]) {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const filteredNotes = notes.filter(
-        (note) => note.title.toLowerCase().includes((searchParams.get("q") ?? "").toLowerCase()) // Add better expression with REGEX later?
+    const filteredNotes = notes.filter((note) =>
+        note.title.toLowerCase().includes((searchParams.get("q") ?? "").toLowerCase())
     );
 
     const setSearch = (value: string) => {
