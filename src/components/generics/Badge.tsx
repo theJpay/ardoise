@@ -4,7 +4,7 @@ type BadgeProps = {
 
 function Badge({ label }: BadgeProps) {
     return (
-        <span className="text-ui-xs text-dim bg-surface border-border-soft ml-1.5 inline-block rounded-sm border px-1.25 py-px align-middle font-mono">
+        <span className="text-ui-xs text-muted bg-surface border-border-soft ml-1.5 inline-block rounded-sm border px-1.25 py-px align-middle font-mono">
             {label}
         </span>
     );
