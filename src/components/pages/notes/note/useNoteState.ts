@@ -69,6 +69,7 @@ export function useNoteState(noteId: string | undefined, mode: EditorMode) {
     const phantomRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const lastCursorRef = useRef({ start: 0, end: 0 });
+    const lastScrollRatioRef = useRef(0);
 
     const handleContentChange = (newContent: string) => {
         setContent(newContent);
@@ -91,6 +92,15 @@ export function useNoteState(noteId: string | undefined, mode: EditorMode) {
         setSelection({ start: 0, end: 0 });
     };
 
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        if (mode !== "edit") {
+            return;
+        }
+        const el = e.currentTarget;
+        const max = el.scrollHeight - el.clientHeight;
+        lastScrollRatioRef.current = max > 0 ? el.scrollTop / max : 0;
+    };
+
     const handleTitleChange = (newTitle: string) => {
         setTitle(newTitle);
         setSaveStatus("writing");
@@ -105,6 +115,7 @@ export function useNoteState(noteId: string | undefined, mode: EditorMode) {
     useFocusOnLoad(titleRef, editorRef, selectedNote);
     useResetCursorOnNoteChange(lastCursorRef, selectedNote?.id);
     useRestoreEditorOnModeChange(editorRef, scrollContainerRef, lastCursorRef, mode);
+    useApplyScrollOnPreview(scrollContainerRef, lastScrollRatioRef, mode);
 
     return {
         isPending,
@@ -123,6 +134,7 @@ export function useNoteState(noteId: string | undefined, mode: EditorMode) {
         resetSelection,
         handleContentChange,
         handleCursorChange,
+        handleScroll,
         handleTitleChange,
         setFocused
     };
@@ -225,4 +237,47 @@ function scrollToCursor(
     const linesBefore = textarea.value.slice(0, cursorPos).split("\n").length - 1;
     const targetScroll = linesBefore * lineHeight;
     container.scrollTop = Math.max(0, targetScroll - SCROLL_CONTEXT_MARGIN);
+}
+
+function useApplyScrollOnPreview(
+    scrollContainerRef: React.RefObject<HTMLDivElement | null>,
+    lastScrollRatioRef: React.RefObject<number>,
+    mode: EditorMode
+) {
+    useEffect(() => {
+        if (mode !== "preview") {
+            return;
+        }
+        const container = scrollContainerRef.current;
+        if (!container) {
+            return;
+        }
+        const ratio = lastScrollRatioRef.current;
+
+        const apply = () => {
+            const max = container.scrollHeight - container.clientHeight;
+            if (max <= 0) {
+                return false;
+            }
+            container.scrollTop = ratio * max;
+            return true;
+        };
+
+        if (apply()) {
+            return;
+        }
+
+        const observer = new ResizeObserver(() => {
+            if (apply()) {
+                observer.disconnect();
+            }
+        });
+        observer.observe(container);
+        const timeout = window.setTimeout(() => observer.disconnect(), 1000);
+
+        return () => {
+            observer.disconnect();
+            clearTimeout(timeout);
+        };
+    }, [mode, scrollContainerRef, lastScrollRatioRef]);
 }

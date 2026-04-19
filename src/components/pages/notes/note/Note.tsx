@@ -46,6 +46,7 @@ function Note() {
         resetSelection,
         handleContentChange,
         handleCursorChange,
+        handleScroll,
         handleTitleChange,
         setFocused
     } = useNoteState(noteId, mode);
@@ -101,6 +102,7 @@ function Note() {
             <div
                 ref={scrollContainerRef}
                 className={`flex-1 overflow-auto px-6 py-12 transition-opacity duration-150 ${armed ? "opacity-40" : ""}`}
+                onScroll={handleScroll}
             >
                 <div
                     className={`mx-auto flex w-full flex-col gap-2 ${mode === "edit" ? "max-w-[72ch]" : "max-w-180"}`}
