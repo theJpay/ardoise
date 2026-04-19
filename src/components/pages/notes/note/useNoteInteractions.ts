@@ -73,9 +73,9 @@ function useFocusOnLoad(
             return;
         }
         if (selectedNote.title.trim() === "") {
-            titleRef.current?.focus();
+            titleRef.current?.focus({ preventScroll: true });
         } else {
-            editorRef.current?.focus();
+            editorRef.current?.focus({ preventScroll: true });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedNote?.id]);
