@@ -45,6 +45,7 @@ export function useNoteInteractions({ selectedNote, mode }: Options) {
 
     useFocusOnLoad(titleRef, editorRef, selectedNote);
     useResetCursorOnNoteChange(lastCursorRef, selectedNote?.id);
+    useResetScrollOnNoteChange(scrollContainerRef, lastScrollRatioRef, selectedNote?.id);
     useRestoreEditorOnModeChange(editorRef, scrollContainerRef, lastCursorRef, mode);
     useApplyScrollOnPreview(scrollContainerRef, lastScrollRatioRef, mode);
 
@@ -87,6 +88,19 @@ function useResetCursorOnNoteChange(
     useEffect(() => {
         lastCursorRef.current = { start: 0, end: 0 };
     }, [noteId, lastCursorRef]);
+}
+
+function useResetScrollOnNoteChange(
+    scrollContainerRef: React.RefObject<HTMLDivElement | null>,
+    lastScrollRatioRef: React.RefObject<number>,
+    noteId: string | undefined
+) {
+    useEffect(() => {
+        lastScrollRatioRef.current = 0;
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTop = 0;
+        }
+    }, [noteId, scrollContainerRef, lastScrollRatioRef]);
 }
 
 function useRestoreEditorOnModeChange(
