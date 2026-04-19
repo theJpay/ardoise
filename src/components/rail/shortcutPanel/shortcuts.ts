@@ -39,8 +39,7 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
             { label: "Strikethrough", keys: [Command, ArrowBigUp, "X"] },
             { label: "Inline code", keys: [Command, "E"] },
             { label: "Link", keys: [Command, "K"] },
-            { label: "Slash commands", keys: ["/"] },
-            { label: "Voice note", keys: [Command, ArrowBigUp, "V"], soon: true }
+            { label: "Slash commands", keys: ["/"] }
         ]
     },
     {
