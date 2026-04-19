@@ -1,0 +1,132 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { NoteEntity } from "@entities";
+import { useDebounce } from "@hooks/useDebounce";
+import { useNotesMutations, useNotesQuery } from "@queries/useNotesQuery";
+
+import type { Note } from "@entities";
+
+export type SaveStatus = "saved" | "writing";
+
+export function useNoteData(noteId: string | undefined) {
+    const { notes, isPending } = useNotesQuery();
+    const { updateNote } = useNotesMutations();
+
+    const selectedNote = notes.find((note) => note.id === noteId);
+
+    const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
+    const [saveError, setSaveError] = useState(false);
+    const lastFailedUpdate = useRef<{ id: string; fields: Record<string, string> } | null>(null);
+
+    const { debouncedCallback: debouncedUpdateTitle } = useDebounce(
+        async (noteId: string, title: string) => {
+            try {
+                await updateNote({ id: noteId, fields: { title } });
+                setSaveStatus("saved");
+                setSaveError(false);
+            } catch {
+                setSaveError(true);
+                lastFailedUpdate.current = { id: noteId, fields: { title } };
+            }
+        }
+    );
+    const { debouncedCallback: debouncedUpdateContent } = useDebounce(
+        async (noteId: string, content: string) => {
+            try {
+                await updateNote({ id: noteId, fields: { content } });
+                setSaveStatus("saved");
+                setSaveError(false);
+            } catch {
+                setSaveError(true);
+                lastFailedUpdate.current = { id: noteId, fields: { content } };
+            }
+        }
+    );
+
+    const retrySave = useCallback(async () => {
+        if (!lastFailedUpdate.current) {
+            return;
+        }
+        try {
+            const { id, fields } = lastFailedUpdate.current;
+            await updateNote({ id, fields });
+            setSaveStatus("saved");
+            setSaveError(false);
+            lastFailedUpdate.current = null;
+        } catch {
+            // Still failing — keep the error state
+        }
+    }, [updateNote]);
+
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
+
+    const handleContentChange = (newContent: string) => {
+        setContent(newContent);
+        setSaveStatus("writing");
+        if (selectedNote) {
+            debouncedUpdateContent(selectedNote.id, newContent);
+        }
+    };
+
+    const handleTitleChange = (newTitle: string) => {
+        setTitle(newTitle);
+        setSaveStatus("writing");
+        if (selectedNote) {
+            debouncedUpdateTitle(selectedNote.id, newTitle);
+        }
+    };
+
+    useSyncNoteToLocalState(selectedNote, setTitle, setContent);
+    useDocumentTitle(title, selectedNote);
+    useWarnUnsavedChanges(saveStatus);
+
+    return {
+        isPending,
+        selectedNote,
+        title,
+        content,
+        saveStatus,
+        saveError,
+        retrySave,
+        handleContentChange,
+        handleTitleChange
+    };
+}
+
+function useSyncNoteToLocalState(
+    selectedNote: Note | undefined,
+    setTitle: (title: string) => void,
+    setContent: (content: string) => void
+) {
+    useEffect(() => {
+        if (selectedNote) {
+            setTitle(selectedNote.title);
+            setContent(selectedNote.content);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedNote?.id]);
+}
+
+function useDocumentTitle(title: string, selectedNote: Note | undefined) {
+    useEffect(() => {
+        if (selectedNote) {
+            document.title = `${NoteEntity.getTitle({ title })} — Ardoise`;
+        }
+    }, [title, selectedNote]);
+}
+
+function useWarnUnsavedChanges(saveStatus: SaveStatus) {
+    useEffect(() => {
+        if (saveStatus === "saved") {
+            return;
+        }
+
+        const handler = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+        };
+
+        window.addEventListener("beforeunload", handler);
+        return () => window.removeEventListener("beforeunload", handler);
+    }, [saveStatus]);
+}
