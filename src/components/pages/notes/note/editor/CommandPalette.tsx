@@ -39,7 +39,7 @@ function CommandPalette({
             className="bg-elevated border-border shadow-float z-50 w-58 rounded border p-1"
             style={floatingStyles}
         >
-            <div className="text-ui-xs text-subtle px-2 py-1.5 font-mono">/ commands</div>
+            <div className="text-ui-xs text-dim px-2 py-1.5 font-mono">/ commands</div>
             <div className="max-h-66 overflow-y-auto">
                 {filteredActions.map((action, index) => (
                     <div
