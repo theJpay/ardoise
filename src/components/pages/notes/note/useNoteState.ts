@@ -67,6 +67,7 @@ export function useNoteState(noteId: string | undefined, mode: EditorMode) {
     const editorRef = useRef<HTMLTextAreaElement>(null);
     const titleRef = useRef<HTMLInputElement>(null);
     const phantomRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
     const lastCursorRef = useRef({ start: 0, end: 0 });
 
     const handleContentChange = (newContent: string) => {
@@ -103,7 +104,7 @@ export function useNoteState(noteId: string | undefined, mode: EditorMode) {
     useWarnUnsavedChanges(saveStatus);
     useFocusOnLoad(titleRef, editorRef, selectedNote);
     useResetCursorOnNoteChange(lastCursorRef, selectedNote?.id);
-    useRestoreEditorOnModeChange(editorRef, lastCursorRef, mode);
+    useRestoreEditorOnModeChange(editorRef, scrollContainerRef, lastCursorRef, mode);
 
     return {
         isPending,
@@ -115,6 +116,7 @@ export function useNoteState(noteId: string | undefined, mode: EditorMode) {
         editorRef,
         titleRef,
         phantomRef,
+        scrollContainerRef,
         saveStatus,
         saveError,
         retrySave,
@@ -190,8 +192,11 @@ function useResetCursorOnNoteChange(
     }, [noteId, lastCursorRef]);
 }
 
+const SCROLL_CONTEXT_MARGIN = 100;
+
 function useRestoreEditorOnModeChange(
     editorRef: React.RefObject<HTMLTextAreaElement | null>,
+    scrollContainerRef: React.RefObject<HTMLDivElement | null>,
     lastCursorRef: React.RefObject<{ start: number; end: number }>,
     mode: EditorMode
 ) {
@@ -200,11 +205,24 @@ function useRestoreEditorOnModeChange(
             return;
         }
         const textarea = editorRef.current;
-        if (!textarea) {
+        const container = scrollContainerRef.current;
+        if (!textarea || !container) {
             return;
         }
         textarea.focus();
         const { start, end } = lastCursorRef.current;
         textarea.setSelectionRange(start, end);
-    }, [mode, editorRef, lastCursorRef]);
+        scrollToCursor(textarea, container, start);
+    }, [mode, editorRef, scrollContainerRef, lastCursorRef]);
+}
+
+function scrollToCursor(
+    textarea: HTMLTextAreaElement,
+    container: HTMLDivElement,
+    cursorPos: number
+) {
+    const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight);
+    const linesBefore = textarea.value.slice(0, cursorPos).split("\n").length - 1;
+    const targetScroll = linesBefore * lineHeight;
+    container.scrollTop = Math.max(0, targetScroll - SCROLL_CONTEXT_MARGIN);
 }

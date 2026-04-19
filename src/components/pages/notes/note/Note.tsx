@@ -39,6 +39,7 @@ function Note() {
         editorRef,
         titleRef,
         phantomRef,
+        scrollContainerRef,
         saveStatus,
         saveError,
         retrySave,
@@ -98,6 +99,7 @@ function Note() {
             )}
 
             <div
+                ref={scrollContainerRef}
                 className={`flex-1 overflow-auto px-6 py-12 transition-opacity duration-150 ${armed ? "opacity-40" : ""}`}
             >
                 <div
