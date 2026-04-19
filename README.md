@@ -1,73 +1,93 @@
-# React + TypeScript + Vite
+<p align="center">
+  <img src="./docs/logo.svg" alt="Ardoise" width="80" height="80" />
+</p>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<h1 align="center">Ardoise</h1>
 
-Currently, two official plugins are available:
+<p align="center">Local-first markdown notes, in your browser.</p>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+![React](https://img.shields.io/badge/React-19-61dafb)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6)
+![Vite](https://img.shields.io/badge/Vite-8-646cff)
 
-## React Compiler
+**[Live demo →](https://ardoise.vercel.app)**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## What is Ardoise?
 
-## Expanding the ESLint configuration
+Ardoise is a markdown note-taking app that runs entirely in your browser. Your notes are stored locally in IndexedDB — nothing syncs, nothing phones home, no servers involved.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+It's built for people who prefer plain text and keyboard shortcuts over collaborative walls of blocks. Write in markdown with inline syntax highlighting, preview without switching files, navigate between notes with `⌘⇧F`, and insert structure with a slash menu. If you've ever wanted something between iA Writer and a disposable scratch pad, that's roughly the shape.
 
-```js
-export default defineConfig([
-    globalIgnores(["dist"]),
-    {
-        files: ["**/*.{ts,tsx}"],
-        extends: [
-            // Other configs...
+**Privacy by construction:** there is no backend to breach. Your notes never leave your device because there's nowhere for them to go.
 
-            // Remove tseslint.configs.recommended and replace with this
-            tseslint.configs.recommendedTypeChecked,
-            // Alternatively, use this for stricter rules
-            tseslint.configs.strictTypeChecked,
-            // Optionally, add this for stylistic rules
-            tseslint.configs.stylisticTypeChecked
+## Features
 
-            // Other configs...
-        ],
-        languageOptions: {
-            parserOptions: {
-                project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-                tsconfigRootDir: import.meta.dirname
-            }
-            // other options...
-        }
-    }
-]);
+- **Inline markdown syntax highlighting** — see formatting as you type, not after
+- **Live preview mode** — switch between editing and reading with `⌘⇧M`
+- **Command palette** — type `/` in the editor to insert headings, code blocks, lists
+- **Floating toolbar on selection** — for when you'd rather click
+- **Keyboard-first** — every action has a shortcut; press the `?` icon to see them all
+- **Smart list continuation** — hit Enter on a list item to continue, Enter on an empty one to exit
+- **Auto-save** — every keystroke, stored locally, never lost
+- **Export all notes** — download a zip of markdown files anytime
+- **Spellcheck, default mode, and dark-first aesthetic** — because yes
+
+## Built with
+
+- [**React 19**](https://react.dev/) + [**TypeScript**](https://www.typescriptlang.org/) — strict mode, no `any` outside one typed generic
+- [**Vite**](https://vitejs.dev/) — dev server and build
+- [**Tailwind v4**](https://tailwindcss.com/) — design system via CSS tokens
+- [**Dexie**](https://dexie.org/) — IndexedDB wrapper for local persistence
+- [**TanStack Query**](https://tanstack.com/query) — data layer on top of Dexie
+- [**React Router**](https://reactrouter.com/) — routing
+- [**unified** / **remark** / **rehype**](https://unifiedjs.com/) — markdown pipeline with sanitization
+- [**Zustand**](https://zustand-demo.pmnd.rs/) — small shared state (sidebar, deletion, onboarding)
+- [**Floating UI**](https://floating-ui.com/) — positioning for popovers and palettes
+- [**fflate**](https://github.com/101arrowz/fflate) — export zip generation
+- [**Lucide**](https://lucide.dev/) — icons
+
+## Run locally
+
+```bash
+git clone https://github.com/theJpay/ardoise.git
+cd ardoise
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Then open [http://localhost:5173](http://localhost:5173).
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
+Available scripts:
 
-export default defineConfig([
-    globalIgnores(["dist"]),
-    {
-        files: ["**/*.{ts,tsx}"],
-        extends: [
-            // Other configs...
-            // Enable lint rules for React
-            reactX.configs["recommended-typescript"],
-            // Enable lint rules for React DOM
-            reactDom.configs.recommended
-        ],
-        languageOptions: {
-            parserOptions: {
-                project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-                tsconfigRootDir: import.meta.dirname
-            }
-            // other options...
-        }
-    }
-]);
-```
+- `npm run dev` — start the dev server
+- `npm run build` — type-check and build for production
+- `npm run preview` — preview the production build
+- `npm run lint` — ESLint
+- `npm run format` — Prettier
+
+## About this project
+
+Ardoise started as a way to learn React 19 and TypeScript by building something I'd actually use. I care about tools that respect user autonomy, and this is my attempt at one.
+
+The technical bits I wanted to explore:
+
+- **Inline syntax highlighting in a textarea** — most markdown editors break native undo, spellcheck, or IME to get highlighting. Ardoise keeps all of it by overlaying a mirror `<div>` on a transparent textarea.
+- **Local-first without the cloud fallback** — IndexedDB as the primary store, no sync, no account system. Every design decision leaned into this.
+- **Keyboard-first interactions** — command palette, floating toolbar, global shortcuts, all discoverable through a `?` panel.
+- **A design system that doesn't drift** — opaque hex tokens only, typographic utilities (`text-ui-xs` through `text-ui-h1`), strict rules about when to use `dim` vs `subtle` vs `muted`.
+
+If you're evaluating me as an engineer, the most interesting files are probably:
+
+- [`src/components/pages/notes/note/editor/utils/tokenize.ts`](./src/components/pages/notes/note/editor/utils/tokenize.ts) — the hand-rolled markdown tokenizer
+- [`src/components/pages/notes/note/editor/utils/replaceRange.ts`](./src/components/pages/notes/note/editor/utils/replaceRange.ts) — how native undo is preserved via `execCommand`
+- [`src/components/pages/notes/note/editor/useSmartKeys.ts`](./src/components/pages/notes/note/editor/useSmartKeys.ts) — smart list continuation and Tab indentation
+- [`src/hooks/useNotesShortcuts.ts`](./src/hooks/useNotesShortcuts.ts) — layered keyboard shortcut handling
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md). Short version: this is a personal project. Issues are welcome; pull requests are not.
+
+## License
+
+[MIT](./LICENSE) © 2026 Jules Paris

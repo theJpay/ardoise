@@ -1,8 +1,26 @@
 {
     "name": "ardoise",
     "private": true,
-    "version": "0.0.0",
+    "version": "0.1.0",
     "type": "module",
+    "description": "Local-first markdown notes, in your browser.",
+    "author": "Jules Paris",
+    "license": "MIT",
+    "homepage": "https://ardoise.vercel.app",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/theJpay/ardoise.git"
+    },
+    "bugs": {
+        "url": "https://github.com/theJpay/ardoise/issues"
+    },
+    "keywords": [
+        "markdown",
+        "notes",
+        "local-first",
+        "react",
+        "typescript"
+    ],
     "scripts": {
         "dev": "vite",
         "build": "tsc -b && vite build",
