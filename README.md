@@ -11,7 +11,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6)
 ![Vite](https://img.shields.io/badge/Vite-8-646cff)
 
-**[Live demo →](https://ardoise.vercel.app)**
+**[Live demo →](https://ardoise.page)**
 
 ## What is Ardoise?
 

@@ -6,7 +6,7 @@
     "description": "Local-first markdown notes, in your browser.",
     "author": "Jules Paris",
     "license": "MIT",
-    "homepage": "https://ardoise.vercel.app",
+    "homepage": "https://ardoise.page",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/theJpay/ardoise.git"
