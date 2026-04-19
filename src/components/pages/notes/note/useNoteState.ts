@@ -5,11 +5,12 @@ import { useDebounce } from "@hooks/useDebounce";
 import { useNotesMutations, useNotesQuery } from "@queries/useNotesQuery";
 
 import type { Note } from "@entities";
+import type { EditorMode } from "@hooks/useEditorMode";
 
 // Future: "recording" will be added when voice input is implemented
 export type SaveStatus = "saved" | "writing";
 
-export function useNoteState(noteId: string | undefined) {
+export function useNoteState(noteId: string | undefined, mode: EditorMode) {
     const { notes, isPending } = useNotesQuery();
     const { updateNote } = useNotesMutations();
 
@@ -66,6 +67,7 @@ export function useNoteState(noteId: string | undefined) {
     const editorRef = useRef<HTMLTextAreaElement>(null);
     const titleRef = useRef<HTMLInputElement>(null);
     const phantomRef = useRef<HTMLDivElement>(null);
+    const lastCursorRef = useRef({ start: 0, end: 0 });
 
     const handleContentChange = (newContent: string) => {
         setContent(newContent);
@@ -76,10 +78,12 @@ export function useNoteState(noteId: string | undefined) {
     };
 
     const handleCursorChange = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
-        setSelection({
+        const next = {
             start: e.currentTarget.selectionStart,
             end: e.currentTarget.selectionEnd
-        });
+        };
+        setSelection(next);
+        lastCursorRef.current = next;
     };
 
     const resetSelection = () => {
@@ -98,6 +102,8 @@ export function useNoteState(noteId: string | undefined) {
     useDocumentTitle(title, selectedNote);
     useWarnUnsavedChanges(saveStatus);
     useFocusOnLoad(titleRef, editorRef, selectedNote);
+    useResetCursorOnNoteChange(lastCursorRef, selectedNote?.id);
+    useRestoreEditorOnModeChange(editorRef, lastCursorRef, mode);
 
     return {
         isPending,
@@ -173,4 +179,32 @@ function useFocusOnLoad(
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedNote?.id]);
+}
+
+function useResetCursorOnNoteChange(
+    lastCursorRef: React.RefObject<{ start: number; end: number }>,
+    noteId: string | undefined
+) {
+    useEffect(() => {
+        lastCursorRef.current = { start: 0, end: 0 };
+    }, [noteId, lastCursorRef]);
+}
+
+function useRestoreEditorOnModeChange(
+    editorRef: React.RefObject<HTMLTextAreaElement | null>,
+    lastCursorRef: React.RefObject<{ start: number; end: number }>,
+    mode: EditorMode
+) {
+    useEffect(() => {
+        if (mode !== "edit") {
+            return;
+        }
+        const textarea = editorRef.current;
+        if (!textarea) {
+            return;
+        }
+        textarea.focus();
+        const { start, end } = lastCursorRef.current;
+        textarea.setSelectionRange(start, end);
+    }, [mode, editorRef, lastCursorRef]);
 }

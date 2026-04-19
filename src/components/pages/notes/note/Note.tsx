@@ -47,7 +47,7 @@ function Note() {
         handleCursorChange,
         handleTitleChange,
         setFocused
-    } = useNoteState(noteId);
+    } = useNoteState(noteId, mode);
 
     const { toggleBlock, isBlockActive, toggleInline, isInlineActive, toggleLink } =
         useEditorCommands(editorRef, content, selection.start, handleContentChange);
