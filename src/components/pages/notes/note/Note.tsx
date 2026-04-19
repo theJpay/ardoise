@@ -101,7 +101,7 @@ function Note() {
 
             <div
                 ref={scrollContainerRef}
-                className={`flex-1 overflow-auto scroll-pb-48 px-6 pt-12 pb-48 transition-opacity duration-150 ${armed ? "opacity-40" : ""}`}
+                className={`flex-1 scroll-pb-48 overflow-auto px-6 pt-12 pb-48 transition-opacity duration-150 ${armed ? "opacity-40" : ""}`}
                 onScroll={handleScroll}
             >
                 <div
