@@ -52,7 +52,7 @@ function Note() {
     } = useNoteState(noteId, mode);
 
     const { toggleBlock, isBlockActive, toggleInline, isInlineActive, toggleLink } =
-        useEditorCommands(editorRef, content, selection.start, handleContentChange);
+        useEditorCommands(editorRef, content, handleContentChange);
 
     const {
         state: commandPaletteState,
