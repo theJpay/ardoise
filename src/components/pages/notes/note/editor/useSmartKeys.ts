@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { isInsideCodeBlock, replaceRange } from "./utils";
 
@@ -6,15 +6,29 @@ import type { RefObject } from "react";
 
 type OnChange = (newContent: string) => void;
 
+type AttachedListeners = {
+    textarea: HTMLTextAreaElement;
+    onBeforeInput: (e: InputEvent) => void;
+    onInput: (e: Event) => void;
+};
+
 export function useSmartKeys(editorRef: RefObject<HTMLTextAreaElement | null>, onChange: OnChange) {
+    const onChangeRef = useRef(onChange);
+    onChangeRef.current = onChange;
+
+    const skipContinuationRef = useRef(false);
+    const attachedRef = useRef<AttachedListeners | null>(null);
+
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLTextAreaElement>): boolean => {
             const textarea = editorRef.current;
             if (!textarea) {
                 return false;
             }
-            if (e.key === "Enter" && !e.shiftKey) {
-                return handleSmartEnter(e, textarea, onChange);
+            if (e.key === "Enter") {
+                skipContinuationRef.current =
+                    e.shiftKey || textarea.selectionStart !== textarea.selectionEnd;
+                return false;
             }
             if (e.key === "Tab") {
                 return handleSmartTab(e, textarea, onChange);
@@ -24,49 +38,106 @@ export function useSmartKeys(editorRef: RefObject<HTMLTextAreaElement | null>, o
         [editorRef, onChange]
     );
 
+    useEffect(() => {
+        const textarea = editorRef.current;
+        const attached = attachedRef.current;
+
+        if (attached && attached.textarea === textarea) {
+            return;
+        }
+
+        if (attached) {
+            attached.textarea.removeEventListener("beforeinput", attached.onBeforeInput);
+            attached.textarea.removeEventListener("input", attached.onInput);
+            attachedRef.current = null;
+        }
+
+        if (!textarea) {
+            return;
+        }
+
+        const onBeforeInput = (e: InputEvent) => {
+            if (e.inputType !== "insertLineBreak") {
+                return;
+            }
+            if (e.isComposing) {
+                return;
+            }
+            if (skipContinuationRef.current) {
+                return;
+            }
+
+            const { value, selectionStart } = textarea;
+            const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
+            const line = value.slice(lineStart, selectionStart);
+            if (getListContinuation(line) !== "break") {
+                return;
+            }
+
+            e.preventDefault();
+            replaceRange(textarea, {
+                start: lineStart,
+                end: selectionStart,
+                text: "",
+                onChange: onChangeRef.current,
+                cursor: { start: lineStart }
+            });
+        };
+
+        const onInput = (e: Event) => {
+            const ie = e as InputEvent;
+            if (ie.inputType !== "insertLineBreak") {
+                return;
+            }
+            if (ie.isComposing) {
+                return;
+            }
+            if (skipContinuationRef.current) {
+                skipContinuationRef.current = false;
+                return;
+            }
+
+            const { value, selectionStart } = textarea;
+            const prevLineEnd = selectionStart - 1;
+            if (prevLineEnd < 0) {
+                return;
+            }
+            const prevLineStart = value.lastIndexOf("\n", prevLineEnd - 1) + 1;
+            const prevLine = value.slice(prevLineStart, prevLineEnd);
+            const continuation = getListContinuation(prevLine);
+            if (!continuation || continuation === "break") {
+                return;
+            }
+
+            queueMicrotask(() => {
+                const caret = textarea.selectionStart;
+                replaceRange(textarea, {
+                    start: caret,
+                    end: caret,
+                    text: continuation,
+                    onChange: onChangeRef.current,
+                    cursor: { start: caret + continuation.length }
+                });
+            });
+        };
+
+        textarea.addEventListener("beforeinput", onBeforeInput);
+        textarea.addEventListener("input", onInput);
+        attachedRef.current = { textarea, onBeforeInput, onInput };
+    });
+
+    useEffect(() => {
+        return () => {
+            const attached = attachedRef.current;
+            if (attached) {
+                attached.textarea.removeEventListener("beforeinput", attached.onBeforeInput);
+                attached.textarea.removeEventListener("input", attached.onInput);
+                attachedRef.current = null;
+            }
+        };
+    }, []);
+
     return { handleKeyDown };
-}
-
-function handleSmartEnter(
-    e: React.KeyboardEvent<HTMLTextAreaElement>,
-    textarea: HTMLTextAreaElement,
-    onChange: OnChange
-): boolean {
-    const { value, selectionStart, selectionEnd } = textarea;
-    if (selectionStart !== selectionEnd) {
-        return false;
-    }
-
-    const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
-    const line = value.slice(lineStart, selectionStart);
-
-    const continuation = getListContinuation(line);
-    if (!continuation) {
-        return false;
-    }
-
-    e.preventDefault();
-
-    if (continuation === "break") {
-        replaceRange(textarea, {
-            start: lineStart,
-            end: selectionStart,
-            text: "",
-            onChange,
-            cursor: { start: lineStart }
-        });
-    } else {
-        const insert = `\n${continuation}`;
-        replaceRange(textarea, {
-            start: selectionStart,
-            end: selectionStart,
-            text: insert,
-            onChange,
-            cursor: { start: selectionStart + insert.length }
-        });
-    }
-
-    return true;
 }
 
 function handleSmartTab(
