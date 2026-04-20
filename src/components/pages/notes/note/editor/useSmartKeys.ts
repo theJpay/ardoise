@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useRef } from "react";
 
-import { getLineStart, getSelectedLines, isInsideCodeBlock, replaceRange } from "./utils";
+import {
+    getLineStart,
+    getListContinuation,
+    getSelectedLines,
+    isInsideCodeBlock,
+    isListLine,
+    replaceRange
+} from "./utils";
 
 import type { RefObject } from "react";
 
@@ -177,41 +184,6 @@ function handleSmartTab(
     return true;
 }
 
-function getListContinuation(line: string): string | "break" | null {
-    if (isEmptyTaskItem(line) || isEmptyUnorderedItem(line) || isEmptyOrderedItem(line)) {
-        return "break";
-    }
-
-    return nextTaskPrefix(line) ?? nextUnorderedPrefix(line) ?? nextOrderedPrefix(line);
-}
-
-function isEmptyTaskItem(line: string): boolean {
-    return /^\s*- \[([ x])\] $/.test(line);
-}
-
-function isEmptyUnorderedItem(line: string): boolean {
-    return /^\s*([-*]) $/.test(line);
-}
-
-function isEmptyOrderedItem(line: string): boolean {
-    return /^\s*\d+\. $/.test(line);
-}
-
-function nextTaskPrefix(line: string): string | null {
-    const match = line.match(/^(\s*)- \[([ x])\] (.+)$/);
-    return match ? `${match[1]}- [ ] ` : null;
-}
-
-function nextUnorderedPrefix(line: string): string | null {
-    const match = line.match(/^(\s*)([-*]) (.+)$/);
-    return match ? `${match[1]}${match[2]} ` : null;
-}
-
-function nextOrderedPrefix(line: string): string | null {
-    const match = line.match(/^(\s*)(\d+)\. (.+)$/);
-    return match ? `${match[1]}${parseInt(match[2]) + 1}. ` : null;
-}
-
 function dedentLine(line: string): string {
     const spaces = line.match(/^ {1,2}/)?.[0].length ?? 0;
     return line.slice(spaces);
@@ -224,8 +196,4 @@ function shouldInterceptTab(value: string, selectionStart: number, selectionEnd:
 
     const { lines } = getSelectedLines(value, selectionStart, selectionEnd);
     return lines.some((line) => isListLine(line));
-}
-
-function isListLine(line: string): boolean {
-    return /^\s*([-*]|\d+\.) /.test(line) || /^\s*- \[([ x])\] /.test(line);
 }
