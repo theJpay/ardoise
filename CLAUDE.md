@@ -4,6 +4,7 @@
 - Discuss fixes before implementing — wait for explicit approval
 - Suggest generic components, design tokens, or shared abstractions when they'd fit — don't add them unilaterally
 - If we establish a convention mid-session, propose adding it here so it doesn't evaporate
+- After non-trivial implementation, explain choices: distinguish forced (no real alternative) from discussable. For discussable ones, name the alternatives and the tradeoff so the call can be revisited.
 
 ## Design system
 - Colors are opaque hex only — no rgba tokens
