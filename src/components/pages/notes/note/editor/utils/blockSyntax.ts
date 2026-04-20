@@ -8,6 +8,12 @@ type ToggleResult = {
     cursorOffset: number;
 };
 
+export function isBlockSyntaxActiveAtPosition(text: string, position: number, syntax: string) {
+    const lineContent = text.slice(getLineStart(text, position));
+    const activeSyntax = BLOCK_SYNTAXES.find((s) => lineContent.startsWith(s));
+    return activeSyntax === syntax;
+}
+
 export function toggleBlockAtLineStart(
     textarea: HTMLTextAreaElement,
     syntax: string
