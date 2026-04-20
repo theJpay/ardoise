@@ -21,14 +21,39 @@ type NoteEditorProps = {
  * (collapsing to intrinsic size) then sets it to `scrollHeight` (the full
  * content height). This prevents internal scrolling so the parent container
  * handles scrolling — keeping the textarea and mirror div aligned.
+ *
+ * The transient `height: auto` causes the scroll ancestor to reflow with a
+ * smaller content height, which can clamp its scrollTop. We snapshot and
+ * restore scrollTop around the reflow to keep the caret anchored.
  */
 function useAutoGrow(ref: RefObject<HTMLTextAreaElement | null>, content: string) {
     useEffect(() => {
-        if (ref.current) {
-            ref.current.style.height = "auto";
-            ref.current.style.height = `${ref.current.scrollHeight}px`;
+        const el = ref.current;
+        if (!el) {
+            return;
+        }
+        const scroller = findScrollableAncestor(el);
+        const savedScrollTop = scroller?.scrollTop ?? 0;
+
+        el.style.height = "auto";
+        el.style.height = `${el.scrollHeight}px`;
+
+        if (scroller && scroller.scrollTop !== savedScrollTop) {
+            scroller.scrollTop = savedScrollTop;
         }
     }, [content, ref]);
+}
+
+function findScrollableAncestor(el: HTMLElement): HTMLElement | null {
+    let node = el.parentElement;
+    while (node) {
+        const { overflowY } = getComputedStyle(node);
+        if (overflowY === "auto" || overflowY === "scroll") {
+            return node;
+        }
+        node = node.parentElement;
+    }
+    return null;
 }
 
 function NoteEditor({
