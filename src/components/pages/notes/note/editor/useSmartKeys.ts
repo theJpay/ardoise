@@ -13,18 +13,11 @@ import type { RefObject } from "react";
 
 type OnChange = (newContent: string) => void;
 
-type AttachedListeners = {
-    textarea: HTMLTextAreaElement;
-    onBeforeInput: (e: InputEvent) => void;
-    onInput: (e: Event) => void;
-};
-
 export function useSmartKeys(editorRef: RefObject<HTMLTextAreaElement | null>, onChange: OnChange) {
     const onChangeRef = useRef(onChange);
     onChangeRef.current = onChange;
 
     const skipContinuationRef = useRef(false);
-    const attachedRef = useRef<AttachedListeners | null>(null);
 
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLTextAreaElement>): boolean => {
@@ -45,105 +38,82 @@ export function useSmartKeys(editorRef: RefObject<HTMLTextAreaElement | null>, o
         [editorRef, onChange]
     );
 
-    useEffect(() => {
-        const textarea = editorRef.current;
-        const attached = attachedRef.current;
-
-        if (attached && attached.textarea === textarea) {
-            return;
-        }
-
-        if (attached) {
-            attached.textarea.removeEventListener("beforeinput", attached.onBeforeInput);
-            attached.textarea.removeEventListener("input", attached.onInput);
-            attachedRef.current = null;
-        }
-
-        if (!textarea) {
-            return;
-        }
-
+    useRefEffect(editorRef, (textarea) => {
         const onBeforeInput = (e: InputEvent) => {
-            if (e.inputType !== "insertLineBreak") {
+            if (!isPlainLineBreak(e) || skipContinuationRef.current) {
                 return;
             }
-            if (e.isComposing) {
-                return;
+            if (tryBreakEmptyListItem(textarea, onChangeRef.current)) {
+                e.preventDefault();
             }
-            if (skipContinuationRef.current) {
-                return;
-            }
-
-            const { value, selectionStart } = textarea;
-            const lineStart = getLineStart(value, selectionStart);
-            const line = value.slice(lineStart, selectionStart);
-            if (getListContinuation(line) !== "break") {
-                return;
-            }
-
-            e.preventDefault();
-            replaceRange(textarea, {
-                start: lineStart,
-                end: selectionStart,
-                text: "",
-                onChange: onChangeRef.current,
-                cursor: { start: lineStart }
-            });
         };
 
-        const onInput = (e: Event) => {
-            const ie = e as InputEvent;
-            if (ie.inputType !== "insertLineBreak") {
-                return;
-            }
-            if (ie.isComposing) {
+        const onInput = (event: Event) => {
+            const e = event as InputEvent;
+            if (!isPlainLineBreak(e)) {
                 return;
             }
             if (skipContinuationRef.current) {
                 skipContinuationRef.current = false;
                 return;
             }
-
-            const { value, selectionStart } = textarea;
-            const prevLineEnd = selectionStart - 1;
-            if (prevLineEnd < 0) {
-                return;
-            }
-            const prevLine = value.slice(getLineStart(value, prevLineEnd), prevLineEnd);
-            const continuation = getListContinuation(prevLine);
-            if (!continuation || continuation === "break") {
-                return;
-            }
-
-            queueMicrotask(() => {
-                const caret = textarea.selectionStart;
-                replaceRange(textarea, {
-                    start: caret,
-                    end: caret,
-                    text: continuation,
-                    onChange: onChangeRef.current,
-                    cursor: { start: caret + continuation.length }
-                });
-            });
+            tryContinueList(textarea, onChangeRef.current);
         };
 
         textarea.addEventListener("beforeinput", onBeforeInput);
         textarea.addEventListener("input", onInput);
-        attachedRef.current = { textarea, onBeforeInput, onInput };
+        return () => {
+            textarea.removeEventListener("beforeinput", onBeforeInput);
+            textarea.removeEventListener("input", onInput);
+        };
     });
 
-    useEffect(() => {
-        return () => {
-            const attached = attachedRef.current;
-            if (attached) {
-                attached.textarea.removeEventListener("beforeinput", attached.onBeforeInput);
-                attached.textarea.removeEventListener("input", attached.onInput);
-                attachedRef.current = null;
-            }
-        };
-    }, []);
-
     return { handleKeyDown };
+}
+
+function isPlainLineBreak(e: InputEvent): boolean {
+    return e.inputType === "insertLineBreak" && !e.isComposing;
+}
+
+function tryBreakEmptyListItem(textarea: HTMLTextAreaElement, onChange: OnChange): boolean {
+    const { value, selectionStart } = textarea;
+    const lineStart = getLineStart(value, selectionStart);
+    const line = value.slice(lineStart, selectionStart);
+    if (getListContinuation(line) !== "break") {
+        return false;
+    }
+    replaceRange(textarea, {
+        start: lineStart,
+        end: selectionStart,
+        text: "",
+        onChange,
+        cursor: { start: lineStart }
+    });
+    return true;
+}
+
+function tryContinueList(textarea: HTMLTextAreaElement, onChange: OnChange) {
+    const { value, selectionStart } = textarea;
+    const prevLineEnd = selectionStart - 1;
+    if (prevLineEnd < 0) {
+        return;
+    }
+    const prevLine = value.slice(getLineStart(value, prevLineEnd), prevLineEnd);
+    const continuation = getListContinuation(prevLine);
+    if (!continuation || continuation === "break") {
+        return;
+    }
+
+    queueMicrotask(() => {
+        const caret = textarea.selectionStart;
+        replaceRange(textarea, {
+            start: caret,
+            end: caret,
+            text: continuation,
+            onChange,
+            cursor: { start: caret + continuation.length }
+        });
+    });
 }
 
 function handleSmartTab(
@@ -196,4 +166,44 @@ function shouldInterceptTab(value: string, selectionStart: number, selectionEnd:
 
     const { lines } = getSelectedLines(value, selectionStart, selectionEnd);
     return lines.some((line) => isListLine(line));
+}
+
+/**
+ * Run `setup` when `ref.current` becomes available, and re-run when it changes
+ * (or cleanup when it goes away). `setup` follows the standard useEffect
+ * convention: return a cleanup function. Needed because refs aren't reactive,
+ * so a plain useEffect with `[ref]` in deps never fires on ref population.
+ */
+function useRefEffect<T>(ref: RefObject<T | null>, setup: (el: T) => (() => void) | void) {
+    const attachedRef = useRef<{ el: T; cleanup: (() => void) | void } | null>(null);
+
+    useEffect(() => {
+        const el = ref.current;
+        const attached = attachedRef.current;
+
+        if (attached && attached.el === el) {
+            return;
+        }
+
+        if (attached && typeof attached.cleanup === "function") {
+            attached.cleanup();
+        }
+        attachedRef.current = null;
+
+        if (!el) {
+            return;
+        }
+
+        attachedRef.current = { el, cleanup: setup(el) };
+    });
+
+    useEffect(() => {
+        return () => {
+            const attached = attachedRef.current;
+            if (attached && typeof attached.cleanup === "function") {
+                attached.cleanup();
+                attachedRef.current = null;
+            }
+        };
+    }, []);
 }
