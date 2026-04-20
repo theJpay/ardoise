@@ -27,12 +27,18 @@ type NoteEditorProps = {
  * restore scrollTop around the reflow to keep the caret anchored.
  */
 function useAutoGrow(ref: RefObject<HTMLTextAreaElement | null>, content: string) {
+    const scrollerRef = useRef<{ el: HTMLElement; scroller: HTMLElement | null } | null>(null);
+
     useEffect(() => {
         const el = ref.current;
         if (!el) {
             return;
         }
-        const scroller = findScrollableAncestor(el);
+
+        if (!scrollerRef.current || scrollerRef.current.el !== el) {
+            scrollerRef.current = { el, scroller: findScrollableAncestor(el) };
+        }
+        const { scroller } = scrollerRef.current;
         const savedScrollTop = scroller?.scrollTop ?? 0;
 
         el.style.height = "auto";
