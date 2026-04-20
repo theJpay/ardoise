@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer } from "react";
+import { useCallback, useEffect, useMemo, useReducer } from "react";
 
 import { UnreachableError } from "@utils";
 
@@ -28,11 +28,12 @@ export function useCommandPalette(
 ) {
     const [state, dispatch] = useReducer(reducer, getInitialState());
 
-    const filteredActions = COMMAND_PALETTE_ACTIONS.filter(
-        (action) =>
-            action.label.toLowerCase().includes(state.filter.toLowerCase()) ||
-            action.name.includes(state.filter.toLowerCase())
-    );
+    const filteredActions = useMemo(() => {
+        const filter = state.filter.toLowerCase();
+        return COMMAND_PALETTE_ACTIONS.filter(
+            (action) => action.label.toLowerCase().includes(filter) || action.name.includes(filter)
+        );
+    }, [state.filter]);
 
     useEffect(() => {
         const filter = getSlashContext(content, cursorPosition);
