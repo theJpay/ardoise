@@ -40,7 +40,7 @@ function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
                     <ShortcutKey content={Command} />
                     <ShortcutKey content={ArrowBigUp} />
                     <ShortcutKey content="M" />
-                    <span className="ml-1">to toggle</span>
+                    <span>to toggle</span>
                 </div>
                 <button
                     className="text-ui-sm text-accent border-accent-dim hover:bg-accent-surface rounded-sm border bg-transparent px-2 py-0.5 font-mono tracking-[0.04em] transition-colors"

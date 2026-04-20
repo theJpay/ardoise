@@ -17,7 +17,7 @@ function DeleteBanner({ noteTitle }: DeleteBannerProps) {
                 <div className="flex items-center gap-1">
                     <ShortcutKey content={Command} variant="danger" />
                     <ShortcutKey content={Delete} variant="danger" />
-                    <span className="text-danger text-ui-sm ml-1">to confirm</span>
+                    <span className="text-danger text-ui-sm">to confirm</span>
                 </div>
                 <span className="text-subtle text-ui-sm">·</span>
                 <span className="text-subtle text-ui-sm">Esc to cancel</span>
