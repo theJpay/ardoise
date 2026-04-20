@@ -8,7 +8,10 @@ const SETTINGS_ID = "default" as const;
 
 export async function getSettings(): Promise<Settings> {
     const stored = await db.settings.get(SETTINGS_ID);
-    return stored ?? DEFAULT_SETTINGS;
+    if (!stored) {
+        return DEFAULT_SETTINGS;
+    }
+    return { ...DEFAULT_SETTINGS, ...stored };
 }
 
 export async function updateSettings(settings: Omit<Settings, "id">): Promise<void> {

@@ -29,6 +29,130 @@
 }
 
 @layer base {
+    [data-theme="dark"] {
+        --color-bg: #181818;
+        --color-surface: #202020;
+        --color-elevated: #282828;
+        --color-border: #303030;
+        --color-border-soft: #262626;
+        --color-editor-bg: #141414;
+        --color-editor-text: #edeae5;
+        --color-text: #f0ede8;
+        --color-muted: #b0ada8;
+        --color-subtle: #908d88;
+        --color-dim: #484440;
+        --color-danger: #d67d74;
+        --color-danger-surface: #2a1c1b;
+        --color-danger-surface-hover: #331f1e;
+        --color-danger-border: #3d2422;
+        --shadow-float: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    [data-theme="light"] {
+        --color-bg: #f7f5f1;
+        --color-surface: #efece6;
+        --color-elevated: #e7e3db;
+        --color-border: #d2cec4;
+        --color-border-soft: #e2ded5;
+        --color-editor-bg: #fbfaf6;
+        --color-editor-text: #1c1a14;
+        --color-text: #15120d;
+        --color-muted: #3d3a34;
+        --color-subtle: #5a5650;
+        --color-dim: #b0aba2;
+        --color-danger: #954037;
+        --color-danger-surface: #f4dedb;
+        --color-danger-surface-hover: #ecd0cc;
+        --color-danger-border: #e0bdb8;
+        --shadow-float: 0 8px 24px rgba(30, 25, 15, 0.12);
+    }
+
+    [data-theme="dark"] {
+        &[data-accent="lichen"],
+        & [data-accent="lichen"] {
+            --color-accent: #6e9a78;
+            --color-accent-dim: #3d5c44;
+            --color-accent-hover: #5d8a67;
+            --color-accent-surface: #1e2e22;
+            --color-accent-surface-hover: #243528;
+        }
+        &[data-accent="clay"],
+        & [data-accent="clay"] {
+            --color-accent: #b07a5e;
+            --color-accent-dim: #5f4032;
+            --color-accent-hover: #9f6a4f;
+            --color-accent-surface: #2e1f18;
+            --color-accent-surface-hover: #37241c;
+        }
+        &[data-accent="slate"],
+        & [data-accent="slate"] {
+            --color-accent: #6a85a3;
+            --color-accent-dim: #39485a;
+            --color-accent-hover: #627b99;
+            --color-accent-surface: #1b2430;
+            --color-accent-surface-hover: #222b38;
+        }
+        &[data-accent="heather"],
+        & [data-accent="heather"] {
+            --color-accent: #9a7a9e;
+            --color-accent-dim: #54425a;
+            --color-accent-hover: #86679a;
+            --color-accent-surface: #261c2a;
+            --color-accent-surface-hover: #2d2232;
+        }
+        &[data-accent="amber"],
+        & [data-accent="amber"] {
+            --color-accent: #b59257;
+            --color-accent-dim: #614c2e;
+            --color-accent-hover: #a28146;
+            --color-accent-surface: #2d2517;
+            --color-accent-surface-hover: #37291c;
+        }
+    }
+
+    [data-theme="light"] {
+        &[data-accent="lichen"],
+        & [data-accent="lichen"] {
+            --color-accent: #3f7a4d;
+            --color-accent-dim: #bfd2c4;
+            --color-accent-hover: #316540;
+            --color-accent-surface: #e5ede3;
+            --color-accent-surface-hover: #d4e1d5;
+        }
+        &[data-accent="clay"],
+        & [data-accent="clay"] {
+            --color-accent: #8f4f2b;
+            --color-accent-dim: #dfc4b0;
+            --color-accent-hover: #723f21;
+            --color-accent-surface: #eddfd2;
+            --color-accent-surface-hover: #e2d1bd;
+        }
+        &[data-accent="slate"],
+        & [data-accent="slate"] {
+            --color-accent: #35628a;
+            --color-accent-dim: #b9c6d6;
+            --color-accent-hover: #29517a;
+            --color-accent-surface: #e0e8f0;
+            --color-accent-surface-hover: #cdd8e5;
+        }
+        &[data-accent="heather"],
+        & [data-accent="heather"] {
+            --color-accent: #6b4576;
+            --color-accent-dim: #cfbed3;
+            --color-accent-hover: #573862;
+            --color-accent-surface: #ebe1ed;
+            --color-accent-surface-hover: #dccfe0;
+        }
+        &[data-accent="amber"],
+        & [data-accent="amber"] {
+            --color-accent: #856324;
+            --color-accent-dim: #dbc89d;
+            --color-accent-hover: #6c4f1b;
+            --color-accent-surface: #efe5cf;
+            --color-accent-surface-hover: #e5d8b8;
+        }
+    }
+
     html {
         @apply bg-bg text-text antialiased;
         font-family: var(--font-sans);

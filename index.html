@@ -1,10 +1,20 @@
 <!doctype html>
-<html lang="en">
+<html data-accent="lichen" data-theme="dark" lang="en">
     <head>
         <meta charset="UTF-8" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Ardoise</title>
+        <script>
+            (function () {
+                var THEMES = ["dark", "light"];
+                var ACCENTS = ["lichen", "clay", "slate", "heather", "amber"];
+                var t = localStorage.getItem("ardoise:theme");
+                var a = localStorage.getItem("ardoise:accent");
+                if (THEMES.indexOf(t) >= 0) document.documentElement.dataset.theme = t;
+                if (ACCENTS.indexOf(a) >= 0) document.documentElement.dataset.accent = a;
+            })();
+        </script>
     </head>
     <body>
         <div id="root"></div>

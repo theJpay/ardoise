@@ -1,8 +1,10 @@
 import { Outlet } from "react-router";
 
 import { Rail } from "@components/rail";
+import { useThemeSync } from "@hooks/useThemeSync";
 
 function App() {
+    useThemeSync();
     return (
         <div
             className="bg-bg grid h-screen overflow-hidden"
