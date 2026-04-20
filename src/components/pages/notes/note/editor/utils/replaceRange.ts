@@ -21,7 +21,7 @@ export function replaceRange(textarea: HTMLTextAreaElement, options: ReplaceRang
     const { start, end, text, onChange, cursor } = options;
 
     if (USE_NATIVE_UNDO) {
-        textarea.focus();
+        textarea.focus({ preventScroll: true });
         textarea.setSelectionRange(start, end);
         document.execCommand("insertText", false, text);
         if (cursor) {
