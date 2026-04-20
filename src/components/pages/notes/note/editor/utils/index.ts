@@ -4,6 +4,7 @@ export { isInsideCodeBlock, toggleCodeBlock } from "./codeBlock";
 export { getSelectionRect } from "./getSelectionRect";
 export { isBlockSyntaxActiveAtPosition } from "./isBlockSyntaxActive";
 export { isInlineSyntaxActive } from "./isInlineSyntaxActive";
+export { getLineStart, getLineEnd, getSelectedLines } from "./line";
 export { replaceRange } from "./replaceRange";
 export { toggleBlockAtLineStart } from "./toggleBlockAtLineStart";
 export { tokenize } from "./tokenize";

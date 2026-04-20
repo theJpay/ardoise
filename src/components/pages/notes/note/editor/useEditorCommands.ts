@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 
 import {
+    getSelectedLines,
     getSyntax,
     isBlockSyntaxActiveAtPosition,
     isInlineSyntaxActive,
@@ -165,9 +166,11 @@ function toggleBlockMultiLine(
     onChange: (value: string) => void
 ) {
     const { value, selectionStart, selectionEnd } = textarea;
-    const firstLineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
-    const selectedText = value.slice(firstLineStart, selectionEnd);
-    const lines = selectedText.split("\n");
+    const { firstLineStart, selectedText, lines } = getSelectedLines(
+        value,
+        selectionStart,
+        selectionEnd
+    );
 
     const allHaveSyntax = lines.every((line) => line.startsWith(syntax));
 

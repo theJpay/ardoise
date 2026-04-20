@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 
-import { isInsideCodeBlock, replaceRange } from "./utils";
+import { getLineStart, getSelectedLines, isInsideCodeBlock, replaceRange } from "./utils";
 
 import type { RefObject } from "react";
 
@@ -68,7 +68,7 @@ export function useSmartKeys(editorRef: RefObject<HTMLTextAreaElement | null>, o
             }
 
             const { value, selectionStart } = textarea;
-            const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
+            const lineStart = getLineStart(value, selectionStart);
             const line = value.slice(lineStart, selectionStart);
             if (getListContinuation(line) !== "break") {
                 return;
@@ -102,8 +102,7 @@ export function useSmartKeys(editorRef: RefObject<HTMLTextAreaElement | null>, o
             if (prevLineEnd < 0) {
                 return;
             }
-            const prevLineStart = value.lastIndexOf("\n", prevLineEnd - 1) + 1;
-            const prevLine = value.slice(prevLineStart, prevLineEnd);
+            const prevLine = value.slice(getLineStart(value, prevLineEnd), prevLineEnd);
             const continuation = getListContinuation(prevLine);
             if (!continuation || continuation === "break") {
                 return;
@@ -153,9 +152,11 @@ function handleSmartTab(
 
     e.preventDefault();
 
-    const firstLineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
-    const selectedText = value.slice(firstLineStart, selectionEnd);
-    const lines = selectedText.split("\n");
+    const { firstLineStart, selectedText, lines } = getSelectedLines(
+        value,
+        selectionStart,
+        selectionEnd
+    );
 
     const modifiedLines = lines.map((line) => (e.shiftKey ? dedentLine(line) : "  " + line));
 
@@ -221,10 +222,7 @@ function shouldInterceptTab(value: string, selectionStart: number, selectionEnd:
         return true;
     }
 
-    const firstLineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
-    const selectedText = value.slice(firstLineStart, selectionEnd);
-    const lines = selectedText.split("\n");
-
+    const { lines } = getSelectedLines(value, selectionStart, selectionEnd);
     return lines.some((line) => isListLine(line));
 }
 

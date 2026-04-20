@@ -3,6 +3,7 @@ import { useCallback, useEffect, useReducer } from "react";
 import { UnreachableError } from "@utils";
 
 import { COMMAND_PALETTE_ACTIONS } from "./utils/actions";
+import { getLineStart } from "./utils/line";
 import { replaceRange } from "./utils/replaceRange";
 
 import type { RefObject } from "react";
@@ -53,7 +54,7 @@ export function useCommandPalette(
                 return;
             }
             const textarea = editorRef.current;
-            const lineStart = textarea.value.lastIndexOf("\n", cursorPosition - 1) + 1;
+            const lineStart = getLineStart(textarea.value, cursorPosition);
             const newCursorPos = lineStart + (action.cursorOffset ?? action.syntax.length);
 
             replaceRange(textarea, {
@@ -73,7 +74,7 @@ export function useCommandPalette(
             return;
         }
         const textarea = editorRef.current;
-        const lineStart = textarea.value.lastIndexOf("\n", cursorPosition - 1) + 1;
+        const lineStart = getLineStart(textarea.value, cursorPosition);
 
         replaceRange(textarea, {
             start: lineStart,
@@ -157,8 +158,7 @@ function getInitialState(): State {
 }
 
 function getSlashContext(value: string, cursorPosition: number): string | null {
-    const lineStart = value.lastIndexOf("\n", cursorPosition - 1) + 1;
-    const lineBeforeCursor = value.slice(lineStart, cursorPosition);
+    const lineBeforeCursor = value.slice(getLineStart(value, cursorPosition), cursorPosition);
     const match = lineBeforeCursor.match(/^\/([a-zA-Z-]*)$/);
     if (!match) {
         return null;

@@ -1,4 +1,5 @@
 import { BLOCK_SYNTAXES } from "./actions";
+import { getLineStart } from "./line";
 
 type ToggleResult = {
     rangeStart: number;
@@ -12,7 +13,7 @@ export function toggleBlockAtLineStart(
     syntax: string
 ): ToggleResult {
     const { value, selectionStart } = textarea;
-    const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
+    const lineStart = getLineStart(value, selectionStart);
     const lineContent = value.slice(lineStart);
     const activeSyntax = BLOCK_SYNTAXES.find((s) => lineContent.startsWith(s));
 
