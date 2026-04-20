@@ -1,7 +1,13 @@
+import { useEffect, useState } from "react";
+
 import { NoteEntity } from "@entities";
+import { formatRelativeDate } from "@utils";
 
 import type { EditorMode } from "@hooks/useEditorMode";
 import type { RefObject } from "react";
+
+const RELATIVE_DATE_REFRESH_MS = 60_000;
+const exactDateFormat = new Intl.DateTimeFormat("en", { dateStyle: "full", timeStyle: "short" });
 
 type NoteTitleProps = {
     title: string;
@@ -12,6 +18,8 @@ type NoteTitleProps = {
 };
 
 function NoteTitle({ title, date, mode, inputRef, onChange }: NoteTitleProps) {
+    const relativeDate = useRelativeDate(date);
+
     return (
         <>
             {mode === "edit" ? (
@@ -31,14 +39,25 @@ function NoteTitle({ title, date, mode, inputRef, onChange }: NoteTitleProps) {
                     <h1>{NoteEntity.getTitle({ title })}</h1>
                 </div>
             )}
-            <div className="text-ui-sm text-subtle mb-7 font-mono">
-                {new Intl.DateTimeFormat("en", {
-                    dateStyle: "medium",
-                    timeStyle: "short"
-                }).format(date)}
+            <div
+                className="text-ui-sm text-subtle mb-7 font-mono"
+                title={exactDateFormat.format(date)}
+            >
+                {relativeDate}
             </div>
         </>
     );
+}
+
+function useRelativeDate(date: Date): string {
+    const [, tick] = useState(0);
+
+    useEffect(() => {
+        const id = setInterval(() => tick((n) => n + 1), RELATIVE_DATE_REFRESH_MS);
+        return () => clearInterval(id);
+    }, []);
+
+    return formatRelativeDate(date);
 }
 
 export default NoteTitle;
