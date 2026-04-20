@@ -21,14 +21,20 @@ function RailButton({ icon, label, disabled, isActive, to, onClick }: RailButton
 
     if (to) {
         return (
-            <Link aria-label={label} className={className} to={to}>
+            <Link aria-label={label} className={className} title={label} to={to}>
                 {icon}
             </Link>
         );
     }
 
     return (
-        <button aria-label={label} className={className} disabled={disabled} onClick={onClick}>
+        <button
+            aria-label={label}
+            className={className}
+            disabled={disabled}
+            title={label}
+            onClick={onClick}
+        >
             {icon}
         </button>
     );
