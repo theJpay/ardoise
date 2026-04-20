@@ -2,8 +2,7 @@ export { ALL_ACTIONS, BLOCK_SYNTAXES, TOOLBAR_ACTIONS, getSyntax } from "./actio
 export { isBlockSyntaxActiveAtPosition, toggleBlockAtLineStart } from "./blockSyntax";
 export { isInsideCodeBlock, toggleCodeBlock } from "./codeBlock";
 export { getSelectionRect } from "./getSelectionRect";
-export { handleFormattingShortcut } from "./handleFormattingShortcut";
-export { isInlineSyntaxActive } from "./isInlineSyntaxActive";
+export { handleFormattingShortcut, isInlineSyntaxActive } from "./inlineSyntax";
 export { getLineStart, getLineEnd, getSelectedLines } from "./line";
 export { getListContinuation, isListLine, parseListLine } from "./listItem";
 export { replaceRange } from "./replaceRange";
