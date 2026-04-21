@@ -59,21 +59,21 @@ export function useCommandPalette() {
             if (event.key === "ArrowDown") {
                 event.preventDefault();
                 event.stopPropagation();
-                setSelectedIndex((prev) => wrapIndex(prev + 1, results.notes.length));
+                setSelectedIndex((prev) => wrapIndex(prev + 1, results.items.length));
                 return;
             }
             if (event.key === "ArrowUp") {
                 event.preventDefault();
                 event.stopPropagation();
-                setSelectedIndex((prev) => wrapIndex(prev - 1, results.notes.length));
+                setSelectedIndex((prev) => wrapIndex(prev - 1, results.items.length));
                 return;
             }
             if (event.key === "Enter") {
                 event.preventDefault();
                 event.stopPropagation();
-                const selected = results.notes[selectedIndex];
+                const selected = results.items[selectedIndex];
                 if (selected) {
-                    openNote(selected);
+                    openNote(selected.note);
                 }
             }
         };

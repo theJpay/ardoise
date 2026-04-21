@@ -8,12 +8,13 @@ import type { Note } from "@entities";
 type PaletteItemProps = {
     note: Note;
     query: string;
+    snippet: string | null;
     selected: boolean;
     onMouseEnter: () => void;
     onSelect: () => void;
 };
 
-function PaletteItem({ note, query, selected, onMouseEnter, onSelect }: PaletteItemProps) {
+function PaletteItem({ note, query, snippet, selected, onMouseEnter, onSelect }: PaletteItemProps) {
     return (
         <button
             ref={(el) => scrollSelectedIntoView(el, selected)}
@@ -32,18 +33,23 @@ function PaletteItem({ note, query, selected, onMouseEnter, onSelect }: PaletteI
             </span>
             <span className="min-w-0 flex-1">
                 <span className="text-ui-base text-text block truncate">
-                    <HighlightedTitle query={query} title={NoteEntity.getTitle(note)} />
+                    <Highlighted query={query} text={NoteEntity.getTitle(note)} />
                 </span>
                 <span className="text-ui-sm text-subtle mt-0.5 block font-mono">
                     {formatRelativeDate(note.updatedAt)}
                 </span>
+                {snippet && (
+                    <span className="text-ui-sm text-subtle mt-0.5 block truncate font-mono">
+                        <Highlighted query={query} text={snippet} />
+                    </span>
+                )}
             </span>
         </button>
     );
 }
 
-function HighlightedTitle({ title, query }: { title: string; query: string }) {
-    const segments = splitByMatch(title, query);
+function Highlighted({ text, query }: { text: string; query: string }) {
+    const segments = splitByMatch(text, query);
     return (
         <>
             {segments.map((segment, i) =>

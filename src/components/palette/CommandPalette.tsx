@@ -27,7 +27,7 @@ function CommandPalette() {
             >
                 <PaletteInput value={query} onChange={setQuery} />
                 <PaletteResults
-                    notes={results.notes}
+                    items={results.items}
                     query={query}
                     section={results.section}
                     selectedIndex={selectedIndex}

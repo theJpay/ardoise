@@ -1,10 +1,11 @@
 import PaletteItem from "./PaletteItem";
 
 import type { Note } from "@entities";
+import type { PaletteResult } from "@hooks/usePaletteResults";
 
 type PaletteResultsProps = {
     section: string;
-    notes: Note[];
+    items: PaletteResult[];
     query: string;
     selectedIndex: number;
     onHover: (index: number) => void;
@@ -13,13 +14,13 @@ type PaletteResultsProps = {
 
 function PaletteResults({
     section,
-    notes,
+    items,
     query,
     selectedIndex,
     onHover,
     onSelect
 }: PaletteResultsProps) {
-    if (notes.length === 0) {
+    if (items.length === 0) {
         return query === "" ? (
             <div className="flex-1" />
         ) : (
@@ -32,14 +33,15 @@ function PaletteResults({
     return (
         <div className="flex-1 overflow-y-auto py-1">
             <div className="text-ui-xs text-dim px-4 pt-2 pb-1 font-mono">{section}</div>
-            {notes.map((note, index) => (
+            {items.map((item, index) => (
                 <PaletteItem
-                    key={note.id}
-                    note={note}
+                    key={item.note.id}
+                    note={item.note}
                     query={query}
                     selected={index === selectedIndex}
+                    snippet={item.snippet}
                     onMouseEnter={() => onHover(index)}
-                    onSelect={() => onSelect(note)}
+                    onSelect={() => onSelect(item.note)}
                 />
             ))}
         </div>
