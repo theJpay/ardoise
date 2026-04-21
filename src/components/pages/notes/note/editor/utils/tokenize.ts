@@ -1,27 +1,51 @@
+import { highlightToHtml, isRegistered } from "@utils/lowlight";
+
 import { escapeHtml } from "./escapeHtml";
 
 export function tokenize(content: string): string {
     const lines = content.split("\n");
     const result: string[] = [];
     let inCodeBlock = false;
+    let codeLang: string | null = null;
+    let codeBuffer: string[] = [];
+
+    const flushCodeBlock = () => {
+        if (codeBuffer.length === 0) {
+            return;
+        }
+        result.push(formatCodeBlock(codeBuffer, codeLang));
+        codeBuffer = [];
+    };
 
     for (const line of lines) {
         if (/^```/.test(line)) {
             if (!inCodeBlock) {
                 result.push(tokenizeCodeFenceOpen(line));
+                codeLang = line.slice(3).trim() || null;
                 inCodeBlock = true;
             } else {
+                flushCodeBlock();
                 result.push(`<span class="ed-token-muted">${escapeHtml(line)}</span>`);
+                codeLang = null;
                 inCodeBlock = false;
             }
         } else if (inCodeBlock) {
-            result.push(escapeHtml(line));
+            codeBuffer.push(line);
         } else {
             result.push(tokenizeLine(line));
         }
     }
+    flushCodeBlock();
 
     return result.join("\n");
+}
+
+function formatCodeBlock(lines: string[], lang: string | null): string {
+    const code = lines.join("\n");
+    if (lang && isRegistered(lang)) {
+        return highlightToHtml(lang, code);
+    }
+    return escapeHtml(code);
 }
 
 function tokenizeLine(line: string): string {
