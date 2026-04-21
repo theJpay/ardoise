@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer } from "react";
 
 import { UnreachableError } from "@utils";
 
-import { COMMAND_PALETTE_ACTIONS } from "./utils/actions";
+import { SLASH_MENU_ACTIONS } from "./utils/actions";
 import { getLineStart } from "./utils/line";
 import { replaceRange } from "./utils/replaceRange";
 
@@ -20,7 +20,7 @@ type Action =
     | { type: "filter"; value: string }
     | { type: "navigate"; direction: "up" | "down"; count: number };
 
-export function useCommandPalette(
+export function useSlashMenu(
     editorRef: RefObject<HTMLTextAreaElement | null>,
     content: string,
     cursorPosition: number,
@@ -30,7 +30,7 @@ export function useCommandPalette(
 
     const filteredActions = useMemo(() => {
         const filter = state.filter.toLowerCase();
-        return COMMAND_PALETTE_ACTIONS.filter(
+        return SLASH_MENU_ACTIONS.filter(
             (action) => action.label.toLowerCase().includes(filter) || action.name.includes(filter)
         );
     }, [state.filter]);
@@ -50,7 +50,7 @@ export function useCommandPalette(
 
     const executeCommand = useCallback(
         (actionName: string) => {
-            const action = COMMAND_PALETTE_ACTIONS.find((a) => a.name === actionName);
+            const action = SLASH_MENU_ACTIONS.find((a) => a.name === actionName);
             if (!action || !editorRef.current) {
                 return;
             }

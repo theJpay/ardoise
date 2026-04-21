@@ -12,7 +12,7 @@ import {
     Strikethrough
 } from "lucide-react";
 
-import type { BlockActionName, CommandPaletteActionName, InlineActionName } from "./actions";
+import type { BlockActionName, InlineActionName, SlashMenuActionName } from "./actions";
 
 export const TOOLBAR_ACTION_ICONS: Record<BlockActionName, React.ReactNode> = {
     "heading-1": <Heading1 size={14} strokeWidth={1.5} />,
@@ -30,7 +30,7 @@ export const FLOATING_TOOLBAR_ACTION_ICONS: Record<InlineActionName, React.React
     link: <Link size={13} strokeWidth={1.5} />
 };
 
-export const COMMAND_PALETTE_ACTION_ICONS: Record<CommandPaletteActionName, React.ReactNode> = {
+export const SLASH_MENU_ACTION_ICONS: Record<SlashMenuActionName, React.ReactNode> = {
     "heading-1": <Heading1 size={13} strokeWidth={1.5} />,
     "heading-2": <Heading2 size={13} strokeWidth={1.5} />,
     "heading-3": <Heading3 size={13} strokeWidth={1.5} />,
