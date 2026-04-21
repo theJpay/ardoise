@@ -6,7 +6,7 @@ import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { visit } from "unist-util-visit";
 
-import { lowlight } from "@utils/lowlight";
+import { highlightToHast, isRegistered } from "@utils/lowlight";
 
 import type { Element, ElementContent, Root } from "hast";
 
@@ -33,14 +33,14 @@ function rehypeLowlight() {
                 return;
             }
             const lang = extractLanguage(node);
-            if (!lang || !lowlight.registered(lang)) {
+            if (!lang || !isRegistered(lang)) {
                 return;
             }
             const code = node.children
                 .filter((child) => child.type === "text")
                 .map((child) => child.value)
                 .join("");
-            const result = lowlight.highlight(lang, code);
+            const result = highlightToHast(lang, code);
             node.children = result.children as ElementContent[];
             const className = (node.properties.className as string[] | undefined) ?? [];
             node.properties.className = ["hljs", ...className];
