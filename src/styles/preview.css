@@ -243,25 +243,3 @@
 .ardoise-preview tr:hover td {
     background: var(--color-surface);
 }
-
-/* Syntax highlighting — minimal per spec */
-.ardoise-preview .hljs-keyword {
-    color: #8a9e90;
-}
-.ardoise-preview .hljs-string {
-    color: #9a8870;
-}
-.ardoise-preview .hljs-comment {
-    color: var(--color-subtle);
-    font-style: italic;
-}
-.ardoise-preview .hljs-number {
-    color: #9a8870;
-}
-.ardoise-preview .hljs-title {
-    color: var(--color-text);
-    font-weight: 500;
-}
-.ardoise-preview .hljs-built_in {
-    color: #8a9e90;
-}
