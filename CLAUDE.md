@@ -5,6 +5,7 @@
 - Suggest generic components, design tokens, or shared abstractions when they'd fit — don't add them unilaterally
 - If we establish a convention mid-session, propose adding it here so it doesn't evaporate
 - After non-trivial implementation, explain choices: distinguish forced (no real alternative) from discussable. For discussable ones, name the alternatives and the tradeoff so the call can be revisited.
+- Before implementation, propose the commit sequence as a table (one row per commit, user-visible name + one-sentence effect). Keep splitting until each row is a single concern.
 
 ## Design system
 - Colors are opaque hex only — no rgba tokens
@@ -17,6 +18,7 @@
 - Self-documenting code over comments; use naming or extraction
 - One commit = one concern; no co-authored-by trailers
 - Prefer functional slices over technical layers for feature work — each commit should be a product-meaningful increment that leaves the app in a shippable state (e.g. "palette opens with recents" → "add title search" → "add content search", not "data layer" → "UI" → "wiring"). Iso-functional changes (renames, refactors, extractions) can stand alone.
+- If a feature needs a refactor to land cleanly, ship the refactor as its own iso-functional commit first — don't bundle it into the feature commit.
 - Name commits by user-visible behavior, not implementation (good: "add title search in command palette"; bad: "add usePaletteResults hook")
 - ESLint enforces `curly`, `jsx-sort-props`, `import/order` (`@aliases` as internal)
 - `@utils` for shared utilities
