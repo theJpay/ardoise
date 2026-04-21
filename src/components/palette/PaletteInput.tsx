@@ -1,7 +1,12 @@
 import { Search } from "lucide-react";
 import { useEffect, useRef } from "react";
 
-function PaletteInput() {
+type PaletteInputProps = {
+    value: string;
+    onChange: (value: string) => void;
+};
+
+function PaletteInput({ value, onChange }: PaletteInputProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -17,6 +22,8 @@ function PaletteInput() {
                 className="text-ui-base text-text placeholder:text-dim flex-1 bg-transparent font-mono outline-none"
                 placeholder="Search notes..."
                 type="search"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
             />
         </div>
     );

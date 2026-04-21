@@ -1,23 +1,25 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-
-import { useNotesQuery } from "@queries/useNotesQuery";
+import { useCallback, useEffect, useState } from "react";
 
 import { useAppNavigate } from "./useAppNavigate";
+import { usePaletteResults } from "./usePaletteResults";
 
 import type { Note } from "@entities";
 
-const RECENT_LIMIT = 5;
-
 export function useCommandPalette() {
     const [isOpen, setIsOpen] = useState(false);
+    const [query, setQuery] = useState("");
     const [selectedIndex, setSelectedIndex] = useState(0);
-    const { notes } = useNotesQuery();
+    const results = usePaletteResults(query);
     const { navigate } = useAppNavigate();
-
-    const recentNotes = useMemo<Note[]>(() => notes.slice(0, RECENT_LIMIT), [notes]);
 
     const close = useCallback(() => {
         setIsOpen(false);
+        setQuery("");
+        setSelectedIndex(0);
+    }, []);
+
+    const updateQuery = useCallback((value: string) => {
+        setQuery(value);
         setSelectedIndex(0);
     }, []);
 
@@ -35,6 +37,7 @@ export function useCommandPalette() {
                 event.preventDefault();
                 event.stopPropagation();
                 setIsOpen((prev) => !prev);
+                setQuery("");
                 setSelectedIndex(0);
             }
         };
@@ -56,19 +59,19 @@ export function useCommandPalette() {
             if (event.key === "ArrowDown") {
                 event.preventDefault();
                 event.stopPropagation();
-                setSelectedIndex((prev) => wrapIndex(prev + 1, recentNotes.length));
+                setSelectedIndex((prev) => wrapIndex(prev + 1, results.notes.length));
                 return;
             }
             if (event.key === "ArrowUp") {
                 event.preventDefault();
                 event.stopPropagation();
-                setSelectedIndex((prev) => wrapIndex(prev - 1, recentNotes.length));
+                setSelectedIndex((prev) => wrapIndex(prev - 1, results.notes.length));
                 return;
             }
             if (event.key === "Enter") {
                 event.preventDefault();
                 event.stopPropagation();
-                const selected = recentNotes[selectedIndex];
+                const selected = results.notes[selectedIndex];
                 if (selected) {
                     openNote(selected);
                 }
@@ -76,9 +79,18 @@ export function useCommandPalette() {
         };
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [isOpen, recentNotes, selectedIndex, close, openNote]);
+    }, [isOpen, results, selectedIndex, close, openNote]);
 
-    return { isOpen, close, recentNotes, selectedIndex, setSelectedIndex, openNote };
+    return {
+        isOpen,
+        close,
+        query,
+        setQuery: updateQuery,
+        results,
+        selectedIndex,
+        setSelectedIndex,
+        openNote
+    };
 }
 
 function isPaletteShortcut(e: KeyboardEvent) {

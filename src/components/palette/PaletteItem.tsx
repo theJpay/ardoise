@@ -1,18 +1,19 @@
 import { File } from "lucide-react";
 
 import { NoteEntity } from "@entities";
-import { formatRelativeDate } from "@utils";
+import { formatRelativeDate, splitByMatch } from "@utils";
 
 import type { Note } from "@entities";
 
 type PaletteItemProps = {
     note: Note;
+    query: string;
     selected: boolean;
     onMouseEnter: () => void;
     onSelect: () => void;
 };
 
-function PaletteItem({ note, selected, onMouseEnter, onSelect }: PaletteItemProps) {
+function PaletteItem({ note, query, selected, onMouseEnter, onSelect }: PaletteItemProps) {
     return (
         <button
             ref={(el) => scrollSelectedIntoView(el, selected)}
@@ -31,13 +32,30 @@ function PaletteItem({ note, selected, onMouseEnter, onSelect }: PaletteItemProp
             </span>
             <span className="min-w-0 flex-1">
                 <span className="text-ui-base text-text block truncate">
-                    {NoteEntity.getTitle(note)}
+                    <HighlightedTitle query={query} title={NoteEntity.getTitle(note)} />
                 </span>
                 <span className="text-ui-sm text-subtle mt-0.5 block font-mono">
                     {formatRelativeDate(note.updatedAt)}
                 </span>
             </span>
         </button>
+    );
+}
+
+function HighlightedTitle({ title, query }: { title: string; query: string }) {
+    const segments = splitByMatch(title, query);
+    return (
+        <>
+            {segments.map((segment, i) =>
+                segment.isMatch ? (
+                    <span key={i} className="text-accent font-medium">
+                        {segment.text}
+                    </span>
+                ) : (
+                    <span key={i}>{segment.text}</span>
+                )
+            )}
+        </>
     );
 }
 
