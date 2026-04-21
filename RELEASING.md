@@ -28,8 +28,8 @@ Schema caveat: Dexie migrations run client-side when a user loads the app. A cod
 
 ## Scripts
 
-| Script | Action |
-|---|---|
-| `release:pr` | Opens PR `beta → main`, title `Release v$npm_package_version`, body seeded from `git log main..beta`. |
-| `release:sync-beta` | `git checkout beta && git fetch origin && git merge origin/main --no-edit && git push`. |
-| `release:tag` | `gh release create v$npm_package_version --target main --generate-notes`. |
+| Script              | Action                                                                                                |
+| ------------------- | ----------------------------------------------------------------------------------------------------- |
+| `release:pr`        | Opens PR `beta → main`, title `Release v$npm_package_version`, body seeded from `git log main..beta`. |
+| `release:sync-beta` | `git checkout beta && git fetch origin && git merge origin/main --no-edit && git push`.               |
+| `release:tag`       | `gh release create v$npm_package_version --target main --generate-notes`.                             |
