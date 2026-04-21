@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ShortcutKey } from "@components/generics";
 import { NoteEntity } from "@entities";
 import { useAppNavigate } from "@hooks/useAppNavigate";
+import { useClickOutside } from "@hooks/useClickOutside";
 import { useFloatingMenu } from "@hooks/useFloatingMenu";
 import { useNotesMutations } from "@queries/useNotesQuery";
 import { useDeletionActions } from "@stores/deletion.store";
@@ -29,28 +30,22 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
     const [armed, setArmed] = useState(false);
     const timerRef = useRef<number | null>(null);
 
+    useClickOutside(refs.floating, onClose);
+
     useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (refs.floating.current && !refs.floating.current.contains(e.target as Node)) {
-                onClose();
-            }
-        };
         const handleEscape = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
                 onClose();
             }
         };
-
-        document.addEventListener("mousedown", handleClickOutside);
         document.addEventListener("keydown", handleEscape);
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
             document.removeEventListener("keydown", handleEscape);
             if (timerRef.current) {
                 clearTimeout(timerRef.current);
             }
         };
-    }, [refs.floating, onClose]);
+    }, [onClose]);
 
     const handleDuplicate = async () => {
         await duplicateNote(note.id);

@@ -1,5 +1,6 @@
 import { Outlet } from "react-router";
 
+import { CommandPalette } from "@components/palette";
 import { Rail } from "@components/rail";
 import { useThemeSync } from "@hooks/useThemeSync";
 
@@ -14,6 +15,7 @@ function App() {
             <main className="h-screen overflow-hidden">
                 <Outlet />
             </main>
+            <CommandPalette />
         </div>
     );
 }

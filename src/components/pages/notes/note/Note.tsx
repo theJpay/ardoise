@@ -6,13 +6,13 @@ import { useDeletionState } from "@stores/deletion.store";
 
 import DeleteBanner from "./DeleteBanner";
 import {
-    CommandPalette,
     FloatingToolbar,
     handleFormattingShortcut,
     NoteEditor,
+    SlashMenu,
     Toolbar,
-    useCommandPalette,
     useEditorCommands,
+    useSlashMenu,
     useSmartKeys
 } from "./editor";
 import NoteFooter from "./NoteFooter";
@@ -55,11 +55,11 @@ function Note() {
         useEditorCommands(editorRef, content, handleContentChange);
 
     const {
-        state: commandPaletteState,
-        filteredActions: commandPaletteActions,
+        state: slashMenuState,
+        filteredActions: slashMenuActions,
         executeCommand,
-        handleKeyDown: handleCommandPaletteKeyDown
-    } = useCommandPalette(editorRef, content, selection.start, handleContentChange);
+        handleKeyDown: handleSlashMenuKeyDown
+    } = useSlashMenu(editorRef, content, selection.start, handleContentChange);
 
     const { handleKeyDown: handleSmartKeys } = useSmartKeys(editorRef, handleContentChange);
 
@@ -67,7 +67,7 @@ function Note() {
         if (handleFormattingShortcut(e, toggleInline, toggleLink)) {
             return;
         }
-        if (handleCommandPaletteKeyDown(e)) {
+        if (handleSlashMenuKeyDown(e)) {
             return;
         }
         handleSmartKeys(e);
@@ -139,12 +139,12 @@ function Note() {
                                 onToggleInline={toggleInline}
                                 onToggleLink={toggleLink}
                             />
-                            {commandPaletteState.isOpen && (
-                                <CommandPalette
+                            {slashMenuState.isOpen && (
+                                <SlashMenu
                                     content={content}
-                                    filteredActions={commandPaletteActions}
+                                    filteredActions={slashMenuActions}
                                     phantomRef={phantomRef}
-                                    selectedIndex={commandPaletteState.selectedIndex}
+                                    selectedIndex={slashMenuState.selectedIndex}
                                     selection={selection}
                                     onExecute={executeCommand}
                                 />

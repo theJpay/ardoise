@@ -78,7 +78,7 @@
         }
         &[data-accent="clay"],
         & [data-accent="clay"] {
-            --color-accent: #b07a5e;
+            --color-accent: #c38d70;
             --color-accent-dim: #5f4032;
             --color-accent-hover: #9f6a4f;
             --color-accent-surface: #2e1f18;
@@ -86,7 +86,7 @@
         }
         &[data-accent="slate"],
         & [data-accent="slate"] {
-            --color-accent: #6a85a3;
+            --color-accent: #829bb8;
             --color-accent-dim: #39485a;
             --color-accent-hover: #627b99;
             --color-accent-surface: #1b2430;
@@ -94,7 +94,7 @@
         }
         &[data-accent="heather"],
         & [data-accent="heather"] {
-            --color-accent: #9a7a9e;
+            --color-accent: #ae8db2;
             --color-accent-dim: #54425a;
             --color-accent-hover: #86679a;
             --color-accent-surface: #261c2a;
@@ -113,7 +113,7 @@
     [data-theme="light"] {
         &[data-accent="lichen"],
         & [data-accent="lichen"] {
-            --color-accent: #3f7a4d;
+            --color-accent: #346a42;
             --color-accent-dim: #bfd2c4;
             --color-accent-hover: #316540;
             --color-accent-surface: #e5ede3;
@@ -145,7 +145,7 @@
         }
         &[data-accent="amber"],
         & [data-accent="amber"] {
-            --color-accent: #856324;
+            --color-accent: #73561e;
             --color-accent-dim: #dbc89d;
             --color-accent-hover: #6c4f1b;
             --color-accent-surface: #efe5cf;
