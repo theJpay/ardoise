@@ -5,7 +5,7 @@ export type EditorAction = {
     type: "block" | "inline";
 };
 
-export type CommandPaletteAction = {
+export type SlashMenuAction = {
     name: string;
     syntax: string;
     label: string;
@@ -39,7 +39,7 @@ export const FLOATING_TOOLBAR_ACTION_GROUPS: InlineActionName[][] = [
     ["code", "link"]
 ];
 
-export const COMMAND_PALETTE_ACTIONS = [
+export const SLASH_MENU_ACTIONS = [
     { name: "heading-1", syntax: "# ", label: "Heading 1", description: "Large section title" },
     { name: "heading-2", syntax: "## ", label: "Heading 2", description: "Medium section title" },
     { name: "heading-3", syntax: "### ", label: "Heading 3", description: "Small section title" },
@@ -53,13 +53,13 @@ export const COMMAND_PALETTE_ACTIONS = [
     { name: "quote", syntax: "> ", label: "Quote", description: "Block quotation" },
     { name: "task-list", syntax: "- [ ] ", label: "Task list", description: "Checkbox item" },
     { name: "hr", syntax: "---\n", label: "Horizontal rule", description: "Section divider" }
-] satisfies readonly CommandPaletteAction[];
+] satisfies readonly SlashMenuAction[];
 
 export const ALL_ACTIONS = [...TOOLBAR_ACTIONS, ...FLOATING_TOOLBAR_ACTIONS] as const;
 
 export type BlockActionName = (typeof TOOLBAR_ACTIONS)[number]["name"];
 export type InlineActionName = (typeof FLOATING_TOOLBAR_ACTIONS)[number]["name"];
-export type CommandPaletteActionName = (typeof COMMAND_PALETTE_ACTIONS)[number]["name"];
+export type SlashMenuActionName = (typeof SLASH_MENU_ACTIONS)[number]["name"];
 export type ActionName = (typeof ALL_ACTIONS)[number]["name"];
 
 export const BLOCK_SYNTAXES = TOOLBAR_ACTIONS.filter((a) => !a.syntax.includes("\n"))

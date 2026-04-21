@@ -2,6 +2,7 @@ import { BookOpen, PenLine } from "lucide-react";
 import { useRef } from "react";
 
 import { useEditorMode } from "@hooks/useEditorMode";
+import { isMac } from "@utils";
 
 import ModeToggleTooltip from "./ModeToggleTooltip";
 
@@ -20,6 +21,8 @@ function EditorModeToggler({ disabled }: EditorModeTogglerProps) {
                 : "text-subtle hover:bg-elevated hover:text-muted"
         }`;
 
+    const shortcut = isMac() ? "⌘⇧M" : "Ctrl+Shift+M";
+
     return (
         <>
             <div
@@ -27,9 +30,10 @@ function EditorModeToggler({ disabled }: EditorModeTogglerProps) {
                 className="bg-surface border-border-soft flex flex-col gap-0.5 rounded-lg border p-1"
             >
                 <button
-                    aria-label="Write mode"
+                    aria-label="Edit mode"
                     className={buttonClass(mode === "edit")}
                     disabled={disabled}
+                    title={`Edit mode (${shortcut})`}
                     onClick={toggleMode}
                 >
                     <PenLine aria-hidden="true" size={15} strokeWidth={1.5} />
@@ -38,6 +42,7 @@ function EditorModeToggler({ disabled }: EditorModeTogglerProps) {
                     aria-label="Preview mode"
                     className={buttonClass(mode === "preview")}
                     disabled={disabled}
+                    title={`Preview mode (${shortcut})`}
                     onClick={toggleMode}
                 >
                     <BookOpen aria-hidden="true" size={15} strokeWidth={1.5} />

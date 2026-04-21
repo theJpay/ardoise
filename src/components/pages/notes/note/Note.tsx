@@ -6,13 +6,13 @@ import { useDeletionState } from "@stores/deletion.store";
 
 import DeleteBanner from "./DeleteBanner";
 import {
-    CommandPalette,
     FloatingToolbar,
     handleFormattingShortcut,
     NoteEditor,
+    SlashMenu,
     Toolbar,
-    useCommandPalette,
     useEditorCommands,
+    useSlashMenu,
     useSmartKeys
 } from "./editor";
 import NoteFooter from "./NoteFooter";
@@ -39,25 +39,27 @@ function Note() {
         editorRef,
         titleRef,
         phantomRef,
+        scrollContainerRef,
         saveStatus,
         saveError,
         retrySave,
         resetSelection,
         handleContentChange,
         handleCursorChange,
+        handleScroll,
         handleTitleChange,
         setFocused
-    } = useNoteState(noteId);
+    } = useNoteState(noteId, mode);
 
     const { toggleBlock, isBlockActive, toggleInline, isInlineActive, toggleLink } =
-        useEditorCommands(editorRef, content, selection.start, handleContentChange);
+        useEditorCommands(editorRef, content, handleContentChange);
 
     const {
-        state: commandPaletteState,
-        filteredActions: commandPaletteActions,
+        state: slashMenuState,
+        filteredActions: slashMenuActions,
         executeCommand,
-        handleKeyDown: handleCommandPaletteKeyDown
-    } = useCommandPalette(editorRef, content, selection.start, handleContentChange);
+        handleKeyDown: handleSlashMenuKeyDown
+    } = useSlashMenu(editorRef, content, selection.start, handleContentChange);
 
     const { handleKeyDown: handleSmartKeys } = useSmartKeys(editorRef, handleContentChange);
 
@@ -65,7 +67,7 @@ function Note() {
         if (handleFormattingShortcut(e, toggleInline, toggleLink)) {
             return;
         }
-        if (handleCommandPaletteKeyDown(e)) {
+        if (handleSlashMenuKeyDown(e)) {
             return;
         }
         handleSmartKeys(e);
@@ -98,7 +100,9 @@ function Note() {
             )}
 
             <div
-                className={`flex-1 overflow-auto px-6 py-12 transition-opacity duration-150 ${armed ? "opacity-40" : ""}`}
+                ref={scrollContainerRef}
+                className={`flex-1 scroll-pb-48 overflow-auto px-6 pt-12 pb-48 transition-opacity duration-150 ${armed ? "opacity-40" : ""}`}
+                onScroll={handleScroll}
             >
                 <div
                     className={`mx-auto flex w-full flex-col gap-2 ${mode === "edit" ? "max-w-[72ch]" : "max-w-180"}`}
@@ -135,12 +139,12 @@ function Note() {
                                 onToggleInline={toggleInline}
                                 onToggleLink={toggleLink}
                             />
-                            {commandPaletteState.isOpen && (
-                                <CommandPalette
+                            {slashMenuState.isOpen && (
+                                <SlashMenu
                                     content={content}
-                                    filteredActions={commandPaletteActions}
+                                    filteredActions={slashMenuActions}
                                     phantomRef={phantomRef}
-                                    selectedIndex={commandPaletteState.selectedIndex}
+                                    selectedIndex={slashMenuState.selectedIndex}
                                     selection={selection}
                                     onExecute={executeCommand}
                                 />

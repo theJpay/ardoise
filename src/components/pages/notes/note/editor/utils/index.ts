@@ -1,9 +1,9 @@
 export { ALL_ACTIONS, BLOCK_SYNTAXES, TOOLBAR_ACTIONS, getSyntax } from "./actions";
-export { handleFormattingShortcut } from "./handleFormattingShortcut";
+export { isBlockSyntaxActiveAtPosition, toggleBlockAtLineStart } from "./blockSyntax";
 export { isInsideCodeBlock, toggleCodeBlock } from "./codeBlock";
 export { getSelectionRect } from "./getSelectionRect";
-export { isBlockSyntaxActiveAtPosition } from "./isBlockSyntaxActive";
-export { isInlineSyntaxActive } from "./isInlineSyntaxActive";
+export { handleFormattingShortcut, isInlineSyntaxActive } from "./inlineSyntax";
+export { getLineStart, getLineEnd, getSelectedLines } from "./line";
+export { getListContinuation, isListLine, parseListLine } from "./listItem";
 export { replaceRange } from "./replaceRange";
-export { toggleBlockAtLineStart } from "./toggleBlockAtLineStart";
 export { tokenize } from "./tokenize";

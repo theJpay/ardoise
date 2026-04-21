@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useReducer } from "react";
+import { useCallback, useEffect, useMemo, useReducer } from "react";
 
 import { UnreachableError } from "@utils";
 
-import { COMMAND_PALETTE_ACTIONS } from "./utils/actions";
+import { SLASH_MENU_ACTIONS } from "./utils/actions";
+import { getLineStart } from "./utils/line";
 import { replaceRange } from "./utils/replaceRange";
 
 import type { RefObject } from "react";
@@ -19,7 +20,7 @@ type Action =
     | { type: "filter"; value: string }
     | { type: "navigate"; direction: "up" | "down"; count: number };
 
-export function useCommandPalette(
+export function useSlashMenu(
     editorRef: RefObject<HTMLTextAreaElement | null>,
     content: string,
     cursorPosition: number,
@@ -27,11 +28,12 @@ export function useCommandPalette(
 ) {
     const [state, dispatch] = useReducer(reducer, getInitialState());
 
-    const filteredActions = COMMAND_PALETTE_ACTIONS.filter(
-        (action) =>
-            action.label.toLowerCase().includes(state.filter.toLowerCase()) ||
-            action.name.includes(state.filter.toLowerCase())
-    );
+    const filteredActions = useMemo(() => {
+        const filter = state.filter.toLowerCase();
+        return SLASH_MENU_ACTIONS.filter(
+            (action) => action.label.toLowerCase().includes(filter) || action.name.includes(filter)
+        );
+    }, [state.filter]);
 
     useEffect(() => {
         const filter = getSlashContext(content, cursorPosition);
@@ -48,12 +50,12 @@ export function useCommandPalette(
 
     const executeCommand = useCallback(
         (actionName: string) => {
-            const action = COMMAND_PALETTE_ACTIONS.find((a) => a.name === actionName);
+            const action = SLASH_MENU_ACTIONS.find((a) => a.name === actionName);
             if (!action || !editorRef.current) {
                 return;
             }
             const textarea = editorRef.current;
-            const lineStart = textarea.value.lastIndexOf("\n", cursorPosition - 1) + 1;
+            const lineStart = getLineStart(textarea.value, cursorPosition);
             const newCursorPos = lineStart + (action.cursorOffset ?? action.syntax.length);
 
             replaceRange(textarea, {
@@ -73,7 +75,7 @@ export function useCommandPalette(
             return;
         }
         const textarea = editorRef.current;
-        const lineStart = textarea.value.lastIndexOf("\n", cursorPosition - 1) + 1;
+        const lineStart = getLineStart(textarea.value, cursorPosition);
 
         replaceRange(textarea, {
             start: lineStart,
@@ -157,8 +159,7 @@ function getInitialState(): State {
 }
 
 function getSlashContext(value: string, cursorPosition: number): string | null {
-    const lineStart = value.lastIndexOf("\n", cursorPosition - 1) + 1;
-    const lineBeforeCursor = value.slice(lineStart, cursorPosition);
+    const lineBeforeCursor = value.slice(getLineStart(value, cursorPosition), cursorPosition);
     const match = lineBeforeCursor.match(/^\/([a-zA-Z-]*)$/);
     if (!match) {
         return null;

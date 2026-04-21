@@ -19,7 +19,7 @@ function NoteFooter({ noteContent, saveStatus }: NoteFooterProps) {
     return (
         <div className="border-border-soft flex h-8 shrink-0 items-center justify-between border-t px-5">
             <span className="text-ui-sm text-subtle font-mono">
-                {wordCount} words · {readTime} min read
+                {wordCount} words <span className="text-dim">·</span> {readTime} min read
             </span>
             <div className="flex items-center gap-4">
                 <div className="text-ui-sm text-subtle flex items-center gap-1 font-mono">

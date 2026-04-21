@@ -5,7 +5,6 @@ import type { LucideIcon } from "lucide-react";
 export type Shortcut = {
     label: string;
     keys: (string | LucideIcon)[];
-    soon?: boolean;
 };
 
 export type ShortcutGroup = {
@@ -19,6 +18,7 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
         shortcuts: [
             { label: "Toggle sidebar", keys: [Command, ArrowBigUp, "B"] },
             { label: "Toggle mode", keys: [Command, ArrowBigUp, "M"] },
+            { label: "Command palette", keys: [Command, ArrowBigUp, "K"] },
             { label: "Focus search", keys: [Command, ArrowBigUp, "F"] },
             { label: "New note", keys: [Command, Option, "N"] },
             { label: "Save", keys: [Command, "S"] }
@@ -39,12 +39,7 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
             { label: "Strikethrough", keys: [Command, ArrowBigUp, "X"] },
             { label: "Inline code", keys: [Command, "E"] },
             { label: "Link", keys: [Command, "K"] },
-            { label: "Slash commands", keys: ["/"] },
-            { label: "Voice note", keys: [Command, ArrowBigUp, "V"], soon: true }
+            { label: "Slash commands", keys: ["/"] }
         ]
-    },
-    {
-        title: "Coming soon",
-        shortcuts: [{ label: "Advanced search", keys: [Command, ArrowBigUp, "K"], soon: true }]
     }
 ];

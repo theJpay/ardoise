@@ -1,6 +1,7 @@
 import { Select, Toggle } from "@components/generics";
 import { useSettingsMutations, useSettingsQuery } from "@queries/useSettingsQuery";
 
+import AccentSwatchPicker from "./AccentSwatchPicker";
 import SettingsRow from "./SettingsRow";
 import SettingsSection from "./SettingsSection";
 
@@ -27,8 +28,21 @@ function GeneralSection() {
                         onChange={(spellcheck) => updateSettings({ ...settings, spellcheck })}
                     />
                 </SettingsRow>
-                <SettingsRow badge="soon" description="Light and dark mode" label="Theme">
-                    <Toggle checked={false} disabled onChange={() => {}} />
+                <SettingsRow description="Light or dark mode" label="Theme">
+                    <Select
+                        options={[
+                            { value: "dark", label: "Dark" },
+                            { value: "light", label: "Light" }
+                        ]}
+                        value={settings.theme}
+                        onChange={(theme) => updateSettings({ ...settings, theme })}
+                    />
+                </SettingsRow>
+                <SettingsRow description="Accent color used across the app" label="Accent">
+                    <AccentSwatchPicker
+                        value={settings.accent}
+                        onChange={(accent) => updateSettings({ ...settings, accent })}
+                    />
                 </SettingsRow>
             </div>
         </SettingsSection>

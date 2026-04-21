@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 import { useEffect } from "react";
 
+import { useClickOutside } from "@hooks/useClickOutside";
 import { useFloatingMenu } from "@hooks/useFloatingMenu";
 
 import ShortcutGroup from "./ShortcutGroup";
@@ -21,32 +22,20 @@ function ShortcutPanel({ anchorRef, isOpen, onClose }: ShortcutPanelProps) {
         offset: 12
     });
 
+    useClickOutside(refs.floating, onClose, { enabled: isOpen, ignore: anchorRef });
+
     useEffect(() => {
         if (!isOpen) {
             return;
         }
-
-        const handleClickOutside = (e: MouseEvent) => {
-            const target = e.target as Node;
-            const isInsidePanel = refs.floating.current?.contains(target);
-            const isInsideAnchor = anchorRef.current?.contains(target);
-            if (!isInsidePanel && !isInsideAnchor) {
-                onClose();
-            }
-        };
         const handleEscape = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
                 onClose();
             }
         };
-
-        document.addEventListener("mousedown", handleClickOutside);
         document.addEventListener("keydown", handleEscape);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-            document.removeEventListener("keydown", handleEscape);
-        };
-    }, [isOpen, refs.floating, anchorRef, onClose]);
+        return () => document.removeEventListener("keydown", handleEscape);
+    }, [isOpen, onClose]);
 
     if (!isOpen) {
         return null;

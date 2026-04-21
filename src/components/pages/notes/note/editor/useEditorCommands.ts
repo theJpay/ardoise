@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 
 import {
+    getSelectedLines,
     getSyntax,
     isBlockSyntaxActiveAtPosition,
     isInlineSyntaxActive,
@@ -18,7 +19,6 @@ const MULTI_LINE_SYNTAXES = ["> "];
 export function useEditorCommands(
     editorRef: RefObject<HTMLTextAreaElement | null>,
     content: string,
-    cursorPosition: number,
     onChange: (newContent: string) => void
 ) {
     const toggleBlock = useCallback(
@@ -53,17 +53,18 @@ export function useEditorCommands(
 
     const isBlockActive = useCallback(
         (actionName: BlockActionName) => {
-            if (document.activeElement !== editorRef.current) {
+            const textarea = editorRef.current;
+            if (!textarea || document.activeElement !== textarea) {
                 return false;
             }
-            const pos = editorRef.current?.selectionStart ?? cursorPosition;
+            const pos = textarea.selectionStart;
             if (actionName === "code-block") {
                 return isInsideCodeBlock(content, pos);
             }
             const syntax = getSyntax(actionName);
             return isBlockSyntaxActiveAtPosition(content, pos, syntax);
         },
-        [editorRef, content, cursorPosition]
+        [editorRef, content]
     );
 
     const toggleInline = useCallback(
@@ -165,9 +166,11 @@ function toggleBlockMultiLine(
     onChange: (value: string) => void
 ) {
     const { value, selectionStart, selectionEnd } = textarea;
-    const firstLineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
-    const selectedText = value.slice(firstLineStart, selectionEnd);
-    const lines = selectedText.split("\n");
+    const { firstLineStart, selectedText, lines } = getSelectedLines(
+        value,
+        selectionStart,
+        selectionEnd
+    );
 
     const allHaveSyntax = lines.every((line) => line.startsWith(syntax));
 

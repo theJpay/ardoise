@@ -1,3 +1,4 @@
+import { getLineEnd, getLineStart } from "./line";
 import { replaceRange } from "./replaceRange";
 
 export function isInsideCodeBlock(text: string, position: number): boolean {
@@ -22,15 +23,14 @@ export function toggleCodeBlock(textarea: HTMLTextAreaElement, onChange: (value:
             cursor: { start: selectionStart + 4, end: selectionStart + 4 + selected.length }
         });
     } else {
-        const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
-        const lineEnd = value.indexOf("\n", selectionStart);
-        const actualLineEnd = lineEnd === -1 ? value.length : lineEnd;
-        const lineContent = value.slice(lineStart, actualLineEnd);
+        const lineStart = getLineStart(value, selectionStart);
+        const lineEnd = getLineEnd(value, selectionStart);
+        const lineContent = value.slice(lineStart, lineEnd);
 
         if (lineContent.length === 0) {
             replaceRange(textarea, {
                 start: lineStart,
-                end: actualLineEnd,
+                end: lineEnd,
                 text: "```\n\n```",
                 onChange,
                 cursor: { start: lineStart + 4 }
@@ -38,7 +38,7 @@ export function toggleCodeBlock(textarea: HTMLTextAreaElement, onChange: (value:
         } else {
             replaceRange(textarea, {
                 start: lineStart,
-                end: actualLineEnd,
+                end: lineEnd,
                 text: "```\n" + lineContent + "\n```",
                 onChange,
                 cursor: { start: lineStart + 4, end: lineStart + 4 + lineContent.length }

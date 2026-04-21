@@ -1,26 +1,26 @@
 import { useFloatingPosition } from "./useFloatingPosition";
-import { COMMAND_PALETTE_ACTION_ICONS } from "./utils/icons";
+import { SLASH_MENU_ACTION_ICONS } from "./utils/icons";
 
-import type { CommandPaletteAction } from "./utils/actions";
+import type { SlashMenuAction } from "./utils/actions";
 import type { RefObject } from "react";
 
-type CommandPaletteProps = {
+type SlashMenuProps = {
     content: string;
-    filteredActions: readonly CommandPaletteAction[];
+    filteredActions: readonly SlashMenuAction[];
     phantomRef: RefObject<HTMLDivElement | null>;
     selectedIndex: number;
     selection: { start: number; end: number };
     onExecute: (actionName: string) => void;
 };
 
-function CommandPalette({
+function SlashMenu({
     content,
     filteredActions,
     phantomRef,
     selectedIndex,
     selection,
     onExecute
-}: CommandPaletteProps) {
+}: SlashMenuProps) {
     const { refs, floatingStyles } = useFloatingPosition({
         measureRef: phantomRef,
         content,
@@ -39,7 +39,7 @@ function CommandPalette({
             className="bg-elevated border-border shadow-float z-50 w-58 rounded border p-1"
             style={floatingStyles}
         >
-            <div className="text-ui-xs text-subtle px-2 py-1.5 font-mono">/ commands</div>
+            <div className="text-ui-xs text-dim px-2 py-1.5 font-mono">/ commands</div>
             <div className="max-h-66 overflow-y-auto">
                 {filteredActions.map((action, index) => (
                     <div
@@ -58,7 +58,7 @@ function CommandPalette({
                                 index === selectedIndex ? "text-accent" : "text-muted"
                             }`}
                         >
-                            {COMMAND_PALETTE_ACTION_ICONS[action.name]}
+                            {SLASH_MENU_ACTION_ICONS[action.name]}
                         </div>
                         <div>
                             <div className="text-ui-base text-text">{action.label}</div>
@@ -79,4 +79,4 @@ function scrollSelectedIntoView(el: HTMLDivElement | null, isSelected: boolean) 
     }
 }
 
-export default CommandPalette;
+export default SlashMenu;
