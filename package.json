@@ -27,7 +27,10 @@
         "preview": "vite preview",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "release:pr": "gh pr create --base main --head beta --title \"Release v$npm_package_version\" --body \"$(git log main..beta --pretty=format:'- %s' --no-merges)\"",
+        "release:sync-beta": "git checkout beta && git pull --rebase origin main && git push",
+        "release:tag": "gh release create \"v$npm_package_version\" --target main --generate-notes --title \"v$npm_package_version\""
     },
     "dependencies": {
         "@floating-ui/react": "^0.27.19",
