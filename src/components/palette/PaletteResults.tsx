@@ -1,7 +1,7 @@
 import PaletteItem from "./PaletteItem";
 
+import type { PaletteResult } from "./usePaletteResults";
 import type { Note } from "@entities";
-import type { PaletteResult } from "@hooks/usePaletteResults";
 
 type PaletteResultsProps = {
     section: string;

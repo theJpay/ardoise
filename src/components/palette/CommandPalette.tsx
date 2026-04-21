@@ -2,11 +2,11 @@ import { FloatingPortal } from "@floating-ui/react";
 import { useRef } from "react";
 
 import { useClickOutside } from "@hooks/useClickOutside";
-import { useCommandPalette } from "@hooks/useCommandPalette";
 
 import PaletteFooter from "./PaletteFooter";
 import PaletteInput from "./PaletteInput";
 import PaletteResults from "./PaletteResults";
+import { useCommandPalette } from "./useCommandPalette";
 
 function CommandPalette() {
     const { isOpen, close, query, setQuery, results, selectedIndex, setSelectedIndex, openNote } =

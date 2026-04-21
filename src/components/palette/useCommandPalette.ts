@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { useAppNavigate } from "./useAppNavigate";
+import { useAppNavigate } from "@hooks/useAppNavigate";
+
 import { usePaletteResults } from "./usePaletteResults";
 
 import type { Note } from "@entities";
