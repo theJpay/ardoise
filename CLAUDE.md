@@ -23,6 +23,7 @@
 - Prefer functional slices over technical layers for feature work — each commit should be a product-meaningful increment that leaves the app in a shippable state (e.g. "palette opens with recents" → "add title search" → "add content search", not "data layer" → "UI" → "wiring"). Iso-functional changes (renames, refactors, extractions) can stand alone.
 - If a feature needs a refactor to land cleanly, ship the refactor as its own iso-functional commit first — don't bundle it into the feature commit.
 - Name commits by user-visible behavior, not implementation (good: "add title search in command palette"; bad: "add usePaletteResults hook")
+- Prefix commits and PR titles with conventional type: `fix:`, `feat:`, `refactor:`, `chore:`, `docs:`
 - ESLint enforces `curly`, `jsx-sort-props`, `import/order` (`@aliases` as internal)
 - `@utils` for shared utilities
 - Editor text operations go through `replaceRange`
