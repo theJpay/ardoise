@@ -1,9 +1,10 @@
 import { Command, Copy, Delete, Trash2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 
 import { ShortcutKey } from "@components/generics";
 import { NoteEntity } from "@entities";
 import { useAppNavigate } from "@hooks/useAppNavigate";
+import { useArmedAction } from "@hooks/useArmedAction";
 import { useClickOutside } from "@hooks/useClickOutside";
 import { useFloatingMenu } from "@hooks/useFloatingMenu";
 import { useNotesMutations } from "@queries/useNotesQuery";
@@ -11,7 +12,6 @@ import { useDeletionActions } from "@stores/deletion.store";
 
 import type { Note } from "@entities";
 
-const CONFIRM_TIMEOUT = 3000;
 const EXIT_ANIMATION_DURATION = 150;
 
 type ContextMenuProps = {
@@ -27,8 +27,21 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
     const { duplicateNote, deleteNote, hardDeleteNote } = useNotesMutations();
     const { setDeleting, reset } = useDeletionActions();
     const { navigate } = useAppNavigate();
-    const [armed, setArmed] = useState(false);
-    const timerRef = useRef<number | null>(null);
+    const { armed, trigger } = useArmedAction({
+        onConfirm: () => {
+            onClose();
+            setDeleting(note.id);
+            setTimeout(async () => {
+                if (NoteEntity.isEmpty(note)) {
+                    await hardDeleteNote(note.id);
+                } else {
+                    await deleteNote(note.id);
+                }
+                reset();
+                navigate("/notes");
+            }, EXIT_ANIMATION_DURATION);
+        }
+    });
 
     useClickOutside(refs.floating, onClose);
 
@@ -41,38 +54,12 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
         document.addEventListener("keydown", handleEscape);
         return () => {
             document.removeEventListener("keydown", handleEscape);
-            if (timerRef.current) {
-                clearTimeout(timerRef.current);
-            }
         };
     }, [onClose]);
 
     const handleDuplicate = async () => {
         await duplicateNote(note.id);
         onClose();
-    };
-
-    const handleDelete = () => {
-        if (!armed) {
-            setArmed(true);
-            timerRef.current = setTimeout(() => {
-                setArmed(false);
-            }, CONFIRM_TIMEOUT);
-            return;
-        }
-
-        onClose();
-        setDeleting(note.id);
-
-        setTimeout(async () => {
-            if (NoteEntity.isEmpty(note)) {
-                await hardDeleteNote(note.id);
-            } else {
-                await deleteNote(note.id);
-            }
-            reset();
-            navigate("/notes");
-        }, EXIT_ANIMATION_DURATION);
     };
 
     return (
@@ -93,7 +80,7 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
                 className={`text-ui-base duration-fast relative flex w-full items-center justify-between overflow-hidden rounded-sm px-2.5 py-1.5 transition-colors ${
                     armed ? "bg-danger-surface text-danger" : "text-danger hover:bg-danger-surface"
                 }`}
-                onClick={handleDelete}
+                onClick={trigger}
             >
                 <span className="flex items-center gap-2">
                     <Trash2 size={13} strokeWidth={1.5} />
