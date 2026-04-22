@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router";
 
 import { ErrorFallback } from "@components";
-import { Note, NoteIndex, NotesPage } from "@components/pages/notes";
+import { NoteIndex, NotesPage } from "@components/pages/notes";
 import {
     DangerZoneSection,
     ExportSection,
@@ -27,7 +27,12 @@ export const router = createBrowserRouter([
                 element: <NotesPage />,
                 children: [
                     { index: true, element: <NoteIndex /> },
-                    { path: ":noteId", element: <Note /> }
+                    {
+                        path: ":noteId",
+                        lazy: async () => ({
+                            Component: (await import("@components/pages/notes/note/Note")).default
+                        })
+                    }
                 ]
             },
             {
