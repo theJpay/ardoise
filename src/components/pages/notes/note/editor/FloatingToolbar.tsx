@@ -53,7 +53,7 @@ function FloatingToolbar({
     return (
         <div
             ref={refs.setFloating}
-            className="bg-elevated border-border shadow-float z-50 flex items-center gap-px rounded-md border p-1 transition-opacity duration-base"
+            className="bg-elevated border-border shadow-float z-50 flex items-center gap-px rounded-md border p-1 transition-opacity duration-base ease-out"
             style={floatingStyles}
         >
             {FLOATING_TOOLBAR_ACTION_GROUPS.map((group, groupIndex) => (

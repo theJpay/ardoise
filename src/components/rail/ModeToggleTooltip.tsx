@@ -26,7 +26,7 @@ function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
     return (
         <div
             ref={refs.setFloating}
-            className="bg-elevated border-border shadow-float z-50 max-w-65 rounded-md border px-3.5 py-3 transition-opacity duration-base"
+            className="bg-elevated border-border shadow-float z-50 max-w-65 rounded-md border px-3.5 py-3 transition-opacity duration-base ease-out"
             style={floatingStyles}
         >
             <div className="text-ui-base text-text mb-1 font-medium">
