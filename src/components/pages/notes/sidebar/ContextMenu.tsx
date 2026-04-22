@@ -82,7 +82,7 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
             style={floatingStyles}
         >
             <button
-                className="text-ui-base text-muted hover:bg-accent-surface hover:text-text flex w-full items-center gap-2 rounded-sm px-2.5 py-1.5 transition-colors"
+                className="text-ui-base text-muted hover:bg-accent-surface hover:text-text duration-fast flex w-full items-center gap-2 rounded-sm px-2.5 py-1.5 transition-colors"
                 onClick={handleDuplicate}
             >
                 <Copy size={13} strokeWidth={1.5} />
@@ -90,7 +90,7 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
             </button>
             <div className="bg-border-soft mx-1 my-0.5 h-px" />
             <button
-                className={`text-ui-base relative flex w-full items-center justify-between overflow-hidden rounded-sm px-2.5 py-1.5 transition-colors ${
+                className={`text-ui-base duration-fast relative flex w-full items-center justify-between overflow-hidden rounded-sm px-2.5 py-1.5 transition-colors ${
                     armed ? "bg-danger-surface text-danger" : "text-danger hover:bg-danger-surface"
                 }`}
                 onClick={handleDelete}
@@ -110,10 +110,7 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
                     )}
                 </span>
                 {armed && (
-                    <span
-                        className="bg-danger absolute bottom-0 left-0 h-[1.5px] w-full origin-left"
-                        style={{ animation: "timer-deplete 3s linear forwards" }}
-                    />
+                    <span className="bg-danger animate-timer-deplete absolute bottom-0 left-0 h-[1.5px] w-full origin-left" />
                 )}
             </button>
         </div>

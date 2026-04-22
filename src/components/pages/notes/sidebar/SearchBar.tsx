@@ -14,7 +14,7 @@ function SearchBar({ value, onChange, ref }: SearchBarProps) {
     const hasValue = value.length > 0;
 
     return (
-        <div className="bg-bg border-border focus-within:border-accent hover:border-muted hover:focus-within:border-accent flex h-8 items-center gap-2 rounded border px-2.5 transition-colors duration-100">
+        <div className="bg-bg border-border focus-within:border-accent hover:border-muted hover:focus-within:border-accent duration-fast flex h-8 items-center gap-2 rounded border px-2.5 transition-colors">
             <Search className="text-subtle shrink-0" size={12} strokeWidth={1.5} />
             <input
                 ref={ref}

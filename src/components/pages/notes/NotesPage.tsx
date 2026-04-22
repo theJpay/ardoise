@@ -11,7 +11,7 @@ function NotesPage() {
 
     return (
         <div
-            className="grid h-full transition-[grid-template-columns] duration-250 ease-in-out"
+            className="duration-layout grid h-full transition-[grid-template-columns] ease-in-out"
             style={{
                 gridTemplateColumns: isSidebarOpen ? "240px 1fr" : "0px 1fr"
             }}

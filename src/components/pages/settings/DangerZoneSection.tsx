@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { Button } from "@components/generics";
 import { useNotesMutations } from "@queries/useNotesQuery";
 
 import SettingsRow from "./SettingsRow";
@@ -44,11 +43,15 @@ function DangerZoneSection() {
                 description="Permanently removes all notes from this device"
                 label="Delete all notes"
             >
-                <Button
-                    label={armed ? "Click again to confirm" : "Delete all"}
-                    variant="danger"
+                <button
+                    className="text-ui-base bg-danger-surface text-danger border-danger-border hover:bg-danger-surface-hover duration-fast relative flex h-8 shrink-0 items-center justify-center overflow-hidden rounded border px-4 font-medium transition-colors"
                     onClick={handleClick}
-                />
+                >
+                    {armed ? "Click again to confirm" : "Delete all"}
+                    {armed && (
+                        <span className="bg-danger animate-timer-deplete absolute bottom-0 left-0 h-[1.5px] w-full origin-left" />
+                    )}
+                </button>
             </SettingsRow>
         </SettingsSection>
     );
