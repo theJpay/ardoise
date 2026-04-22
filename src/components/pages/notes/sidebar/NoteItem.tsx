@@ -19,7 +19,7 @@ function NoteItem({ note }: NoteItemProps) {
 
     return (
         <Link
-            className={`text-text box-border flex h-8 items-center border-l-2 transition-all duration-150 ease-out focus-visible:-outline-offset-2 ${
+            className={`text-text box-border flex h-8 items-center border-l-2 transition-all duration-base ease-out focus-visible:-outline-offset-2 ${
                 isExiting
                     ? "pointer-events-none -translate-y-1 opacity-0"
                     : isActive

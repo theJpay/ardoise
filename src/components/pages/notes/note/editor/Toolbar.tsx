@@ -25,7 +25,7 @@ function Toolbar({ isBlockActive, onToggleBlock }: ToolbarProps) {
                             <button
                                 key={name}
                                 aria-label={action.label}
-                                className={`flex h-7 w-7 items-center justify-center rounded transition-colors duration-100 ${
+                                className={`flex h-7 w-7 items-center justify-center rounded transition-colors duration-fast ${
                                     isBlockActive(name)
                                         ? "text-accent bg-accent-surface hover:bg-accent-surface-hover"
                                         : "text-subtle hover:bg-surface hover:text-muted"

@@ -36,6 +36,10 @@
     --font-mono: "IBM Plex Mono", monospace;
 
     --shadow-float: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+    --duration-fast: 100ms;
+    --duration-base: 150ms;
+    --duration-layout: 250ms;
 }
 
 @layer base {
