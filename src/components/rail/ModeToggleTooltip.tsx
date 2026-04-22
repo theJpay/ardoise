@@ -43,7 +43,7 @@ function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
                     <span>to toggle</span>
                 </div>
                 <button
-                    className="text-ui-sm text-accent border-accent-dim hover:bg-accent-surface rounded-sm border bg-transparent px-2 py-0.5 font-mono tracking-[0.04em] transition-colors"
+                    className="text-ui-sm text-accent border-accent-dim hover:bg-accent-surface rounded-sm border bg-transparent px-2 py-0.5 font-mono tracking-[0.04em] transition-colors duration-fast"
                     onClick={dismissModeTooltip}
                 >
                     Got it

@@ -18,7 +18,7 @@ const VARIANT_CLASSES: Record<Variant, string> = {
 function Button({ label, variant = "primary", icon: Icon, onClick }: ButtonProps) {
     return (
         <button
-            className={`text-ui-base flex h-8 shrink-0 items-center justify-center gap-1.5 rounded px-4 font-medium transition-colors ${VARIANT_CLASSES[variant]}`}
+            className={`text-ui-base flex h-8 shrink-0 items-center justify-center gap-1.5 rounded px-4 font-medium transition-colors duration-fast ${VARIANT_CLASSES[variant]}`}
             onClick={onClick}
         >
             {Icon && <Icon size={14} strokeWidth={2} />}

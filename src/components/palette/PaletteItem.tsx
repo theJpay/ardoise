@@ -18,7 +18,7 @@ function PaletteItem({ note, query, snippet, selected, onMouseEnter, onSelect }:
     return (
         <button
             ref={(el) => scrollSelectedIntoView(el, selected)}
-            className={`flex w-full items-center gap-3 px-4 py-2 text-left transition-colors ${
+            className={`flex w-full items-center gap-3 px-4 py-2 text-left transition-colors duration-fast ${
                 selected ? "bg-accent-surface" : ""
             }`}
             onClick={onSelect}
