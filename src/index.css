@@ -212,6 +212,10 @@
     }
 }
 
+@utility animate-timer-deplete {
+    animation: timer-deplete 3s linear forwards;
+}
+
 @utility text-ui-xs {
     font-size: 11px;
     line-height: 1.4;
