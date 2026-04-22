@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { useParams } from "react-router";
 
 import { useEditorMode } from "@hooks/useEditorMode";
@@ -21,7 +22,8 @@ import NoteNotFound from "./NoteNotFound";
 import NoteTitle from "./NoteTitle";
 import StorageErrorBanner from "./StorageErrorBanner";
 import { useNoteState } from "./useNoteState";
-import { NoteViewer } from "./viewer";
+
+const NoteViewer = lazy(() => import("./viewer/NoteViewer"));
 
 function Note() {
     const { noteId } = useParams<{ noteId: string }>();
@@ -151,7 +153,9 @@ function Note() {
                             )}
                         </>
                     ) : (
-                        <NoteViewer content={content} onSwitchToWrite={toggleMode} />
+                        <Suspense fallback={null}>
+                            <NoteViewer content={content} onSwitchToWrite={toggleMode} />
+                        </Suspense>
                     )}
                 </div>
             </div>
