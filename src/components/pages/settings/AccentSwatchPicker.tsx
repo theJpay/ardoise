@@ -25,7 +25,7 @@ function AccentSwatchPicker({ value, onChange }: AccentSwatchPickerProps) {
                         key={accent}
                         aria-label={ACCENT_LABELS[accent]}
                         aria-pressed={isActive}
-                        className={`bg-accent h-5 w-5 rounded-full border transition-all duration-fast ${
+                        className={`bg-accent h-5 w-5 rounded-full border transition-[border-color,transform] duration-fast ${
                             isActive
                                 ? "border-text scale-110"
                                 : "border-border-soft hover:border-muted"
