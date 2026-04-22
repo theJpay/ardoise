@@ -1,28 +1,20 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback } from "react";
 
 import { NoteEntity } from "@entities";
 import { useAppNavigate } from "@hooks/useAppNavigate";
+import { useArmedAction } from "@hooks/useArmedAction";
 import { useNotesMutations } from "@queries/useNotesQuery";
 import { useDeletionActions, useDeletionState } from "@stores/deletion.store";
 
 import type { Note } from "@entities";
 
-const CONFIRM_TIMEOUT = 3000;
 const EXIT_ANIMATION_DURATION = 150;
 
 export function useDeleteConfirmation() {
     const { navigate } = useAppNavigate();
     const { deleteNote, hardDeleteNote } = useNotesMutations();
     const { armed, noteId, noteTitle } = useDeletionState();
-    const { arm, cancel, setDeleting, reset } = useDeletionActions();
-    const timerRef = useRef<number | null>(null);
-
-    const clearTimer = useCallback(() => {
-        if (timerRef.current) {
-            clearTimeout(timerRef.current);
-            timerRef.current = null;
-        }
-    }, []);
+    const { arm: armStore, cancel: cancelStore, setDeleting, reset } = useDeletionActions();
 
     const executeDelete = useCallback(
         async (id: string, { hard }: { hard: boolean }) => {
@@ -40,35 +32,36 @@ export function useDeleteConfirmation() {
         [setDeleting, deleteNote, hardDeleteNote, reset, navigate]
     );
 
+    const onConfirm = useCallback(async () => {
+        if (!noteId) {
+            return;
+        }
+        await executeDelete(noteId, { hard: false });
+    }, [noteId, executeDelete]);
+
+    const { arm, confirm, cancel } = useArmedAction({
+        onConfirm,
+        onCancel: cancelStore
+    });
+
     const armDelete = useCallback(
         (note: Note) => {
             if (NoteEntity.isEmpty(note)) {
                 executeDelete(note.id, { hard: true });
                 return;
             }
-            clearTimer();
-            arm(note.id, note.title);
-            timerRef.current = setTimeout(cancel, CONFIRM_TIMEOUT);
+            arm();
+            armStore(note.id, note.title);
         },
-        [arm, cancel, clearTimer, executeDelete]
+        [arm, armStore, executeDelete]
     );
 
-    const confirmDelete = useCallback(async () => {
-        if (!noteId) {
-            return;
-        }
-        clearTimer();
-        await executeDelete(noteId, { hard: false });
-    }, [noteId, clearTimer, executeDelete]);
-
-    const cancelDelete = useCallback(() => {
-        clearTimer();
-        cancel();
-    }, [clearTimer, cancel]);
-
-    useEffect(() => {
-        return clearTimer;
-    }, [clearTimer]);
-
-    return { armed, noteId, noteTitle, armDelete, confirmDelete, cancelDelete };
+    return {
+        armed,
+        noteId,
+        noteTitle,
+        armDelete,
+        confirmDelete: confirm,
+        cancelDelete: cancel
+    };
 }
