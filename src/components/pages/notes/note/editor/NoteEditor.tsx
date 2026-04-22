@@ -29,7 +29,7 @@ function NoteEditor({
 }: NoteEditorProps) {
     const mirrorRef = useRef<HTMLDivElement | null>(null);
     const className =
-        "text-ed-body text-editor-text placeholder:text-dim w-full resize-none border-none bg-transparent font-mono font-normal whitespace-pre-wrap outline-none";
+        "text-ed-body text-editor-text placeholder:text-dim w-full resize-none border-none bg-transparent font-mono font-normal whitespace-pre-wrap wrap-anywhere outline-none";
 
     useAutoGrow(ref, content);
     const tokenizedHtml = useMemo(() => tokenize(content), [content]);
