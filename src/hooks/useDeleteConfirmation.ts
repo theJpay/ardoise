@@ -13,7 +13,7 @@ const EXIT_ANIMATION_DURATION = 150;
 export function useDeleteConfirmation() {
     const { navigate } = useAppNavigate();
     const { deleteNote, hardDeleteNote } = useNotesMutations();
-    const { armed, noteId, noteTitle } = useDeletionState();
+    const { noteId } = useDeletionState();
     const { arm: armStore, cancel: cancelStore, setDeleting, reset } = useDeletionActions();
 
     const executeDelete = useCallback(
@@ -57,9 +57,6 @@ export function useDeleteConfirmation() {
     );
 
     return {
-        armed,
-        noteId,
-        noteTitle,
         armDelete,
         confirmDelete: confirm,
         cancelDelete: cancel
