@@ -12,7 +12,7 @@ function StorageErrorBanner({ onRetry }: StorageErrorBannerProps) {
                 Failed to save. Your device storage may be full.
             </div>
             <button
-                className="text-danger border-danger-border text-ui-sm hover:bg-danger-surface-hover rounded-sm border bg-transparent px-2 py-0.5 font-mono transition-colors duration-fast"
+                className="text-danger border-danger-border text-ui-sm hover:bg-danger-surface-hover duration-fast rounded-sm border bg-transparent px-2 py-0.5 font-mono transition-colors"
                 onClick={onRetry}
             >
                 Retry

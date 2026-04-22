@@ -26,7 +26,7 @@ function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
     return (
         <div
             ref={refs.setFloating}
-            className="bg-elevated border-border shadow-float z-50 max-w-65 rounded-md border px-3.5 py-3 transition-opacity duration-base ease-out"
+            className="bg-elevated border-border shadow-float duration-base z-50 max-w-65 rounded-md border px-3.5 py-3 transition-opacity ease-out"
             style={floatingStyles}
         >
             <div className="text-ui-base text-text mb-1 font-medium">
@@ -43,7 +43,7 @@ function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
                     <span>to toggle</span>
                 </div>
                 <button
-                    className="text-ui-sm text-accent border-accent-dim hover:bg-accent-surface rounded-sm border bg-transparent px-2 py-0.5 font-mono tracking-[0.04em] transition-colors duration-fast"
+                    className="text-ui-sm text-accent border-accent-dim hover:bg-accent-surface duration-fast rounded-sm border bg-transparent px-2 py-0.5 font-mono tracking-[0.04em] transition-colors"
                     onClick={dismissModeTooltip}
                 >
                     Got it

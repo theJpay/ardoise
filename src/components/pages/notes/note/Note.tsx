@@ -84,7 +84,7 @@ function Note() {
     return (
         <div className="flex h-full flex-col">
             <div
-                className={`overflow-hidden transition-[height,opacity] duration-layout ease-out ${
+                className={`duration-layout overflow-hidden transition-[height,opacity] ease-out ${
                     mode === "edit" ? "h-10 opacity-100" : "h-0 opacity-0"
                 }`}
             >
@@ -101,7 +101,7 @@ function Note() {
 
             <div
                 ref={scrollContainerRef}
-                className={`flex-1 scroll-pb-48 overflow-auto px-6 pt-12 pb-48 transition-opacity duration-base ${armed ? "opacity-40" : ""}`}
+                className={`duration-base flex-1 scroll-pb-48 overflow-auto px-6 pt-12 pb-48 transition-opacity ${armed ? "opacity-40" : ""}`}
                 onScroll={handleScroll}
             >
                 <div

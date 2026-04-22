@@ -45,7 +45,7 @@ function SlashMenu({
                     <div
                         key={action.name}
                         ref={(el) => scrollSelectedIntoView(el, index === selectedIndex)}
-                        className={`flex cursor-pointer items-center gap-2.5 rounded-sm px-2 py-1.5 transition-colors duration-fast ${
+                        className={`duration-fast flex cursor-pointer items-center gap-2.5 rounded-sm px-2 py-1.5 transition-colors ${
                             index === selectedIndex ? "bg-accent-surface" : ""
                         }`}
                         onMouseDown={(e) => {
