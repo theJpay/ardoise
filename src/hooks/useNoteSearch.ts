@@ -10,11 +10,15 @@ export function useNoteSearch(notes: Note[]) {
     );
 
     const setSearch = (value: string) => {
-        if (value === "") {
-            setSearchParams({});
-            return;
-        }
-        setSearchParams({ q: value });
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            if (value === "") {
+                next.delete("q");
+            } else {
+                next.set("q", value);
+            }
+            return next;
+        });
     };
 
     return {
