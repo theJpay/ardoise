@@ -7,7 +7,7 @@ import { ErrorBoundary } from "@components";
 
 import "./index.css";
 
-import { queryClient } from "./queryClient.ts";
+import { queryClient } from "@queries/queryClient";
 import { router } from "./routes.tsx";
 
 createRoot(document.getElementById("root")!).render(

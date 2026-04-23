@@ -10,7 +10,7 @@ import {
     updateNote
 } from "@services/notes.service";
 
-import { queryClient } from "../queryClient";
+import { queryClient } from "@queries/queryClient";
 
 import type { Note } from "@entities";
 

@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { DEFAULT_SETTINGS } from "@entities";
 import { getSettings, updateSettings } from "@services/settings.service";
 
-import { queryClient } from "../queryClient";
+import { queryClient } from "@queries/queryClient";
 
 const SETTINGS_KEY = ["settings"] as const;
 
