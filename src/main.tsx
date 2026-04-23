@@ -4,11 +4,10 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router/dom";
 
 import { ErrorBoundary } from "@components";
+import { queryClient } from "@queries/queryClient";
 
-import "./index.css";
-
-import { queryClient } from "./queryClient.ts";
 import { router } from "./routes.tsx";
+import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>

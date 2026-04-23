@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
+import { queryClient } from "@queries/queryClient";
 import {
     createNote,
     deleteNote,
@@ -10,14 +11,12 @@ import {
     updateNote
 } from "@services/notes.service";
 
-import { queryClient } from "../queryClient";
-
-import type { Note } from "@entities";
+import type { NoteUpdate } from "@entities";
 
 const NOTES_KEY = ["notes"] as const;
 
 export function useNotesQuery() {
-    const { isPending, error, data } = useQuery<Note[]>({
+    const { isPending, error, data } = useQuery({
         queryKey: NOTES_KEY,
         queryFn: getNotes
     });
@@ -84,5 +83,5 @@ export function useNotesMutations() {
 
 type UpdateMutationArgs = {
     id: string;
-    fields: Partial<Omit<Note, "id" | "createdAt" | "updatedAt" | "deletedAt">>;
+    fields: NoteUpdate;
 };

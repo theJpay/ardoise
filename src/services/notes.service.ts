@@ -1,6 +1,6 @@
 import db from "./db";
 
-import type { Note } from "@entities";
+import type { Note, NoteUpdate } from "@entities";
 
 export async function getNotes(): Promise<Note[]> {
     return await db.notes
@@ -41,10 +41,7 @@ export async function duplicateNote(id: string): Promise<Note> {
     });
 }
 
-export async function updateNote(
-    id: string,
-    updatedFields: Partial<Omit<Note, "id" | "createdAt" | "updatedAt" | "deletedAt">>
-): Promise<Note> {
+export async function updateNote(id: string, updatedFields: NoteUpdate): Promise<Note> {
     const nbUpdated = await db.notes.update(id, { ...updatedFields, updatedAt: new Date() });
 
     if (nbUpdated === 0) {
