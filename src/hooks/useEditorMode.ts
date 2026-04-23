@@ -5,7 +5,7 @@ import { useSettingsQuery } from "@queries/useSettingsQuery";
 
 export type EditorMode = "edit" | "preview";
 
-const VALID_MODES: string[] = ["edit", "preview"];
+const VALID_MODES: string[] = ["edit", "preview"] satisfies EditorMode[];
 
 export function useEditorMode() {
     const [searchParams, setSearchParams] = useSearchParams();
