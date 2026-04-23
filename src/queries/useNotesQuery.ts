@@ -12,7 +12,7 @@ import {
 
 import { queryClient } from "@queries/queryClient";
 
-import type { Note } from "@entities";
+import type { Note, NoteUpdate } from "@entities";
 
 const NOTES_KEY = ["notes"] as const;
 
@@ -84,5 +84,5 @@ export function useNotesMutations() {
 
 type UpdateMutationArgs = {
     id: string;
-    fields: Partial<Omit<Note, "id" | "createdAt" | "updatedAt" | "deletedAt">>;
+    fields: NoteUpdate;
 };
