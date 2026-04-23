@@ -1,12 +1,15 @@
+import { useMemo } from "react";
 import { useSearchParams } from "react-router";
 
 import type { Note } from "@entities";
 
 export function useNoteSearch(notes: Note[]) {
     const [searchParams, setSearchParams] = useSearchParams();
+    const searchQuery = searchParams.get("q") ?? "";
 
-    const filteredNotes = notes.filter((note) =>
-        note.title.toLowerCase().includes((searchParams.get("q") ?? "").toLowerCase())
+    const filteredNotes = useMemo(
+        () => notes.filter((note) => note.title.toLowerCase().includes(searchQuery.toLowerCase())),
+        [notes, searchQuery]
     );
 
     const setSearch = (value: string) => {
@@ -22,7 +25,7 @@ export function useNoteSearch(notes: Note[]) {
     };
 
     return {
-        search: searchParams.get("q") ?? "",
+        search: searchQuery,
         setSearch,
         filteredNotes
     };
