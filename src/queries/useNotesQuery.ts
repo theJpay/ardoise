@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
+import { queryClient } from "@queries/queryClient";
 import {
     createNote,
     deleteNote,
@@ -9,8 +10,6 @@ import {
     hardDeleteNote,
     updateNote
 } from "@services/notes.service";
-
-import { queryClient } from "@queries/queryClient";
 
 import type { NoteUpdate } from "@entities";
 
