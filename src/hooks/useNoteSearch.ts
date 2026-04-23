@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router";
 
 import type { Note } from "@entities";
@@ -12,17 +12,20 @@ export function useNoteSearch(notes: Note[]) {
         [notes, searchQuery]
     );
 
-    const setSearch = (value: string) => {
-        setSearchParams((prev) => {
-            const next = new URLSearchParams(prev);
-            if (value === "") {
-                next.delete("q");
-            } else {
-                next.set("q", value);
-            }
-            return next;
-        });
-    };
+    const setSearch = useCallback(
+        (value: string) => {
+            setSearchParams((prev) => {
+                const next = new URLSearchParams(prev);
+                if (value === "") {
+                    next.delete("q");
+                } else {
+                    next.set("q", value);
+                }
+                return next;
+            });
+        },
+        [setSearchParams]
+    );
 
     return {
         search: searchQuery,
