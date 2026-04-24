@@ -13,6 +13,7 @@ import {
     SlashMenu,
     Toolbar,
     useEditorCommands,
+    useEditorEngine,
     useSlashMenu,
     useSmartKeys
 } from "./editor";
@@ -53,8 +54,9 @@ function Note() {
         setFocused
     } = useNoteState(noteId, mode);
 
+    const engine = useEditorEngine(editorRef);
     const { toggleBlock, isBlockActive, toggleInline, isInlineActive, toggleLink } =
-        useEditorCommands(editorRef, content, handleContentChange);
+        useEditorCommands(engine);
 
     const {
         state: slashMenuState,

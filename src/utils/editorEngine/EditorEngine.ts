@@ -180,6 +180,10 @@ export class EditorEngine {
         };
     }
 
+    isFocused(): boolean {
+        return document.activeElement === this.textarea;
+    }
+
     hasInlineMarkersAround(marker: string): boolean {
         const { start, end, content } = this.getSelection();
         return hasInlineMarkersAround(content, start, end, marker);
@@ -226,7 +230,7 @@ export class EditorEngine {
         );
     }
 
-    private replaceRange(args: ReplaceRangeArgs): void {
+    replaceRange(args: ReplaceRangeArgs): void {
         const { start, end, text, cursor } = args;
         this.textarea.focus({ preventScroll: true });
         this.textarea.setSelectionRange(start, end);
