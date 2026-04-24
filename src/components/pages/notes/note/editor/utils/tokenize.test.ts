@@ -304,6 +304,60 @@ describe("tokenize — fenced code blocks", () => {
                 '<span class="ed-token-muted">```</span>'
         );
     });
+
+    it("supports ~~~ as an alternative fence delimiter", () => {
+        const input = "~~~\nhi\n~~~";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">~~~</span>\n' +
+                "hi\n" +
+                '<span class="ed-token-muted">~~~</span>'
+        );
+    });
+
+    it("renders a ~~~ opening fence with a language info string", () => {
+        const input = "~~~js\nconst a = 1;\n~~~";
+
+        const firstLine = tokenize(input).split("\n")[0];
+
+        expect(firstLine).toBe(
+            '<span class="ed-token-muted">~~~</span><span class="ed-code-lang">js</span>'
+        );
+    });
+
+    it("syntax-highlights inside a ~~~ fenced block with a registered language", () => {
+        const input = "~~~js\nconst a = 1;\n~~~";
+
+        const result = tokenize(input);
+
+        expect(result).toContain("hljs-");
+    });
+
+    it("does not close a ~~~ fence with backticks", () => {
+        const input = "~~~\nhi\n```\nbye\n~~~";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">~~~</span>\n' +
+                "hi\n```\nbye\n" +
+                '<span class="ed-token-muted">~~~</span>'
+        );
+    });
+
+    it("does not close a ``` fence with tildes", () => {
+        const input = "```\nhi\n~~~\nbye\n```";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">```</span>\n' +
+                "hi\n~~~\nbye\n" +
+                '<span class="ed-token-muted">```</span>'
+        );
+    });
 });
 
 describe("tokenize — golden sample", () => {
