@@ -8,7 +8,7 @@ type ListInfo = {
 };
 
 export function parseListLine(line: string): ListInfo | null {
-    const task = line.match(/^(\s*)- \[([ x])\] (.*)$/);
+    const task = line.match(/^(\s*)- \[([ xX])\] (.*)$/);
     if (task) {
         return { type: "task", indent: task[1], marker: `- [${task[2]}]`, content: task[3] };
     }

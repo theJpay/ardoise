@@ -34,6 +34,14 @@
 - Editor-level shortcuts call `preventDefault` + `stopPropagation` to keep the global listener from firing
 - `window.addEventListener` receives native `KeyboardEvent`; React `onKeyDown` receives `React.KeyboardEvent<T>` — use `e.nativeEvent.code` for code access
 
+## Tests
+
+- Vitest, co-located `*.test.ts` next to the source
+- Arrange / Act / Assert with blank lines between phases — no `// Arrange` comments
+- One assertion per test; push context into the test name, not extra `expect`s
+- Use `it.each` for tabular cases (e.g. every heading level, every HR marker)
+- Import `describe`, `it`, `expect` explicitly from `vitest` — no globals
+
 ## Git flow
 
 - `main` is protected: PRs required, CI must pass, linear history, no direct pushes

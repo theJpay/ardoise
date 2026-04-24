@@ -5,7 +5,7 @@ import { escapeHtml } from "./escapeHtml";
 export function tokenize(content: string): string {
     const lines = content.split("\n");
     const result: string[] = [];
-    let inCodeBlock = false;
+    let fenceChar: "`" | "~" | null = null;
     let codeLang: string | null = null;
     let codeBuffer: string[] = [];
 
@@ -18,26 +18,37 @@ export function tokenize(content: string): string {
     };
 
     for (const line of lines) {
-        if (/^```/.test(line)) {
-            if (!inCodeBlock) {
-                result.push(tokenizeCodeFenceOpen(line));
+        if (fenceChar === null) {
+            const opener = matchFenceOpen(line);
+            if (opener !== null) {
+                result.push(tokenizeCodeFenceOpen(line, opener));
                 codeLang = line.slice(3).trim() || null;
-                inCodeBlock = true;
+                fenceChar = opener;
             } else {
-                flushCodeBlock();
-                result.push(`<span class="ed-token-muted">${escapeHtml(line)}</span>`);
-                codeLang = null;
-                inCodeBlock = false;
+                result.push(tokenizeLine(line));
             }
-        } else if (inCodeBlock) {
-            codeBuffer.push(line);
+        } else if (line.startsWith(fenceChar.repeat(3))) {
+            flushCodeBlock();
+            result.push(`<span class="ed-token-muted">${escapeHtml(line)}</span>`);
+            codeLang = null;
+            fenceChar = null;
         } else {
-            result.push(tokenizeLine(line));
+            codeBuffer.push(line);
         }
     }
     flushCodeBlock();
 
     return result.join("\n");
+}
+
+function matchFenceOpen(line: string): "`" | "~" | null {
+    if (line.startsWith("```")) {
+        return "`";
+    }
+    if (line.startsWith("~~~")) {
+        return "~";
+    }
+    return null;
 }
 
 function formatCodeBlock(lines: string[], lang: string | null): string {
@@ -59,11 +70,12 @@ function tokenizeLine(line: string): string {
     );
 }
 
-function tokenizeCodeFenceOpen(line: string): string {
+function tokenizeCodeFenceOpen(line: string, fenceChar: "`" | "~"): string {
+    const delim = fenceChar.repeat(3);
     const lang = line.slice(3);
     if (lang) {
         return (
-            `<span class="ed-token-muted">\`\`\`</span>` +
+            `<span class="ed-token-muted">${delim}</span>` +
             `<span class="ed-code-lang">${escapeHtml(lang)}</span>`
         );
     }
@@ -104,12 +116,12 @@ function tokenizeTaskList(line: string): string | null {
             inlineTokenize(escapeHtml(unchecked[2]))
         );
     }
-    const checked = line.match(/^(\s*)- \[[xX]\] (.*)$/);
+    const checked = line.match(/^(\s*)- \[([xX])\] (.*)$/);
     if (checked) {
         return (
             escapeHtml(checked[1]) +
-            `<span class="ed-token-muted">- [x] </span>` +
-            `<span class="ed-strike">${escapeHtml(checked[2])}</span>`
+            `<span class="ed-token-muted">- [${checked[2]}] </span>` +
+            `<span class="ed-strike">${escapeHtml(checked[3])}</span>`
         );
     }
     return null;
@@ -169,11 +181,11 @@ class InlineTokenizer {
         return this.applyToText((html) =>
             html
                 .replace(
-                    /\*\*\*(.+?)\*\*\*/g,
+                    /(?<!\*)\*\*\*(?!\*)(?=\S)(.+?)(?<=\S)(?<!\*)\*\*\*(?!\*)/g,
                     '<span class="ed-token-muted">***</span><span class="ed-bold ed-italic">$1</span><span class="ed-token-muted">***</span>'
                 )
                 .replace(
-                    /___(.+?)___/g,
+                    /(?<!_)___(?!_)(?=\S)(.+?)(?<=\S)(?<!_)___(?!_)/g,
                     '<span class="ed-token-muted">___</span><span class="ed-bold ed-italic">$1</span><span class="ed-token-muted">___</span>'
                 )
         );
@@ -183,11 +195,11 @@ class InlineTokenizer {
         return this.applyToText((html) =>
             html
                 .replace(
-                    /\*\*(.+?)\*\*/g,
+                    /(?<!\*)\*\*(?!\*)(?=\S)(.+?)(?<=\S)(?<!\*)\*\*(?!\*)/g,
                     '<span class="ed-token-muted">**</span><span class="ed-bold">$1</span><span class="ed-token-muted">**</span>'
                 )
                 .replace(
-                    /__(.+?)__/g,
+                    /(?<!_)__(?!_)(?=\S)(.+?)(?<=\S)(?<!_)__(?!_)/g,
                     '<span class="ed-token-muted">__</span><span class="ed-bold">$1</span><span class="ed-token-muted">__</span>'
                 )
         );
@@ -197,11 +209,11 @@ class InlineTokenizer {
         return this.applyToText((html) =>
             html
                 .replace(
-                    /(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g,
+                    /(?<!\*)\*(?!\*)(?=\S)(.+?)(?<=\S)(?<!\*)\*(?!\*)/g,
                     '<span class="ed-token-muted">*</span><span class="ed-italic">$1</span><span class="ed-token-muted">*</span>'
                 )
                 .replace(
-                    /(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g,
+                    /(?<!_)_(?!_)(?=\S)(.+?)(?<=\S)(?<!_)_(?!_)/g,
                     '<span class="ed-token-muted">_</span><span class="ed-italic">$1</span><span class="ed-token-muted">_</span>'
                 )
         );
@@ -210,7 +222,7 @@ class InlineTokenizer {
     applyStrikethrough(): this {
         return this.applyToText((html) =>
             html.replace(
-                /~~(.+?)~~/g,
+                /(?<!~)~~(?!~)(?=\S)(.+?)(?<=\S)(?<!~)~~(?!~)/g,
                 '<span class="ed-token-muted">~~</span><span class="ed-strike">$1</span><span class="ed-token-muted">~~</span>'
             )
         );
