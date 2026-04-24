@@ -137,8 +137,8 @@ function Note() {
                             <FloatingToolbar
                                 content={content}
                                 editorFocused={focused}
+                                engine={engine}
                                 isInlineActive={isInlineActive}
-                                phantomRef={phantomRef}
                                 selection={selection}
                                 onToggleInline={toggleInline}
                                 onToggleLink={toggleLink}
@@ -146,8 +146,8 @@ function Note() {
                             {slashMenuState.isOpen && (
                                 <SlashMenu
                                     content={content}
+                                    engine={engine}
                                     filteredActions={slashMenuActions}
-                                    phantomRef={phantomRef}
                                     selectedIndex={slashMenuState.selectedIndex}
                                     selection={selection}
                                     onExecute={executeCommand}

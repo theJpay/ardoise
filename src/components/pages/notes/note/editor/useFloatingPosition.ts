@@ -1,13 +1,11 @@
 import { autoUpdate, flip, offset, useFloating } from "@floating-ui/react";
 import { useEffect, useMemo } from "react";
 
-import { getSelectionRect } from "./utils/getSelectionRect";
-
+import type { EditorEngine } from "@utils/editorEngine";
 import type { Placement, ReferenceType } from "@floating-ui/react";
-import type { RefObject } from "react";
 
 type UseFloatingPositionOptions = {
-    measureRef: RefObject<HTMLDivElement | null>;
+    engine: EditorEngine | null;
     content: string;
     selection: { start: number; end: number };
     placement: Placement;
@@ -16,7 +14,7 @@ type UseFloatingPositionOptions = {
 };
 
 export function useFloatingPosition({
-    measureRef,
+    engine,
     content,
     selection,
     placement,
@@ -24,18 +22,13 @@ export function useFloatingPosition({
     visible = true
 }: UseFloatingPositionOptions) {
     const reference = useMemo<ReferenceType | null>(() => {
-        if (!visible) {
+        if (!visible || !engine) {
             return null;
         }
         return {
-            getBoundingClientRect: () => {
-                if (!measureRef.current) {
-                    return new DOMRect();
-                }
-                return getSelectionRect(measureRef.current, content, selection) ?? new DOMRect();
-            }
+            getBoundingClientRect: () => engine.getSelectionRect() ?? new DOMRect()
         };
-    }, [visible, measureRef, content, selection]);
+    }, [visible, engine, content, selection]);
 
     const { refs, floatingStyles } = useFloating<ReferenceType>({
         placement,

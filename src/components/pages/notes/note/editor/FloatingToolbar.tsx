@@ -5,12 +5,12 @@ import { FLOATING_TOOLBAR_ACTION_GROUPS, FLOATING_TOOLBAR_ACTIONS } from "./util
 import { FLOATING_TOOLBAR_ACTION_ICONS } from "./utils/icons";
 
 import type { InlineActionName } from "./utils/actions";
-import type { RefObject } from "react";
+import type { EditorEngine } from "@utils/editorEngine";
 
 type FloatingToolbarProps = {
     content: string;
     editorFocused: boolean;
-    phantomRef: RefObject<HTMLDivElement | null>;
+    engine: EditorEngine | null;
     selection: { start: number; end: number };
     isInlineActive: (actionName: InlineActionName) => boolean;
     onToggleInline: (actionName: InlineActionName) => void;
@@ -20,7 +20,7 @@ type FloatingToolbarProps = {
 function FloatingToolbar({
     content,
     editorFocused,
-    phantomRef,
+    engine,
     selection,
     isInlineActive,
     onToggleInline,
@@ -30,7 +30,7 @@ function FloatingToolbar({
     const visible = hasSelection && editorFocused;
 
     const { refs, floatingStyles } = useFloatingPosition({
-        measureRef: phantomRef,
+        engine,
         content,
         selection,
         placement: "top",

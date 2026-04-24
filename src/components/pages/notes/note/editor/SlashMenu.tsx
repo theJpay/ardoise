@@ -2,12 +2,12 @@ import { useFloatingPosition } from "./useFloatingPosition";
 import { SLASH_MENU_ACTION_ICONS } from "./utils/icons";
 
 import type { SlashMenuAction } from "./utils/actions";
-import type { RefObject } from "react";
+import type { EditorEngine } from "@utils/editorEngine";
 
 type SlashMenuProps = {
     content: string;
+    engine: EditorEngine | null;
     filteredActions: readonly SlashMenuAction[];
-    phantomRef: RefObject<HTMLDivElement | null>;
     selectedIndex: number;
     selection: { start: number; end: number };
     onExecute: (actionName: string) => void;
@@ -15,14 +15,14 @@ type SlashMenuProps = {
 
 function SlashMenu({
     content,
+    engine,
     filteredActions,
-    phantomRef,
     selectedIndex,
     selection,
     onExecute
 }: SlashMenuProps) {
     const { refs, floatingStyles } = useFloatingPosition({
-        measureRef: phantomRef,
+        engine,
         content,
         selection,
         placement: "bottom-start",
