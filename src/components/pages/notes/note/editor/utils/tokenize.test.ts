@@ -253,14 +253,6 @@ describe("tokenize — inline syntax", () => {
 
         expect(result).toBe('<span class="ed-code">`**not bold**`</span>');
     });
-
-    it("escapes raw HTML-like characters in plain text", () => {
-        const input = "a < b & c > d";
-
-        const result = tokenize(input);
-
-        expect(result).toBe("a &lt; b &amp; c &gt; d");
-    });
 });
 
 describe("tokenize — fenced code blocks", () => {
@@ -272,18 +264,6 @@ describe("tokenize — fenced code blocks", () => {
         expect(result).toBe(
             '<span class="ed-token-muted">```</span>\n' +
                 "hi\n" +
-                '<span class="ed-token-muted">```</span>'
-        );
-    });
-
-    it("escapes HTML in unhighlighted code blocks", () => {
-        const input = "```\n<script>&\n```";
-
-        const result = tokenize(input);
-
-        expect(result).toBe(
-            '<span class="ed-token-muted">```</span>\n' +
-                "&lt;script&gt;&amp;\n" +
                 '<span class="ed-token-muted">```</span>'
         );
     });
@@ -306,14 +286,14 @@ describe("tokenize — fenced code blocks", () => {
         expect(result).toContain("hljs-");
     });
 
-    it("falls back to plain escape for unregistered languages", () => {
-        const input = "```madeuplang\n<x>\n```";
+    it("renders an unregistered language fence without syntax highlighting", () => {
+        const input = "```madeuplang\ncode\n```";
 
         const result = tokenize(input);
 
         expect(result).toBe(
             '<span class="ed-token-muted">```</span><span class="ed-code-lang">madeuplang</span>\n' +
-                "&lt;x&gt;\n" +
+                "code\n" +
                 '<span class="ed-token-muted">```</span>'
         );
     });
@@ -388,6 +368,198 @@ describe("tokenize — fenced code blocks", () => {
         expect(result).toBe(
             '<span class="ed-token-muted">```</span>\n' +
                 "hi\n~~~\nbye\n" +
+                '<span class="ed-token-muted">```</span>'
+        );
+    });
+});
+
+describe("tokenize — html escaping", () => {
+    it("escapes <, >, and & in plain text", () => {
+        const input = "<script>&";
+
+        const result = tokenize(input);
+
+        expect(result).toBe("&lt;script&gt;&amp;");
+    });
+
+    it("escapes HTML in heading content", () => {
+        const input = "# <script>&";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-dim"># </span><span class="ed-heading">&lt;script&gt;&amp;</span>'
+        );
+    });
+
+    it("escapes HTML in quote content", () => {
+        const input = "> <script>&";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-dim">&gt; </span><span class="ed-quote">&lt;script&gt;&amp;</span>'
+        );
+    });
+
+    it("escapes HTML in unchecked task content", () => {
+        const input = "- [ ] <script>&";
+
+        const result = tokenize(input);
+
+        expect(result).toBe('<span class="ed-token-muted">- [ ] </span>&lt;script&gt;&amp;');
+    });
+
+    it("escapes HTML in checked task content", () => {
+        const input = "- [x] <script>&";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">- [x] </span><span class="ed-strike">&lt;script&gt;&amp;</span>'
+        );
+    });
+
+    it("escapes HTML in unordered list content", () => {
+        const input = "- <script>&";
+
+        const result = tokenize(input);
+
+        expect(result).toBe('<span class="ed-token-muted">- </span>&lt;script&gt;&amp;');
+    });
+
+    it("escapes HTML in ordered list content", () => {
+        const input = "1. <script>&";
+
+        const result = tokenize(input);
+
+        expect(result).toBe('<span class="ed-token-muted">1. </span>&lt;script&gt;&amp;');
+    });
+
+    it("escapes HTML in bold content", () => {
+        const input = "**<b>&**";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">**</span>' +
+                '<span class="ed-bold">&lt;b&gt;&amp;</span>' +
+                '<span class="ed-token-muted">**</span>'
+        );
+    });
+
+    it("escapes HTML in italic content", () => {
+        const input = "*<b>&*";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">*</span>' +
+                '<span class="ed-italic">&lt;b&gt;&amp;</span>' +
+                '<span class="ed-token-muted">*</span>'
+        );
+    });
+
+    it("escapes HTML in bold-italic content", () => {
+        const input = "***<b>&***";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">***</span>' +
+                '<span class="ed-bold ed-italic">&lt;b&gt;&amp;</span>' +
+                '<span class="ed-token-muted">***</span>'
+        );
+    });
+
+    it("escapes HTML in strikethrough content", () => {
+        const input = "~~<b>&~~";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">~~</span>' +
+                '<span class="ed-strike">&lt;b&gt;&amp;</span>' +
+                '<span class="ed-token-muted">~~</span>'
+        );
+    });
+
+    it("escapes HTML in code span content", () => {
+        const input = "`<script>&`";
+
+        const result = tokenize(input);
+
+        expect(result).toBe('<span class="ed-code">`&lt;script&gt;&amp;`</span>');
+    });
+
+    it("escapes HTML in link text", () => {
+        const input = "[<b>&](url)";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">[</span>' +
+                '<span class="ed-link">&lt;b&gt;&amp;</span>' +
+                '<span class="ed-token-muted">](</span>' +
+                '<span class="ed-token-dim">url</span>' +
+                '<span class="ed-token-muted">)</span>'
+        );
+    });
+
+    it("escapes HTML in link URLs", () => {
+        const input = "[a](<b>&)";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">[</span>' +
+                '<span class="ed-link">a</span>' +
+                '<span class="ed-token-muted">](</span>' +
+                '<span class="ed-token-dim">&lt;b&gt;&amp;</span>' +
+                '<span class="ed-token-muted">)</span>'
+        );
+    });
+
+    it("escapes HTML in a code block with no language", () => {
+        const input = "```\n<script>&\n```";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">```</span>\n' +
+                "&lt;script&gt;&amp;\n" +
+                '<span class="ed-token-muted">```</span>'
+        );
+    });
+
+    it("escapes HTML in a code block with an unregistered language", () => {
+        const input = "```madeuplang\n<script>&\n```";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">```</span><span class="ed-code-lang">madeuplang</span>\n' +
+                "&lt;script&gt;&amp;\n" +
+                '<span class="ed-token-muted">```</span>'
+        );
+    });
+
+    it("escapes HTML in a code block with a registered language", () => {
+        const input = "```js\n<script>alert(1)</script>\n```";
+
+        const result = tokenize(input);
+
+        expect(result).not.toContain("<script>");
+    });
+
+    it("escapes HTML in the fence language info string", () => {
+        const input = "```<script>&\ncode\n```";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">```</span><span class="ed-code-lang">&lt;script&gt;&amp;</span>\n' +
+                "code\n" +
                 '<span class="ed-token-muted">```</span>'
         );
     });
