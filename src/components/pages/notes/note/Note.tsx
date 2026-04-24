@@ -63,7 +63,7 @@ function Note() {
         filteredActions: slashMenuActions,
         executeCommand,
         handleKeyDown: handleSlashMenuKeyDown
-    } = useSlashMenu(editorRef, content, selection.start, handleContentChange);
+    } = useSlashMenu(engine, content, selection.start);
 
     const { handleKeyDown: handleSmartKeys } = useSmartKeys(editorRef, engine);
 

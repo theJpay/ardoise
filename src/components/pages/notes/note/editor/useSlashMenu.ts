@@ -3,10 +3,8 @@ import { useCallback, useEffect, useMemo, useReducer } from "react";
 import { UnreachableError } from "@utils";
 
 import { SLASH_MENU_ACTIONS } from "./utils/actions";
-import { getLineStart } from "./utils/line";
-import { replaceRange } from "./utils/replaceRange";
 
-import type { RefObject } from "react";
+import type { EditorEngine } from "@utils/editorEngine";
 
 type State = {
     isOpen: boolean;
@@ -20,12 +18,7 @@ type Action =
     | { type: "filter"; value: string }
     | { type: "navigate"; direction: "up" | "down"; count: number };
 
-export function useSlashMenu(
-    editorRef: RefObject<HTMLTextAreaElement | null>,
-    content: string,
-    cursorPosition: number,
-    onChange: (newContent: string) => void
-) {
+export function useSlashMenu(engine: EditorEngine | null, content: string, cursorPosition: number) {
     const [state, dispatch] = useReducer(reducer, getInitialState());
 
     const filteredActions = useMemo(() => {
@@ -51,41 +44,36 @@ export function useSlashMenu(
     const executeCommand = useCallback(
         (actionName: string) => {
             const action = SLASH_MENU_ACTIONS.find((a) => a.name === actionName);
-            if (!action || !editorRef.current) {
+            if (!action || !engine) {
                 return;
             }
-            const textarea = editorRef.current;
-            const lineStart = getLineStart(textarea.value, cursorPosition);
+            const lineStart = engine.getLineStart(cursorPosition);
             const newCursorPos = lineStart + (action.cursorOffset ?? action.syntax.length);
 
-            replaceRange(textarea, {
+            engine.replaceRange({
                 start: lineStart,
                 end: cursorPosition,
                 text: action.syntax,
-                onChange,
                 cursor: { start: newCursorPos }
             });
             dispatch({ type: "close" });
         },
-        [editorRef, cursorPosition, onChange]
+        [engine, cursorPosition]
     );
 
     const dismissAndClean = useCallback(() => {
-        if (!editorRef.current) {
+        if (!engine) {
             return;
         }
-        const textarea = editorRef.current;
-        const lineStart = getLineStart(textarea.value, cursorPosition);
-
-        replaceRange(textarea, {
+        const lineStart = engine.getLineStart(cursorPosition);
+        engine.replaceRange({
             start: lineStart,
             end: cursorPosition,
             text: "",
-            onChange,
             cursor: { start: lineStart }
         });
         dispatch({ type: "close" });
-    }, [editorRef, cursorPosition, onChange]);
+    }, [engine, cursorPosition]);
 
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -159,7 +147,8 @@ function getInitialState(): State {
 }
 
 function getSlashContext(value: string, cursorPosition: number): string | null {
-    const lineBeforeCursor = value.slice(getLineStart(value, cursorPosition), cursorPosition);
+    const lineStart = value.lastIndexOf("\n", cursorPosition - 1) + 1;
+    const lineBeforeCursor = value.slice(lineStart, cursorPosition);
     const match = lineBeforeCursor.match(/^\/([a-zA-Z-]*)$/);
     if (!match) {
         return null;
