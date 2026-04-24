@@ -3,8 +3,6 @@ import { hasLinePrefix } from "./lib/hasLinePrefix";
 import { isInsideCodeBlock } from "./lib/isInsideCodeBlock";
 import { getLineEnd, getLineStart, getSelectedLines } from "./lib/line";
 
-const USE_NATIVE_UNDO = true;
-
 const RELEVANT_STYLE_PROPS = [
     "font",
     "letterSpacing",
@@ -36,12 +34,10 @@ type ReplaceRangeArgs = {
 
 export class EditorEngine {
     private readonly textarea: HTMLTextAreaElement;
-    private readonly onChange: (value: string) => void;
     private phantom: HTMLDivElement | null = null;
 
-    constructor(textarea: HTMLTextAreaElement, onChange: (value: string) => void) {
+    constructor(textarea: HTMLTextAreaElement) {
         this.textarea = textarea;
-        this.onChange = onChange;
     }
 
     dispose(): void {
@@ -144,23 +140,11 @@ export class EditorEngine {
 
     private replaceRange(args: ReplaceRangeArgs): void {
         const { start, end, text, cursor } = args;
-        if (USE_NATIVE_UNDO) {
-            this.textarea.focus({ preventScroll: true });
-            this.textarea.setSelectionRange(start, end);
-            document.execCommand("insertText", false, text);
-            if (cursor) {
-                this.textarea.setSelectionRange(cursor.start, cursor.end ?? cursor.start);
-            }
-        } else {
-            const value = this.textarea.value;
-            const newValue = value.slice(0, start) + text + value.slice(end);
-            this.onChange(newValue);
-            if (cursor) {
-                requestAnimationFrame(() => {
-                    this.textarea.focus();
-                    this.textarea.setSelectionRange(cursor.start, cursor.end ?? cursor.start);
-                });
-            }
+        this.textarea.focus({ preventScroll: true });
+        this.textarea.setSelectionRange(start, end);
+        document.execCommand("insertText", false, text);
+        if (cursor) {
+            this.textarea.setSelectionRange(cursor.start, cursor.end ?? cursor.start);
         }
     }
 
