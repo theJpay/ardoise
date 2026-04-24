@@ -6,7 +6,6 @@ import type { RefObject } from "react";
 
 type NoteEditorProps = {
     content: string;
-    phantomRef: RefObject<HTMLDivElement | null>;
     ref: RefObject<HTMLTextAreaElement | null>;
     spellCheck: boolean;
     onChange: (newContent: string) => void;
@@ -18,7 +17,6 @@ type NoteEditorProps = {
 
 function NoteEditor({
     content,
-    phantomRef,
     ref,
     spellCheck,
     onBlur,
@@ -43,11 +41,6 @@ function NoteEditor({
                     className={`ardoise-editor ${className} pointer-events-none absolute inset-0`}
                     dangerouslySetInnerHTML={{ __html: tokenizedHtml }}
                 ></div>
-                <div
-                    ref={phantomRef}
-                    aria-hidden="true"
-                    className={`${className} pointer-events-none invisible absolute inset-0`}
-                />
                 <textarea
                     ref={ref}
                     aria-label="Note content"

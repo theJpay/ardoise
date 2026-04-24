@@ -16,7 +16,6 @@ export function useNoteInteractions({ selectedNote, mode }: Options) {
 
     const editorRef = useRef<HTMLTextAreaElement>(null);
     const titleRef = useRef<HTMLInputElement>(null);
-    const phantomRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const lastCursorRef = useRef({ start: 0, end: 0 });
     const lastScrollRatioRef = useRef(0);
@@ -54,7 +53,6 @@ export function useNoteInteractions({ selectedNote, mode }: Options) {
         focused,
         editorRef,
         titleRef,
-        phantomRef,
         scrollContainerRef,
         resetSelection,
         handleCursorChange,

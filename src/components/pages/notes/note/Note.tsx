@@ -41,7 +41,6 @@ function Note() {
         focused,
         editorRef,
         titleRef,
-        phantomRef,
         scrollContainerRef,
         saveStatus,
         saveError,
@@ -123,7 +122,6 @@ function Note() {
                             <NoteEditor
                                 ref={editorRef}
                                 content={content}
-                                phantomRef={phantomRef}
                                 spellCheck={settings.spellcheck}
                                 onBlur={() => {
                                     setFocused(false);
