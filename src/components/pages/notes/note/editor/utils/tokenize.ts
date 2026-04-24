@@ -104,12 +104,12 @@ function tokenizeTaskList(line: string): string | null {
             inlineTokenize(escapeHtml(unchecked[2]))
         );
     }
-    const checked = line.match(/^(\s*)- \[[xX]\] (.*)$/);
+    const checked = line.match(/^(\s*)- \[([xX])\] (.*)$/);
     if (checked) {
         return (
             escapeHtml(checked[1]) +
-            `<span class="ed-token-muted">- [x] </span>` +
-            `<span class="ed-strike">${escapeHtml(checked[2])}</span>`
+            `<span class="ed-token-muted">- [${checked[2]}] </span>` +
+            `<span class="ed-strike">${escapeHtml(checked[3])}</span>`
         );
     }
     return null;

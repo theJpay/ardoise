@@ -89,6 +89,14 @@ describe("tokenize — block syntax", () => {
         expect(result).toContain('class="ed-strike"');
     });
 
+    it("preserves the original case of the checked marker", () => {
+        const input = "- [X] done";
+
+        const result = tokenize(input);
+
+        expect(result).toContain('<span class="ed-token-muted">- [X] </span>');
+    });
+
     it("preserves indentation in task items", () => {
         const input = "    - [ ] nested";
 
