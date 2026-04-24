@@ -1,3 +1,4 @@
+export { escapeHtml } from "./escapeHtml";
 export { exportNotesToZip } from "./exportNotes";
 export { formatRelativeDate } from "./formatRelativeDate";
 export { extractSnippet, splitByMatch } from "./highlight";

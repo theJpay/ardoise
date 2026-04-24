@@ -1,6 +1,5 @@
+import { escapeHtml } from "@utils/escapeHtml";
 import { highlightToHtml, isRegistered } from "@utils/lowlight";
-
-import { escapeHtml } from "./escapeHtml";
 
 export function tokenize(content: string): string {
     const lines = content.split("\n");
