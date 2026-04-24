@@ -1,8 +1,8 @@
 import { autoUpdate, flip, offset, useFloating } from "@floating-ui/react";
 import { useEffect, useMemo } from "react";
 
-import type { EditorEngine } from "@utils/editorEngine";
 import type { Placement, ReferenceType } from "@floating-ui/react";
+import type { EditorEngine } from "@utils/editorEngine";
 
 type UseFloatingPositionOptions = {
     engine: EditorEngine | null;
@@ -28,6 +28,8 @@ export function useFloatingPosition({
         return {
             getBoundingClientRect: () => engine.getSelectionRect() ?? new DOMRect()
         };
+        // content and selection are deps so floating-ui re-positions as the user types or selects
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visible, engine, content, selection]);
 
     const { refs, floatingStyles } = useFloating<ReferenceType>({
