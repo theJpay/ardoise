@@ -183,11 +183,11 @@ class InlineTokenizer {
         return this.applyToText((html) =>
             html
                 .replace(
-                    /\*\*(.+?)\*\*/g,
+                    /(?<!\*)\*\*(?!\*)(.+?)(?<!\*)\*\*(?!\*)/g,
                     '<span class="ed-token-muted">**</span><span class="ed-bold">$1</span><span class="ed-token-muted">**</span>'
                 )
                 .replace(
-                    /__(.+?)__/g,
+                    /(?<!_)__(?!_)(.+?)(?<!_)__(?!_)/g,
                     '<span class="ed-token-muted">__</span><span class="ed-bold">$1</span><span class="ed-token-muted">__</span>'
                 )
         );

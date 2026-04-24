@@ -171,6 +171,18 @@ describe("tokenize — inline syntax", () => {
         expect(result).toContain('class="ed-bold ed-italic"');
     });
 
+    it("does not nest bold inside the bold-italic markers", () => {
+        const input = "***both***";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">***</span>' +
+                '<span class="ed-bold ed-italic">both</span>' +
+                '<span class="ed-token-muted">***</span>'
+        );
+    });
+
     it("does not treat bold ** as italic *", () => {
         const input = "**bold**";
 
