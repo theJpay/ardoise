@@ -3,41 +3,59 @@ import { escapeHtml } from "@utils/escapeHtml";
 import { formatCodeBlock, matchFenceOpen, tokenizeCodeFenceOpen } from "./lib/codeBlock";
 import { tokenizeLine } from "./lib/tokenizeLine";
 
-export function tokenize(content: string): string {
-    const lines = content.split("\n");
-    const result: string[] = [];
-    let fenceChar: "`" | "~" | null = null;
-    let codeLang: string | null = null;
-    let codeBuffer: string[] = [];
+class Tokenizer {
+    private result: string[] = [];
+    private fenceChar: "`" | "~" | null = null;
+    private codeLang: string | null = null;
+    private codeBuffer: string[] = [];
 
-    const flushCodeBlock = () => {
-        if (codeBuffer.length === 0) {
-            return;
-        }
-        result.push(formatCodeBlock(codeBuffer, codeLang));
-        codeBuffer = [];
-    };
+    static tokenize(content: string): string {
+        return new Tokenizer().run(content);
+    }
 
-    for (const line of lines) {
-        if (fenceChar === null) {
-            const opener = matchFenceOpen(line);
-            if (opener !== null) {
-                result.push(tokenizeCodeFenceOpen(line, opener));
-                codeLang = line.slice(3).trim() || null;
-                fenceChar = opener;
+    private run(content: string): string {
+        for (const line of content.split("\n")) {
+            if (this.fenceChar === null) {
+                this.handleContentLine(line);
+            } else if (line.startsWith(this.fenceChar.repeat(3))) {
+                this.closeFence(line);
             } else {
-                result.push(tokenizeLine(line));
+                this.codeBuffer.push(line);
             }
-        } else if (line.startsWith(fenceChar.repeat(3))) {
-            flushCodeBlock();
-            result.push(`<span class="ed-token-muted">${escapeHtml(line)}</span>`);
-            codeLang = null;
-            fenceChar = null;
+        }
+        this.pushCodeBlock();
+        return this.result.join("\n");
+    }
+
+    private handleContentLine(line: string): void {
+        const opener = matchFenceOpen(line);
+        if (opener !== null) {
+            this.openFence(line, opener);
         } else {
-            codeBuffer.push(line);
+            this.result.push(tokenizeLine(line));
         }
     }
-    flushCodeBlock();
 
-    return result.join("\n");
+    private openFence(line: string, fenceChar: "`" | "~"): void {
+        this.result.push(tokenizeCodeFenceOpen(line, fenceChar));
+        this.codeLang = line.slice(3).trim() || null;
+        this.fenceChar = fenceChar;
+    }
+
+    private closeFence(line: string): void {
+        this.pushCodeBlock();
+        this.result.push(`<span class="ed-token-muted">${escapeHtml(line)}</span>`);
+        this.codeLang = null;
+        this.fenceChar = null;
+    }
+
+    private pushCodeBlock(): void {
+        if (this.codeBuffer.length === 0) {
+            return;
+        }
+        this.result.push(formatCodeBlock(this.codeBuffer, this.codeLang));
+        this.codeBuffer = [];
+    }
 }
+
+export const tokenize = Tokenizer.tokenize;
