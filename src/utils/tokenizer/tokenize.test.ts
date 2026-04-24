@@ -253,6 +253,42 @@ describe("tokenize — inline syntax", () => {
 
         expect(result).toBe('<span class="ed-code">`**not bold**`</span>');
     });
+
+    it("applies bold across a code span", () => {
+        const input = "**bold with `code` inside**";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">**</span>' +
+                '<span class="ed-bold">bold with <span class="ed-code">`code`</span> inside</span>' +
+                '<span class="ed-token-muted">**</span>'
+        );
+    });
+
+    it("applies italic across a code span", () => {
+        const input = "*italic with `code` inside*";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">*</span>' +
+                '<span class="ed-italic">italic with <span class="ed-code">`code`</span> inside</span>' +
+                '<span class="ed-token-muted">*</span>'
+        );
+    });
+
+    it("applies strikethrough across a code span", () => {
+        const input = "~~strike with `code` inside~~";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">~~</span>' +
+                '<span class="ed-strike">strike with <span class="ed-code">`code`</span> inside</span>' +
+                '<span class="ed-token-muted">~~</span>'
+        );
+    });
 });
 
 describe("tokenize — fenced code blocks", () => {

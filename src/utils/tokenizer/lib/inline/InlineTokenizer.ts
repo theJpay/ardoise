@@ -1,86 +1,77 @@
-type Segment = { html: string; isCode: boolean };
+const CODE_MARKER_OPEN = "";
+const CODE_MARKER_CLOSE = "";
+const CODE_PLACEHOLDER = new RegExp(`${CODE_MARKER_OPEN}(\\d+)${CODE_MARKER_CLOSE}`, "g");
 
 export class InlineTokenizer {
-    private segments: Segment[];
+    private html: string;
+    private codeSpans: string[] = [];
 
     constructor(html: string) {
-        const parts = html.split(/(`[^`]+`)/g);
-        this.segments = parts.map((part, i) => ({
-            html: part,
-            isCode: i % 2 === 1
-        }));
+        this.html = html.replace(/`[^`]+`/g, (match) => {
+            const index = this.codeSpans.length;
+            this.codeSpans.push(match);
+            return `${CODE_MARKER_OPEN}${index}${CODE_MARKER_CLOSE}`;
+        });
     }
 
     applyBoldItalic(): this {
-        return this.applyToText((html) =>
-            html
-                .replace(
-                    /(?<!\*)\*\*\*(?!\*)(?=\S)(.+?)(?<=\S)(?<!\*)\*\*\*(?!\*)/g,
-                    '<span class="ed-token-muted">***</span><span class="ed-bold ed-italic">$1</span><span class="ed-token-muted">***</span>'
-                )
-                .replace(
-                    /(?<!_)___(?!_)(?=\S)(.+?)(?<=\S)(?<!_)___(?!_)/g,
-                    '<span class="ed-token-muted">___</span><span class="ed-bold ed-italic">$1</span><span class="ed-token-muted">___</span>'
-                )
-        );
+        this.html = this.html
+            .replace(
+                /(?<!\*)\*\*\*(?!\*)(?=\S)(.+?)(?<=\S)(?<!\*)\*\*\*(?!\*)/g,
+                '<span class="ed-token-muted">***</span><span class="ed-bold ed-italic">$1</span><span class="ed-token-muted">***</span>'
+            )
+            .replace(
+                /(?<!_)___(?!_)(?=\S)(.+?)(?<=\S)(?<!_)___(?!_)/g,
+                '<span class="ed-token-muted">___</span><span class="ed-bold ed-italic">$1</span><span class="ed-token-muted">___</span>'
+            );
+        return this;
     }
 
     applyBold(): this {
-        return this.applyToText((html) =>
-            html
-                .replace(
-                    /(?<!\*)\*\*(?!\*)(?=\S)(.+?)(?<=\S)(?<!\*)\*\*(?!\*)/g,
-                    '<span class="ed-token-muted">**</span><span class="ed-bold">$1</span><span class="ed-token-muted">**</span>'
-                )
-                .replace(
-                    /(?<!_)__(?!_)(?=\S)(.+?)(?<=\S)(?<!_)__(?!_)/g,
-                    '<span class="ed-token-muted">__</span><span class="ed-bold">$1</span><span class="ed-token-muted">__</span>'
-                )
-        );
+        this.html = this.html
+            .replace(
+                /(?<!\*)\*\*(?!\*)(?=\S)(.+?)(?<=\S)(?<!\*)\*\*(?!\*)/g,
+                '<span class="ed-token-muted">**</span><span class="ed-bold">$1</span><span class="ed-token-muted">**</span>'
+            )
+            .replace(
+                /(?<!_)__(?!_)(?=\S)(.+?)(?<=\S)(?<!_)__(?!_)/g,
+                '<span class="ed-token-muted">__</span><span class="ed-bold">$1</span><span class="ed-token-muted">__</span>'
+            );
+        return this;
     }
 
     applyItalic(): this {
-        return this.applyToText((html) =>
-            html
-                .replace(
-                    /(?<!\*)\*(?!\*)(?=\S)(.+?)(?<=\S)(?<!\*)\*(?!\*)/g,
-                    '<span class="ed-token-muted">*</span><span class="ed-italic">$1</span><span class="ed-token-muted">*</span>'
-                )
-                .replace(
-                    /(?<!_)_(?!_)(?=\S)(.+?)(?<=\S)(?<!_)_(?!_)/g,
-                    '<span class="ed-token-muted">_</span><span class="ed-italic">$1</span><span class="ed-token-muted">_</span>'
-                )
-        );
+        this.html = this.html
+            .replace(
+                /(?<!\*)\*(?!\*)(?=\S)(.+?)(?<=\S)(?<!\*)\*(?!\*)/g,
+                '<span class="ed-token-muted">*</span><span class="ed-italic">$1</span><span class="ed-token-muted">*</span>'
+            )
+            .replace(
+                /(?<!_)_(?!_)(?=\S)(.+?)(?<=\S)(?<!_)_(?!_)/g,
+                '<span class="ed-token-muted">_</span><span class="ed-italic">$1</span><span class="ed-token-muted">_</span>'
+            );
+        return this;
     }
 
     applyStrikethrough(): this {
-        return this.applyToText((html) =>
-            html.replace(
-                /(?<!~)~~(?!~)(?=\S)(.+?)(?<=\S)(?<!~)~~(?!~)/g,
-                '<span class="ed-token-muted">~~</span><span class="ed-strike">$1</span><span class="ed-token-muted">~~</span>'
-            )
+        this.html = this.html.replace(
+            /(?<!~)~~(?!~)(?=\S)(.+?)(?<=\S)(?<!~)~~(?!~)/g,
+            '<span class="ed-token-muted">~~</span><span class="ed-strike">$1</span><span class="ed-token-muted">~~</span>'
         );
+        return this;
     }
 
     applyLink(): this {
-        return this.applyToText((html) =>
-            html.replace(
-                /\[(.+?)\]\((.+?)\)/g,
-                '<span class="ed-token-muted">[</span><span class="ed-link">$1</span><span class="ed-token-muted">](</span><span class="ed-token-dim">$2</span><span class="ed-token-muted">)</span>'
-            )
+        this.html = this.html.replace(
+            /\[(.+?)\]\((.+?)\)/g,
+            '<span class="ed-token-muted">[</span><span class="ed-link">$1</span><span class="ed-token-muted">](</span><span class="ed-token-dim">$2</span><span class="ed-token-muted">)</span>'
         );
+        return this;
     }
 
     toString(): string {
-        return this.segments
-            .map((seg) => (seg.isCode ? `<span class="ed-code">${seg.html}</span>` : seg.html))
-            .join("");
-    }
-
-    private applyToText(fn: (html: string) => string): this {
-        this.segments = this.segments.map((seg) =>
-            seg.isCode ? seg : { ...seg, html: fn(seg.html) }
-        );
-        return this;
+        return this.html.replace(CODE_PLACEHOLDER, (_, index) => {
+            return `<span class="ed-code">${this.codeSpans[Number(index)]}</span>`;
+        });
     }
 }
