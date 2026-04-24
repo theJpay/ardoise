@@ -181,11 +181,11 @@ class InlineTokenizer {
         return this.applyToText((html) =>
             html
                 .replace(
-                    /(?<!\*)\*\*\*(?!\*)(.+?)(?<!\*)\*\*\*(?!\*)/g,
+                    /(?<!\*)\*\*\*(?!\*)(?=\S)(.+?)(?<=\S)(?<!\*)\*\*\*(?!\*)/g,
                     '<span class="ed-token-muted">***</span><span class="ed-bold ed-italic">$1</span><span class="ed-token-muted">***</span>'
                 )
                 .replace(
-                    /(?<!_)___(?!_)(.+?)(?<!_)___(?!_)/g,
+                    /(?<!_)___(?!_)(?=\S)(.+?)(?<=\S)(?<!_)___(?!_)/g,
                     '<span class="ed-token-muted">___</span><span class="ed-bold ed-italic">$1</span><span class="ed-token-muted">___</span>'
                 )
         );
@@ -195,11 +195,11 @@ class InlineTokenizer {
         return this.applyToText((html) =>
             html
                 .replace(
-                    /(?<!\*)\*\*(?!\*)(.+?)(?<!\*)\*\*(?!\*)/g,
+                    /(?<!\*)\*\*(?!\*)(?=\S)(.+?)(?<=\S)(?<!\*)\*\*(?!\*)/g,
                     '<span class="ed-token-muted">**</span><span class="ed-bold">$1</span><span class="ed-token-muted">**</span>'
                 )
                 .replace(
-                    /(?<!_)__(?!_)(.+?)(?<!_)__(?!_)/g,
+                    /(?<!_)__(?!_)(?=\S)(.+?)(?<=\S)(?<!_)__(?!_)/g,
                     '<span class="ed-token-muted">__</span><span class="ed-bold">$1</span><span class="ed-token-muted">__</span>'
                 )
         );
@@ -209,11 +209,11 @@ class InlineTokenizer {
         return this.applyToText((html) =>
             html
                 .replace(
-                    /(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g,
+                    /(?<!\*)\*(?!\*)(?=\S)(.+?)(?<=\S)(?<!\*)\*(?!\*)/g,
                     '<span class="ed-token-muted">*</span><span class="ed-italic">$1</span><span class="ed-token-muted">*</span>'
                 )
                 .replace(
-                    /(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g,
+                    /(?<!_)_(?!_)(?=\S)(.+?)(?<=\S)(?<!_)_(?!_)/g,
                     '<span class="ed-token-muted">_</span><span class="ed-italic">$1</span><span class="ed-token-muted">_</span>'
                 )
         );
@@ -222,7 +222,7 @@ class InlineTokenizer {
     applyStrikethrough(): this {
         return this.applyToText((html) =>
             html.replace(
-                /(?<!~)~~(?!~)(.+?)(?<!~)~~(?!~)/g,
+                /(?<!~)~~(?!~)(?=\S)(.+?)(?<=\S)(?<!~)~~(?!~)/g,
                 '<span class="ed-token-muted">~~</span><span class="ed-strike">$1</span><span class="ed-token-muted">~~</span>'
             )
         );

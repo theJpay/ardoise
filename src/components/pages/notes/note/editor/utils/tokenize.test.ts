@@ -171,6 +171,39 @@ describe("tokenize — inline syntax", () => {
         expect(result).toBe("****both****");
     });
 
+    it.each(["** Test **", "__ Test __", "*** Test ***", "___ Test ___", "~~ Test ~~", "_ Test _"])(
+        "leaves %s literal when whitespace is immediately inside the delimiters",
+        (input) => {
+            const result = tokenize(input);
+
+            expect(result).toBe(input);
+        }
+    );
+
+    it("does not wrap single-asterisk italic when whitespace is inside mid-line", () => {
+        const input = "mid * text * end";
+
+        const result = tokenize(input);
+
+        expect(result).toBe("mid * text * end");
+    });
+
+    it("does not wrap bold when only the opening delimiter is followed by whitespace", () => {
+        const input = "** test**";
+
+        const result = tokenize(input);
+
+        expect(result).toBe("** test**");
+    });
+
+    it("does not wrap bold when only the closing delimiter is preceded by whitespace", () => {
+        const input = "**test **";
+
+        const result = tokenize(input);
+
+        expect(result).toBe("**test **");
+    });
+
     it("wraps strikethrough with ~~", () => {
         const input = "~~gone~~";
 
