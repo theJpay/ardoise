@@ -19,12 +19,12 @@ describe("parseListLine", () => {
         expect(result).toEqual({ type: "task", indent: "", marker: "- [x]", content: "done" });
     });
 
-    it("treats uppercase X as unordered, not a checked task", () => {
+    it("accepts uppercase X as a checked task", () => {
         const line = "- [X] done";
 
         const result = parseListLine(line);
 
-        expect(result?.type).toBe("unordered");
+        expect(result).toEqual({ type: "task", indent: "", marker: "- [X]", content: "done" });
     });
 
     it.each([
@@ -122,6 +122,14 @@ describe("getListContinuation", () => {
 
     it("continues a task list as unchecked regardless of the source state", () => {
         const line = "- [x] done";
+
+        const result = getListContinuation(line);
+
+        expect(result).toBe("- [ ] ");
+    });
+
+    it("continues an uppercase-X task list as unchecked", () => {
+        const line = "- [X] done";
 
         const result = getListContinuation(line);
 
