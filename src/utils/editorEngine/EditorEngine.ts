@@ -1,7 +1,11 @@
+import { escapeHtml } from "@utils/escapeHtml";
+
+import { findEnclosingFence } from "./lib/findEnclosingFence";
 import { hasInlineMarkersAround } from "./lib/hasInlineMarkersAround";
 import { hasLinePrefix } from "./lib/hasLinePrefix";
 import { isInsideCodeBlock } from "./lib/isInsideCodeBlock";
 import { getLineEnd, getLineStart, getSelectedLines } from "./lib/line";
+import { parseLineListInfo } from "./lib/parseLineListInfo";
 
 const RELEVANT_STYLE_PROPS = [
     "font",
@@ -88,11 +92,74 @@ export class EditorEngine {
     }
 
     toggleCodeBlock(): void {
-        throw new Error("not implemented");
+        const { start, end, content } = this.getSelection();
+        if (this.isInsideCodeBlock()) {
+            const fence = findEnclosingFence(content, start);
+            if (!fence) {
+                return;
+            }
+            this.replaceRange({
+                start: fence.openingStart,
+                end: fence.closingEnd,
+                text: fence.innerContent,
+                cursor: {
+                    start: fence.openingStart,
+                    end: fence.openingStart + fence.innerContent.length
+                }
+            });
+            return;
+        }
+        if (start !== end) {
+            const selected = content.slice(start, end);
+            this.replaceRange({
+                start,
+                end,
+                text: "```\n" + selected + "\n```",
+                cursor: { start: start + 4, end: start + 4 + selected.length }
+            });
+            return;
+        }
+        const lineStart = getLineStart(content, start);
+        const lineEnd = getLineEnd(content, start);
+        const lineContent = content.slice(lineStart, lineEnd);
+        if (lineContent.length === 0) {
+            this.replaceRange({
+                start: lineStart,
+                end: lineEnd,
+                text: "```\n\n```",
+                cursor: { start: lineStart + 4 }
+            });
+        } else {
+            this.replaceRange({
+                start: lineStart,
+                end: lineEnd,
+                text: "```\n" + lineContent + "\n```",
+                cursor: { start: lineStart + 4, end: lineStart + 4 + lineContent.length }
+            });
+        }
     }
 
     toggleLink(): void {
-        throw new Error("not implemented");
+        const { start, end, content } = this.getSelection();
+        const selected = content.slice(start, end);
+        const isUrl = /^https?:\/\//.test(selected);
+
+        if (isUrl) {
+            this.replaceRange({
+                start,
+                end,
+                text: `[](${selected})`,
+                cursor: { start: start + 1 }
+            });
+        } else {
+            const urlStart = start + selected.length + 3;
+            this.replaceRange({
+                start,
+                end,
+                text: `[${selected}](url)`,
+                cursor: { start: urlStart, end: urlStart + 3 }
+            });
+        }
     }
 
     insertTemplate(template: string): void {
@@ -129,13 +196,34 @@ export class EditorEngine {
     }
 
     getLineListInfo(): ListLineInfo | null {
-        throw new Error("not implemented");
+        const { start, content } = this.getSelection();
+        const lineStart = getLineStart(content, start);
+        const lineEnd = getLineEnd(content, start);
+        return parseLineListInfo(content.slice(lineStart, lineEnd));
     }
 
     getSelectionRect(): DOMRect | null {
         const phantom = this.ensurePhantom();
         this.syncPhantomStyles(phantom);
-        throw new Error("not implemented");
+        const { start, end, content } = this.getSelection();
+        const before = escapeHtml(content.slice(0, start));
+        const selected = escapeHtml(content.slice(start, end));
+        const after = escapeHtml(content.slice(end));
+        phantom.innerHTML = `${before}<span id="sel-start"></span>${selected}<span id="sel-end"></span>${after}`;
+
+        const startMarker = phantom.querySelector("#sel-start");
+        const endMarker = phantom.querySelector("#sel-end");
+        if (!startMarker || !endMarker) {
+            return null;
+        }
+        const startRect = startMarker.getBoundingClientRect();
+        const endRect = endMarker.getBoundingClientRect();
+        return new DOMRect(
+            startRect.left,
+            startRect.top,
+            endRect.right - startRect.left,
+            endRect.bottom - startRect.top
+        );
     }
 
     private replaceRange(args: ReplaceRangeArgs): void {
