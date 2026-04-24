@@ -1,3 +1,7 @@
+import { hasInlineMarkersAround } from "./lib/hasInlineMarkersAround";
+import { hasLinePrefix } from "./lib/hasLinePrefix";
+import { isInsideCodeBlock } from "./lib/isInsideCodeBlock";
+
 const RELEVANT_STYLE_PROPS = [
     "font",
     "letterSpacing",
@@ -75,24 +79,27 @@ export class EditorEngine {
 
     // --- Queries ----------------------------------------------------------
 
-    getSelection(): { start: number; end: number; value: string } {
+    getSelection(): { start: number; end: number; content: string } {
         return {
             start: this.textarea.selectionStart,
             end: this.textarea.selectionEnd,
-            value: this.textarea.value
+            content: this.textarea.value
         };
     }
 
-    hasInlineMarkersAround(_marker: string): boolean {
-        throw new Error("not implemented");
+    hasInlineMarkersAround(marker: string): boolean {
+        const { start, end, content } = this.getSelection();
+        return hasInlineMarkersAround(content, start, end, marker);
     }
 
-    hasLinePrefix(_prefix: string): boolean {
-        throw new Error("not implemented");
+    hasLinePrefix(prefix: string): boolean {
+        const { start, content } = this.getSelection();
+        return hasLinePrefix(content, start, prefix);
     }
 
     isInsideCodeBlock(): boolean {
-        throw new Error("not implemented");
+        const { start, content } = this.getSelection();
+        return isInsideCodeBlock(content, start);
     }
 
     getLineListInfo(): ListLineInfo | null {
