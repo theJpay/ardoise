@@ -3,36 +3,22 @@ import { describe, expect, it } from "vitest";
 import { tokenize } from "./tokenize";
 
 describe("tokenize — headings", () => {
-    it("wraps the hashes in ed-token-dim", () => {
-        const input = "# Title";
+    it.each([
+        [1, "ed-heading"],
+        [2, "ed-heading"],
+        [3, "ed-heading"],
+        [4, "ed-heading"],
+        [5, "ed-h5"],
+        [6, "ed-h6"]
+    ])("renders level %i heading with %s class", (level, className) => {
+        const hashes = "#".repeat(level);
+        const input = `${hashes} T`;
 
         const result = tokenize(input);
 
-        expect(result).toContain('<span class="ed-token-dim"># </span>');
-    });
-
-    it.each([1, 2, 3, 4])("uses ed-heading for level %i", (level) => {
-        const input = `${"#".repeat(level)} T`;
-
-        const result = tokenize(input);
-
-        expect(result).toContain('class="ed-heading"');
-    });
-
-    it("uses ed-h5 for level 5", () => {
-        const input = "##### T";
-
-        const result = tokenize(input);
-
-        expect(result).toContain('class="ed-h5"');
-    });
-
-    it("uses ed-h6 for level 6", () => {
-        const input = "###### T";
-
-        const result = tokenize(input);
-
-        expect(result).toContain('class="ed-h6"');
+        expect(result).toBe(
+            `<span class="ed-token-dim">${hashes} </span><span class="${className}">T</span>`
+        );
     });
 
     it("does not treat a hash without a trailing space as a heading", () => {
@@ -40,7 +26,7 @@ describe("tokenize — headings", () => {
 
         const result = tokenize(input);
 
-        expect(result).not.toContain("ed-heading");
+        expect(result).toBe("#notaheading");
     });
 
     it("does not treat more than 6 hashes as a heading", () => {
@@ -48,7 +34,7 @@ describe("tokenize — headings", () => {
 
         const result = tokenize(input);
 
-        expect(result).not.toContain("ed-heading");
+        expect(result).toBe("####### seven");
     });
 });
 
@@ -81,20 +67,14 @@ describe("tokenize — block syntax", () => {
         );
     });
 
-    it("accepts uppercase X for checked tasks", () => {
+    it("renders a checked task with uppercase X preserving the marker case", () => {
         const input = "- [X] done";
 
         const result = tokenize(input);
 
-        expect(result).toContain('class="ed-strike"');
-    });
-
-    it("preserves the original case of the checked marker", () => {
-        const input = "- [X] done";
-
-        const result = tokenize(input);
-
-        expect(result).toContain('<span class="ed-token-muted">- [X] </span>');
+        expect(result).toBe(
+            '<span class="ed-token-muted">- [X] </span><span class="ed-strike">done</span>'
+        );
     });
 
     it("preserves indentation in task items", () => {
@@ -140,7 +120,11 @@ describe("tokenize — inline syntax", () => {
 
         const result = tokenize(input);
 
-        expect(result).toContain('class="ed-bold"');
+        expect(result).toBe(
+            '<span class="ed-token-muted">__</span>' +
+                '<span class="ed-bold">bold</span>' +
+                '<span class="ed-token-muted">__</span>'
+        );
     });
 
     it("wraps italic with *", () => {
@@ -160,18 +144,14 @@ describe("tokenize — inline syntax", () => {
 
         const result = tokenize(input);
 
-        expect(result).toContain('class="ed-italic"');
+        expect(result).toBe(
+            '<span class="ed-token-muted">_</span>' +
+                '<span class="ed-italic">italic</span>' +
+                '<span class="ed-token-muted">_</span>'
+        );
     });
 
-    it("wraps bold-italic with ***", () => {
-        const input = "***both***";
-
-        const result = tokenize(input);
-
-        expect(result).toContain('class="ed-bold ed-italic"');
-    });
-
-    it("does not nest bold inside the bold-italic markers", () => {
+    it("wraps bold-italic with *** as a flat span", () => {
         const input = "***both***";
 
         const result = tokenize(input);
@@ -183,20 +163,16 @@ describe("tokenize — inline syntax", () => {
         );
     });
 
-    it("does not treat bold ** as italic *", () => {
-        const input = "**bold**";
-
-        const result = tokenize(input);
-
-        expect(result).not.toContain('class="ed-italic"');
-    });
-
     it("wraps strikethrough with ~~", () => {
         const input = "~~gone~~";
 
         const result = tokenize(input);
 
-        expect(result).toContain('class="ed-strike"');
+        expect(result).toBe(
+            '<span class="ed-token-muted">~~</span>' +
+                '<span class="ed-strike">gone</span>' +
+                '<span class="ed-token-muted">~~</span>'
+        );
     });
 
     it("wraps markdown links", () => {
@@ -213,20 +189,20 @@ describe("tokenize — inline syntax", () => {
         );
     });
 
-    it("does not apply inline transforms inside a code span", () => {
-        const input = "`**not bold**`";
-
-        const result = tokenize(input);
-
-        expect(result).not.toContain('class="ed-bold"');
-    });
-
     it("wraps a code span in ed-code", () => {
         const input = "`code`";
 
         const result = tokenize(input);
 
-        expect(result).toContain('class="ed-code"');
+        expect(result).toBe('<span class="ed-code">`code`</span>');
+    });
+
+    it("does not apply inline transforms inside a code span", () => {
+        const input = "`**not bold**`";
+
+        const result = tokenize(input);
+
+        expect(result).toBe('<span class="ed-code">`**not bold**`</span>');
     });
 
     it("escapes raw HTML-like characters in plain text", () => {
@@ -239,28 +215,16 @@ describe("tokenize — inline syntax", () => {
 });
 
 describe("tokenize — fenced code blocks", () => {
-    it("renders an opening fence with no language as muted backticks", () => {
+    it("renders a fenced block with no language", () => {
         const input = "```\nhi\n```";
 
-        const result = tokenize(input).split("\n");
+        const result = tokenize(input);
 
-        expect(result[0]).toBe('<span class="ed-token-muted">```</span>');
-    });
-
-    it("renders the buffered content between fences", () => {
-        const input = "```\nhi\n```";
-
-        const result = tokenize(input).split("\n");
-
-        expect(result[1]).toBe("hi");
-    });
-
-    it("renders a closing fence as muted backticks", () => {
-        const input = "```\nhi\n```";
-
-        const result = tokenize(input).split("\n");
-
-        expect(result[2]).toBe('<span class="ed-token-muted">```</span>');
+        expect(result).toBe(
+            '<span class="ed-token-muted">```</span>\n' +
+                "hi\n" +
+                '<span class="ed-token-muted">```</span>'
+        );
     });
 
     it("escapes HTML in unhighlighted code blocks", () => {
@@ -268,15 +232,21 @@ describe("tokenize — fenced code blocks", () => {
 
         const result = tokenize(input);
 
-        expect(result).toContain("&lt;script&gt;&amp;");
+        expect(result).toBe(
+            '<span class="ed-token-muted">```</span>\n' +
+                "&lt;script&gt;&amp;\n" +
+                '<span class="ed-token-muted">```</span>'
+        );
     });
 
     it("renders an opening fence with a registered language using ed-code-lang", () => {
         const input = "```js\nconst a = 1;\n```";
 
-        const result = tokenize(input).split("\n")[0];
+        const firstLine = tokenize(input).split("\n")[0];
 
-        expect(result).toContain('class="ed-code-lang">js');
+        expect(firstLine).toBe(
+            '<span class="ed-token-muted">```</span><span class="ed-code-lang">js</span>'
+        );
     });
 
     it("produces syntax-highlighted HTML for registered languages", () => {
@@ -292,15 +262,11 @@ describe("tokenize — fenced code blocks", () => {
 
         const result = tokenize(input);
 
-        expect(result).toContain("&lt;x&gt;");
-    });
-
-    it("does not syntax-highlight unregistered languages", () => {
-        const input = "```madeuplang\n<x>\n```";
-
-        const result = tokenize(input);
-
-        expect(result).not.toContain("hljs-");
+        expect(result).toBe(
+            '<span class="ed-token-muted">```</span><span class="ed-code-lang">madeuplang</span>\n' +
+                "&lt;x&gt;\n" +
+                '<span class="ed-token-muted">```</span>'
+        );
     });
 
     it("flushes an unclosed code block at end of content", () => {
@@ -308,7 +274,7 @@ describe("tokenize — fenced code blocks", () => {
 
         const result = tokenize(input);
 
-        expect(result).toContain("hello");
+        expect(result).toBe('<span class="ed-token-muted">```</span>\nhello');
     });
 
     it("treats inline syntax as literal inside code blocks", () => {
@@ -316,7 +282,11 @@ describe("tokenize — fenced code blocks", () => {
 
         const result = tokenize(input);
 
-        expect(result).not.toContain('class="ed-bold"');
+        expect(result).toBe(
+            '<span class="ed-token-muted">```</span>\n' +
+                "**not bold**\n" +
+                '<span class="ed-token-muted">```</span>'
+        );
     });
 });
 
