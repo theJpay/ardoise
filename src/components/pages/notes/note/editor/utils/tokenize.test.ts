@@ -307,3 +307,26 @@ describe("tokenize — fenced code blocks", () => {
         expect(result).not.toContain('class="ed-bold"');
     });
 });
+
+describe("tokenize — golden sample", () => {
+    it("renders a dense markdown sample as expected HTML", async () => {
+        const input = [
+            "# Main",
+            "## Sub with **bold** and *italic*",
+            "> quoted **bold** *italic* `code` ~~strike~~",
+            "- [x] done",
+            "- [ ] todo",
+            "- item with `code` and [link](https://example.com)",
+            "1. first",
+            "---",
+            "```js",
+            "const x = 1;",
+            "```",
+            "plain paragraph with ***both***"
+        ].join("\n");
+
+        const result = tokenize(input);
+
+        await expect(result).toMatchFileSnapshot("./__snapshots__/tokenize-golden.html");
+    });
+});
