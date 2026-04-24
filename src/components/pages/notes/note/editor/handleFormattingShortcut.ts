@@ -1,11 +1,11 @@
-import type { InlineActionName } from "./actions";
+import type { ActionName } from "@utils/editorEngine";
 
-type ToggleInline = (name: InlineActionName) => void;
+type RunAction = (name: ActionName) => void;
 type ToggleLink = () => void;
 
 export function handleFormattingShortcut(
     e: React.KeyboardEvent<HTMLTextAreaElement>,
-    toggleInline: ToggleInline,
+    runAction: RunAction,
     toggleLink: ToggleLink
 ): boolean {
     if (!e.metaKey && !e.ctrlKey) {
@@ -17,28 +17,28 @@ export function handleFormattingShortcut(
     if (!e.shiftKey && !e.altKey && key === "b") {
         e.preventDefault();
         e.stopPropagation();
-        toggleInline("bold");
+        runAction("bold");
         return true;
     }
 
     if (!e.shiftKey && !e.altKey && key === "i") {
         e.preventDefault();
         e.stopPropagation();
-        toggleInline("italic");
+        runAction("italic");
         return true;
     }
 
     if (e.shiftKey && !e.altKey && key === "x") {
         e.preventDefault();
         e.stopPropagation();
-        toggleInline("strikethrough");
+        runAction("strikethrough");
         return true;
     }
 
     if (!e.shiftKey && !e.altKey && key === "e") {
         e.preventDefault();
         e.stopPropagation();
-        toggleInline("code");
+        runAction("code");
         return true;
     }
 

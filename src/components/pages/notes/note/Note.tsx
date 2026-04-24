@@ -54,8 +54,7 @@ function Note() {
     } = useNoteState(noteId, mode);
 
     const engine = useEditorEngine(editorRef);
-    const { toggleBlock, isBlockActive, toggleInline, isInlineActive, toggleLink } =
-        useEditorCommands(engine);
+    const { runAction, isActionActive, toggleLink } = useEditorCommands(engine);
 
     const {
         state: slashMenuState,
@@ -67,7 +66,7 @@ function Note() {
     const { handleKeyDown: handleSmartKeys } = useSmartKeys(editorRef, engine);
 
     const handleEditorKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (handleFormattingShortcut(e, toggleInline, toggleLink)) {
+        if (handleFormattingShortcut(e, runAction, toggleLink)) {
             return;
         }
         if (handleSlashMenuKeyDown(e)) {
@@ -91,7 +90,7 @@ function Note() {
                     mode === "edit" ? "h-10 opacity-100" : "h-0 opacity-0"
                 }`}
             >
-                <Toolbar isBlockActive={isBlockActive} onToggleBlock={toggleBlock} />
+                <Toolbar isActive={isActionActive} onAction={runAction} />
             </div>
 
             {armed ? (
@@ -136,9 +135,9 @@ function Note() {
                                 content={content}
                                 editorFocused={focused}
                                 engine={engine}
-                                isInlineActive={isInlineActive}
+                                isActive={isActionActive}
                                 selection={selection}
-                                onToggleInline={toggleInline}
+                                onAction={runAction}
                                 onToggleLink={toggleLink}
                             />
                             {slashMenuState.isOpen && (

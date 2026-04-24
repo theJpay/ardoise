@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer } from "react";
 
 import { UnreachableError } from "@utils";
 
-import { SLASH_MENU_ACTIONS } from "./utils/actions";
+import { SLASH_COMMANDS } from "./slashMenuCommands";
 
 import type { EditorEngine } from "@utils/editorEngine";
 
@@ -23,7 +23,7 @@ export function useSlashMenu(engine: EditorEngine | null, content: string, curso
 
     const filteredActions = useMemo(() => {
         const filter = state.filter.toLowerCase();
-        return SLASH_MENU_ACTIONS.filter(
+        return SLASH_COMMANDS.filter(
             (action) => action.label.toLowerCase().includes(filter) || action.name.includes(filter)
         );
     }, [state.filter]);
@@ -43,7 +43,7 @@ export function useSlashMenu(engine: EditorEngine | null, content: string, curso
 
     const executeCommand = useCallback(
         (actionName: string) => {
-            const action = SLASH_MENU_ACTIONS.find((a) => a.name === actionName);
+            const action = SLASH_COMMANDS.find((a) => a.name === actionName);
             if (!action || !engine) {
                 return;
             }

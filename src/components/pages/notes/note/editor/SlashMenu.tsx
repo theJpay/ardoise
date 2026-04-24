@@ -1,13 +1,12 @@
 import { useFloatingPosition } from "./useFloatingPosition";
-import { SLASH_MENU_ACTION_ICONS } from "./utils/icons";
 
-import type { SlashMenuAction } from "./utils/actions";
+import type { SlashCommand } from "./slashMenuCommands";
 import type { EditorEngine } from "@utils/editorEngine";
 
 type SlashMenuProps = {
     content: string;
     engine: EditorEngine | null;
-    filteredActions: readonly SlashMenuAction[];
+    filteredActions: readonly SlashCommand[];
     selectedIndex: number;
     selection: { start: number; end: number };
     onExecute: (actionName: string) => void;
@@ -58,7 +57,7 @@ function SlashMenu({
                                 index === selectedIndex ? "text-accent" : "text-muted"
                             }`}
                         >
-                            {SLASH_MENU_ACTION_ICONS[action.name]}
+                            {action.icon}
                         </div>
                         <div>
                             <div className="text-ui-base text-text">{action.label}</div>

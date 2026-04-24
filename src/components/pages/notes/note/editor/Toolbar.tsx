@@ -1,44 +1,53 @@
+import { Code, Heading1, Heading2, Heading3, Quote } from "lucide-react";
 import { Fragment } from "react";
 
-import { TOOLBAR_ACTION_GROUPS, TOOLBAR_ACTIONS } from "./utils/actions";
-import { TOOLBAR_ACTION_ICONS } from "./utils/icons";
+import { ACTIONS } from "@utils/editorEngine";
 
-import type { BlockActionName } from "./utils/actions";
+import type { ActionName } from "@utils/editorEngine";
 
-type ToolbarProps = {
-    isBlockActive: (actionName: BlockActionName) => boolean;
-    onToggleBlock: (actionName: BlockActionName) => void;
+const TOOLBAR_GROUPS = [
+    ["heading-1", "heading-2", "heading-3"],
+    ["code-block", "quote"]
+] as const satisfies readonly (readonly ActionName[])[];
+
+type ToolbarName = (typeof TOOLBAR_GROUPS)[number][number];
+
+const ICONS: Record<ToolbarName, React.ReactNode> = {
+    "heading-1": <Heading1 size={14} strokeWidth={1.5} />,
+    "heading-2": <Heading2 size={14} strokeWidth={1.5} />,
+    "heading-3": <Heading3 size={14} strokeWidth={1.5} />,
+    "code-block": <Code size={14} strokeWidth={1.5} />,
+    quote: <Quote size={14} strokeWidth={1.5} />
 };
 
-function Toolbar({ isBlockActive, onToggleBlock }: ToolbarProps) {
+type ToolbarProps = {
+    isActive: (actionName: ActionName) => boolean;
+    onAction: (actionName: ActionName) => void;
+};
+
+function Toolbar({ isActive, onAction }: ToolbarProps) {
     return (
         <div className="border-border-soft flex h-10 shrink-0 items-center gap-0.5 border-b px-5">
-            {TOOLBAR_ACTION_GROUPS.map((group, groupIndex) => (
+            {TOOLBAR_GROUPS.map((group, groupIndex) => (
                 <Fragment key={groupIndex}>
                     {groupIndex > 0 && <div className="bg-border-soft mx-1 h-4 w-px" />}
-                    {group.map((name) => {
-                        const action = TOOLBAR_ACTIONS.find((a) => a.name === name);
-                        if (!action) {
-                            return null;
-                        }
-                        return (
-                            <button
-                                key={name}
-                                aria-label={action.label}
-                                className={`duration-fast flex h-7 w-7 items-center justify-center rounded transition-colors ${
-                                    isBlockActive(name)
-                                        ? "text-accent bg-accent-surface hover:bg-accent-surface-hover"
-                                        : "text-subtle hover:bg-surface hover:text-muted"
-                                }`}
-                                onMouseDown={(e) => {
-                                    e.preventDefault();
-                                    onToggleBlock(name);
-                                }}
-                            >
-                                {TOOLBAR_ACTION_ICONS[name]}
-                            </button>
-                        );
-                    })}
+                    {group.map((name) => (
+                        <button
+                            key={name}
+                            aria-label={ACTIONS[name].label}
+                            className={`duration-fast flex h-7 w-7 items-center justify-center rounded transition-colors ${
+                                isActive(name)
+                                    ? "text-accent bg-accent-surface hover:bg-accent-surface-hover"
+                                    : "text-subtle hover:bg-surface hover:text-muted"
+                            }`}
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                onAction(name);
+                            }}
+                        >
+                            {ICONS[name]}
+                        </button>
+                    ))}
                 </Fragment>
             ))}
         </div>

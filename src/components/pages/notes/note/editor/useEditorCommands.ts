@@ -2,12 +2,11 @@ import { useCallback } from "react";
 
 import { dispatch, isActive } from "@utils/editorEngine";
 
-import type { BlockActionName, InlineActionName } from "./utils/actions";
-import type { EditorEngine } from "@utils/editorEngine";
+import type { ActionName, EditorEngine } from "@utils/editorEngine";
 
 export function useEditorCommands(engine: EditorEngine | null) {
-    const toggleBlock = useCallback(
-        (actionName: BlockActionName) => {
+    const runAction = useCallback(
+        (actionName: ActionName) => {
             if (!engine) {
                 return;
             }
@@ -16,37 +15,17 @@ export function useEditorCommands(engine: EditorEngine | null) {
         [engine]
     );
 
-    const isBlockActive = useCallback(
-        (actionName: BlockActionName) => {
+    const isActionActive = useCallback(
+        (actionName: ActionName) => {
             if (!engine || !engine.isFocused()) {
                 return false;
             }
-            return isActive(engine, actionName);
-        },
-        [engine]
-    );
-
-    const toggleInline = useCallback(
-        (actionName: InlineActionName) => {
-            if (!engine) {
-                return;
-            }
-            dispatch(engine, actionName);
-        },
-        [engine]
-    );
-
-    const isInlineActive = useCallback(
-        (actionName: InlineActionName) => {
-            if (!engine || !engine.isFocused()) {
-                return false;
-            }
-            if (actionName === "link") {
-                return false;
-            }
-            const { start, end } = engine.getSelection();
-            if (start === end) {
-                return false;
+            const action = ACTION_ACTIVE_WITH_SELECTION_ONLY.includes(actionName);
+            if (action) {
+                const { start, end } = engine.getSelection();
+                if (start === end) {
+                    return false;
+                }
             }
             return isActive(engine, actionName);
         },
@@ -57,5 +36,7 @@ export function useEditorCommands(engine: EditorEngine | null) {
         engine?.toggleLink();
     }, [engine]);
 
-    return { toggleBlock, isBlockActive, toggleInline, isInlineActive, toggleLink };
+    return { runAction, isActionActive, toggleLink };
 }
+
+const ACTION_ACTIVE_WITH_SELECTION_ONLY: ActionName[] = ["bold", "italic", "strikethrough", "code"];
