@@ -1,4 +1,4 @@
-import { escapeHtml } from "./escapeHtml";
+import { escapeHtml } from "@utils/escapeHtml";
 
 type Selection = { start: number; end: number };
 

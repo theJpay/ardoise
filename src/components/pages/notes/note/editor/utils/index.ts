@@ -6,4 +6,3 @@ export { handleFormattingShortcut, isInlineSyntaxActive } from "./inlineSyntax";
 export { getLineStart, getLineEnd, getSelectedLines } from "./line";
 export { getListContinuation, isListLine, parseListLine } from "./listItem";
 export { replaceRange } from "./replaceRange";
-export { tokenize } from "./tokenize";
