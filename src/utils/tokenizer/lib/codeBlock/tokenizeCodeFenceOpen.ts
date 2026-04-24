@@ -1,8 +1,12 @@
 import { escapeHtml } from "@utils/escapeHtml";
 
-export function tokenizeCodeFenceOpen(line: string, fenceChar: "`" | "~"): string {
-    const delim = fenceChar.repeat(3);
-    const lang = line.slice(3);
+export function tokenizeCodeFenceOpen(
+    line: string,
+    fenceChar: "`" | "~",
+    fenceLength: number
+): string {
+    const delim = fenceChar.repeat(fenceLength);
+    const lang = line.slice(fenceLength);
     if (lang) {
         return (
             `<span class="ed-token-muted">${delim}</span>` +

@@ -3,9 +3,12 @@ import { escapeHtml } from "@utils/escapeHtml";
 import { formatCodeBlock, matchFenceOpen, tokenizeCodeFenceOpen } from "./lib/codeBlock";
 import { tokenizeLine } from "./lib/tokenizeLine";
 
+import type { FenceOpen } from "./lib/codeBlock";
+
 class Tokenizer {
     private result: string[] = [];
     private fenceChar: "`" | "~" | null = null;
+    private fenceLength: number = 0;
     private codeLang: string | null = null;
     private codeBuffer: string[] = [];
 
@@ -17,7 +20,7 @@ class Tokenizer {
         for (const line of content.split("\n")) {
             if (this.fenceChar === null) {
                 this.handleContentLine(line);
-            } else if (line.startsWith(this.fenceChar.repeat(3))) {
+            } else if (line.startsWith(this.fenceChar.repeat(this.fenceLength))) {
                 this.closeFence(line);
             } else {
                 this.codeBuffer.push(line);
@@ -36,10 +39,11 @@ class Tokenizer {
         }
     }
 
-    private openFence(line: string, fenceChar: "`" | "~"): void {
-        this.result.push(tokenizeCodeFenceOpen(line, fenceChar));
-        this.codeLang = line.slice(3).trim() || null;
-        this.fenceChar = fenceChar;
+    private openFence(line: string, opener: FenceOpen): void {
+        this.result.push(tokenizeCodeFenceOpen(line, opener.char, opener.length));
+        this.codeLang = line.slice(opener.length).trim() || null;
+        this.fenceChar = opener.char;
+        this.fenceLength = opener.length;
     }
 
     private closeFence(line: string): void {
@@ -47,6 +51,7 @@ class Tokenizer {
         this.result.push(`<span class="ed-token-muted">${escapeHtml(line)}</span>`);
         this.codeLang = null;
         this.fenceChar = null;
+        this.fenceLength = 0;
     }
 
     private pushCodeBlock(): void {

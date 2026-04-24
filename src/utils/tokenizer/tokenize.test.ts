@@ -371,6 +371,40 @@ describe("tokenize — fenced code blocks", () => {
                 '<span class="ed-token-muted">```</span>'
         );
     });
+
+    it("opens a 4-backtick fence without leaking a backtick into the language", () => {
+        const input = "````js\nconst a = 1;\n````";
+
+        const firstLine = tokenize(input).split("\n")[0];
+
+        expect(firstLine).toBe(
+            '<span class="ed-token-muted">````</span><span class="ed-code-lang">js</span>'
+        );
+    });
+
+    it("does not close a 4-backtick fence with only 3 backticks", () => {
+        const input = "````\n```\nstill code\n````";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">````</span>\n' +
+                "```\nstill code\n" +
+                '<span class="ed-token-muted">````</span>'
+        );
+    });
+
+    it("closes a 4-backtick fence with more than 4 backticks", () => {
+        const input = "````\ncode\n`````";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">````</span>\n' +
+                "code\n" +
+                '<span class="ed-token-muted">`````</span>'
+        );
+    });
 });
 
 describe("tokenize — html escaping", () => {
