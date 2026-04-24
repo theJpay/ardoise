@@ -1,6 +1,9 @@
 import { hasInlineMarkersAround } from "./lib/hasInlineMarkersAround";
 import { hasLinePrefix } from "./lib/hasLinePrefix";
 import { isInsideCodeBlock } from "./lib/isInsideCodeBlock";
+import { getLineEnd, getLineStart, getSelectedLines } from "./lib/line";
+
+const USE_NATIVE_UNDO = true;
 
 const RELEVANT_STYLE_PROPS = [
     "font",
@@ -24,6 +27,13 @@ export type ListLineInfo = {
     isEmpty: boolean;
 };
 
+type ReplaceRangeArgs = {
+    start: number;
+    end: number;
+    text: string;
+    cursor?: { start: number; end?: number };
+};
+
 export class EditorEngine {
     private readonly textarea: HTMLTextAreaElement;
     private readonly onChange: (value: string) => void;
@@ -39,30 +49,46 @@ export class EditorEngine {
         this.phantom = null;
     }
 
-    // --- Raw primitives ---------------------------------------------------
-
     insertText(text: string): void {
-        const { selectionStart, selectionEnd, value } = this.textarea;
-        const newValue = value.slice(0, selectionStart) + text + value.slice(selectionEnd);
-        const caret = selectionStart + text.length;
-        this.textarea.value = newValue;
-        this.textarea.selectionStart = caret;
-        this.textarea.selectionEnd = caret;
-        this.onChange(newValue);
+        const { start, end } = this.getSelection();
+        this.replaceRange({ start, end, text });
     }
 
     clearCurrentLine(): void {
-        throw new Error("not implemented");
+        const { start, content } = this.getSelection();
+        const lineStart = getLineStart(content, start);
+        const lineEnd = getLineEnd(content, start);
+        this.replaceRange({ start: lineStart, end: lineEnd, text: "" });
     }
 
-    // --- Toggles ----------------------------------------------------------
-
-    toggleInlineMarker(_marker: string): void {
-        throw new Error("not implemented");
+    toggleInlineMarker(marker: string): void {
+        const { start, end } = this.getSelection();
+        if (this.hasInlineMarkersAround(marker)) {
+            const selected = this.textarea.value.slice(start, end);
+            this.replaceRange({
+                start: start - marker.length,
+                end: end + marker.length,
+                text: selected,
+                cursor: { start: start - marker.length, end: end - marker.length }
+            });
+        } else {
+            const selected = this.textarea.value.slice(start, end);
+            this.replaceRange({
+                start,
+                end,
+                text: marker + selected + marker,
+                cursor: { start: start + marker.length, end: end + marker.length }
+            });
+        }
     }
 
-    toggleLinePrefix(_prefix: string): void {
-        throw new Error("not implemented");
+    toggleLinePrefix(prefix: string): void {
+        const { start, end, content } = this.getSelection();
+        if (start !== end && content.slice(start, end).includes("\n")) {
+            this.toggleLinePrefixOverSelection(prefix);
+        } else {
+            this.togglePrefixOnLine(prefix);
+        }
     }
 
     toggleCodeBlock(): void {
@@ -73,11 +99,15 @@ export class EditorEngine {
         throw new Error("not implemented");
     }
 
-    insertTemplate(_template: string): void {
-        throw new Error("not implemented");
+    insertTemplate(template: string): void {
+        const { start } = this.getSelection();
+        this.replaceRange({
+            start,
+            end: start,
+            text: template,
+            cursor: { start: start + template.length }
+        });
     }
-
-    // --- Queries ----------------------------------------------------------
 
     getSelection(): { start: number; end: number; content: string } {
         return {
@@ -106,12 +136,75 @@ export class EditorEngine {
         throw new Error("not implemented");
     }
 
-    // --- DOM helper -------------------------------------------------------
-
     getSelectionRect(): DOMRect | null {
         const phantom = this.ensurePhantom();
         this.syncPhantomStyles(phantom);
         throw new Error("not implemented");
+    }
+
+    private replaceRange(args: ReplaceRangeArgs): void {
+        const { start, end, text, cursor } = args;
+        if (USE_NATIVE_UNDO) {
+            this.textarea.focus({ preventScroll: true });
+            this.textarea.setSelectionRange(start, end);
+            document.execCommand("insertText", false, text);
+            if (cursor) {
+                this.textarea.setSelectionRange(cursor.start, cursor.end ?? cursor.start);
+            }
+        } else {
+            const value = this.textarea.value;
+            const newValue = value.slice(0, start) + text + value.slice(end);
+            this.onChange(newValue);
+            if (cursor) {
+                requestAnimationFrame(() => {
+                    this.textarea.focus();
+                    this.textarea.setSelectionRange(cursor.start, cursor.end ?? cursor.start);
+                });
+            }
+        }
+    }
+
+    private togglePrefixOnLine(prefix: string): void {
+        const { start, end, content } = this.getSelection();
+        const lineStart = getLineStart(content, start);
+        const lineContent = content.slice(lineStart);
+
+        if (lineContent.startsWith(prefix)) {
+            this.replaceRange({
+                start: lineStart,
+                end: lineStart + prefix.length,
+                text: "",
+                cursor: { start: start - prefix.length, end: end - prefix.length }
+            });
+        } else {
+            this.replaceRange({
+                start: lineStart,
+                end: lineStart,
+                text: prefix,
+                cursor: { start: start + prefix.length, end: end + prefix.length }
+            });
+        }
+    }
+
+    private toggleLinePrefixOverSelection(prefix: string): void {
+        const { start, end, content } = this.getSelection();
+        const { firstLineStart, selectedText, lines } = getSelectedLines(content, start, end);
+        const allHaveIt = lines.every((line) => line.startsWith(prefix));
+        const newLines = lines.map((line) =>
+            allHaveIt ? line.slice(prefix.length) : prefix + line
+        );
+        const newText = newLines.join("\n");
+        const offset = allHaveIt ? -prefix.length : prefix.length;
+
+        this.replaceRange({
+            start: firstLineStart,
+            end: firstLineStart + selectedText.length,
+            text: newText,
+            cursor: {
+                start: start + offset,
+                end: firstLineStart + newText.length
+            }
+        });
     }
 
     private ensurePhantom(): HTMLDivElement {
