@@ -199,11 +199,29 @@ export class EditorEngine {
         return isInsideCodeBlock(content, start);
     }
 
-    getLineListInfo(): ListLineInfo | null {
+    getLineListInfo(slice?: string): ListLineInfo | null {
+        if (slice !== undefined) {
+            return parseLineListInfo(slice);
+        }
         const { start, content } = this.getSelection();
         const lineStart = getLineStart(content, start);
         const lineEnd = getLineEnd(content, start);
         return parseLineListInfo(content.slice(lineStart, lineEnd));
+    }
+
+    getLineStart(position?: number): number {
+        const pos = position ?? this.textarea.selectionStart;
+        return getLineStart(this.textarea.value, pos);
+    }
+
+    getLineEnd(position?: number): number {
+        const pos = position ?? this.textarea.selectionStart;
+        return getLineEnd(this.textarea.value, pos);
+    }
+
+    getSelectedLines(): { firstLineStart: number; selectedText: string; lines: string[] } {
+        const { start, end, content } = this.getSelection();
+        return getSelectedLines(content, start, end);
     }
 
     getSelectionRect(): DOMRect | null {

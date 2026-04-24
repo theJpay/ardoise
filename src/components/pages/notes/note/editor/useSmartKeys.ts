@@ -1,28 +1,21 @@
 import { useCallback, useEffect, useRef } from "react";
 
-import {
-    getLineStart,
-    getListContinuation,
-    getSelectedLines,
-    isInsideCodeBlock,
-    isListLine,
-    replaceRange
-} from "./utils";
-
+import type { EditorEngine } from "@utils/editorEngine";
 import type { RefObject } from "react";
 
-type OnChange = (newContent: string) => void;
-
-export function useSmartKeys(editorRef: RefObject<HTMLTextAreaElement | null>, onChange: OnChange) {
-    const onChangeRef = useRef(onChange);
-    onChangeRef.current = onChange;
+export function useSmartKeys(
+    editorRef: RefObject<HTMLTextAreaElement | null>,
+    engine: EditorEngine | null
+) {
+    const engineRef = useRef(engine);
+    engineRef.current = engine;
 
     const skipContinuationRef = useRef(false);
 
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLTextAreaElement>): boolean => {
             const textarea = editorRef.current;
-            if (!textarea) {
+            if (!textarea || !engine) {
                 return false;
             }
             if (e.key === "Enter") {
@@ -31,11 +24,11 @@ export function useSmartKeys(editorRef: RefObject<HTMLTextAreaElement | null>, o
                 return false;
             }
             if (e.key === "Tab") {
-                return handleSmartTab(e, textarea, onChange);
+                return handleSmartTab(e, engine);
             }
             return false;
         },
-        [editorRef, onChange]
+        [editorRef, engine]
     );
 
     useRefEffect(editorRef, (textarea) => {
@@ -43,7 +36,11 @@ export function useSmartKeys(editorRef: RefObject<HTMLTextAreaElement | null>, o
             if (!isPlainLineBreak(e) || skipContinuationRef.current) {
                 return;
             }
-            if (tryBreakEmptyListItem(textarea, onChangeRef.current)) {
+            const current = engineRef.current;
+            if (!current) {
+                return;
+            }
+            if (tryBreakEmptyListItem(current)) {
                 e.preventDefault();
             }
         };
@@ -57,7 +54,11 @@ export function useSmartKeys(editorRef: RefObject<HTMLTextAreaElement | null>, o
                 skipContinuationRef.current = false;
                 return;
             }
-            tryContinueList(textarea, onChangeRef.current);
+            const current = engineRef.current;
+            if (!current) {
+                return;
+            }
+            tryContinueList(current);
         };
 
         textarea.addEventListener("beforeinput", onBeforeInput);
@@ -75,78 +76,64 @@ function isPlainLineBreak(e: InputEvent): boolean {
     return e.inputType === "insertLineBreak" && !e.isComposing;
 }
 
-function tryBreakEmptyListItem(textarea: HTMLTextAreaElement, onChange: OnChange): boolean {
-    const { value, selectionStart } = textarea;
-    const lineStart = getLineStart(value, selectionStart);
-    const line = value.slice(lineStart, selectionStart);
-    if (getListContinuation(line) !== "break") {
+function tryBreakEmptyListItem(engine: EditorEngine): boolean {
+    const { start: cursor, content } = engine.getSelection();
+    const lineStart = engine.getLineStart();
+    const info = engine.getLineListInfo(content.slice(lineStart, cursor));
+    if (!info?.isEmpty) {
         return false;
     }
-    replaceRange(textarea, {
+    engine.replaceRange({
         start: lineStart,
-        end: selectionStart,
+        end: cursor,
         text: "",
-        onChange,
         cursor: { start: lineStart }
     });
     return true;
 }
 
-function tryContinueList(textarea: HTMLTextAreaElement, onChange: OnChange) {
-    const { value, selectionStart } = textarea;
-    const prevLineEnd = selectionStart - 1;
+function tryContinueList(engine: EditorEngine) {
+    const { start: cursor, content } = engine.getSelection();
+    const prevLineEnd = cursor - 1;
     if (prevLineEnd < 0) {
         return;
     }
-    const prevLine = value.slice(getLineStart(value, prevLineEnd), prevLineEnd);
-    const continuation = getListContinuation(prevLine);
-    if (!continuation || continuation === "break") {
+    const prevLineStart = engine.getLineStart(prevLineEnd);
+    const prevLine = content.slice(prevLineStart, prevLineEnd);
+    const info = engine.getLineListInfo(prevLine);
+    if (!info || info.isEmpty) {
         return;
     }
 
     queueMicrotask(() => {
-        const caret = textarea.selectionStart;
-        replaceRange(textarea, {
-            start: caret,
-            end: caret,
-            text: continuation,
-            onChange,
-            cursor: { start: caret + continuation.length }
-        });
+        engine.insertText(info.nextMarker);
     });
 }
 
 function handleSmartTab(
     e: React.KeyboardEvent<HTMLTextAreaElement>,
-    textarea: HTMLTextAreaElement,
-    onChange: OnChange
+    engine: EditorEngine
 ): boolean {
-    const { value, selectionStart, selectionEnd } = textarea;
+    const { start } = engine.getSelection();
 
-    if (!shouldInterceptTab(value, selectionStart, selectionEnd)) {
+    if (!shouldInterceptTab(engine)) {
         return false;
     }
 
     e.preventDefault();
 
-    const { firstLineStart, selectedText, lines } = getSelectedLines(
-        value,
-        selectionStart,
-        selectionEnd
-    );
-
+    const { firstLineStart, selectedText, lines } = engine.getSelectedLines();
     const modifiedLines = lines.map((line) => (e.shiftKey ? dedentLine(line) : "  " + line));
 
     const firstLineOffset = modifiedLines[0].length - lines[0].length;
     const newText = modifiedLines.join("\n");
 
-    replaceRange(textarea, {
+    engine.replaceRange({
         start: firstLineStart,
         end: firstLineStart + selectedText.length,
         text: newText,
-        onChange,
         cursor: {
-            start: Math.max(firstLineStart, selectionStart + firstLineOffset),
+            start: Math.max(firstLineStart, start + firstLineOffset),
             end: firstLineStart + newText.length
         }
     });
@@ -159,21 +146,15 @@ function dedentLine(line: string): string {
     return line.slice(spaces);
 }
 
-function shouldInterceptTab(value: string, selectionStart: number, selectionEnd: number): boolean {
-    if (isInsideCodeBlock(value, selectionStart)) {
+function shouldInterceptTab(engine: EditorEngine): boolean {
+    if (engine.isInsideCodeBlock()) {
         return true;
     }
 
-    const { lines } = getSelectedLines(value, selectionStart, selectionEnd);
-    return lines.some((line) => isListLine(line));
+    const { lines } = engine.getSelectedLines();
+    return lines.some((line) => engine.getLineListInfo(line) !== null);
 }
 
-/**
- * Run `setup` when `ref.current` becomes available, and re-run when it changes
- * (or cleanup when it goes away). `setup` follows the standard useEffect
- * convention: return a cleanup function. Needed because refs aren't reactive,
- * so a plain useEffect with `[ref]` in deps never fires on ref population.
- */
 function useRefEffect<T>(ref: RefObject<T | null>, setup: (el: T) => (() => void) | void) {
     const attachedRef = useRef<{ el: T; cleanup: (() => void) | void } | null>(null);
 

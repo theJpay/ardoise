@@ -65,7 +65,7 @@ function Note() {
         handleKeyDown: handleSlashMenuKeyDown
     } = useSlashMenu(editorRef, content, selection.start, handleContentChange);
 
-    const { handleKeyDown: handleSmartKeys } = useSmartKeys(editorRef, handleContentChange);
+    const { handleKeyDown: handleSmartKeys } = useSmartKeys(editorRef, engine);
 
     const handleEditorKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (handleFormattingShortcut(e, toggleInline, toggleLink)) {
