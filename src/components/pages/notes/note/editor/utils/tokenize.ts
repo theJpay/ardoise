@@ -210,7 +210,7 @@ class InlineTokenizer {
     applyStrikethrough(): this {
         return this.applyToText((html) =>
             html.replace(
-                /~~(.+?)~~/g,
+                /(?<!~)~~(?!~)(.+?)(?<!~)~~(?!~)/g,
                 '<span class="ed-token-muted">~~</span><span class="ed-strike">$1</span><span class="ed-token-muted">~~</span>'
             )
         );

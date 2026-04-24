@@ -183,6 +183,14 @@ describe("tokenize — inline syntax", () => {
         );
     });
 
+    it("leaves mid-line ~~~abc~~~ literal when the delimiter run is too long", () => {
+        const input = "prefix ~~~abc~~~ suffix";
+
+        const result = tokenize(input);
+
+        expect(result).toBe("prefix ~~~abc~~~ suffix");
+    });
+
     it("wraps markdown links", () => {
         const input = "[text](https://example.com)";
 
