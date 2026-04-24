@@ -163,6 +163,14 @@ describe("tokenize — inline syntax", () => {
         );
     });
 
+    it("leaves ****x**** literal when the delimiter run is too long", () => {
+        const input = "****both****";
+
+        const result = tokenize(input);
+
+        expect(result).toBe("****both****");
+    });
+
     it("wraps strikethrough with ~~", () => {
         const input = "~~gone~~";
 
