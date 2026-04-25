@@ -17,6 +17,7 @@ export function useEditorCommands(engine: EditorEngine | null) {
 
     const isActionActive = useCallback(
         (actionName: ActionName) => {
+            // console.log("Checking if action is active:", { actionName, engine });
             if (!engine || !engine.isFocused()) {
                 return false;
             }
