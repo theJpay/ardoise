@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 
-import { tokenize } from "@utils/tokenizer";
+import { tokenize } from "@editor/tokenizer";
 
 import type { RefObject } from "react";
 

@@ -14,6 +14,7 @@ export default defineConfig({
             "@components": path.resolve(__dirname, "./src/components"),
             "@components/*": path.resolve(__dirname, "./src/components/*"),
             "@editor": path.resolve(__dirname, "./src/editor"),
+            "@editor/*": path.resolve(__dirname, "./src/editor/*"),
             "@entities": path.resolve(__dirname, "./src/entities"),
             "@entities/*": path.resolve(__dirname, "./src/entities/*"),
             "@hooks": path.resolve(__dirname, "./src/hooks"),

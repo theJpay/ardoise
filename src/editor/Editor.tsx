@@ -1,4 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
+
+import { tokenize } from "./tokenizer";
 
 import type { EditorHandle } from "./useEditor";
 import type { RefObject } from "react";
@@ -11,6 +13,9 @@ type EditorProps = {
     placeholder?: string;
 };
 
+const SHARED_LAYOUT =
+    "text-ed-body w-full resize-none border-none bg-transparent font-mono wrap-anywhere whitespace-pre-wrap outline-none";
+
 export function Editor({ editor, value, onChange, spellCheck, placeholder }: EditorProps) {
     const ref = useRef<HTMLTextAreaElement | null>(null);
     useAutoGrow(ref, value);
@@ -20,16 +25,25 @@ export function Editor({ editor, value, onChange, spellCheck, placeholder }: Edi
         editor.attach(el);
     };
 
+    const tokenizedHtml = useMemo(() => tokenize(value), [value]);
+
     return (
-        <textarea
-            ref={setRef}
-            aria-label="Note content"
-            className="text-ed-body text-editor-text placeholder:text-dim caret-accent w-full resize-none border-none bg-transparent font-mono wrap-anywhere whitespace-pre-wrap outline-none"
-            placeholder={placeholder ?? "Start writing..."}
-            spellCheck={spellCheck}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-        />
+        <div className="relative">
+            <div
+                aria-hidden="true"
+                className={`ardoise-editor ${SHARED_LAYOUT} text-editor-text pointer-events-none absolute inset-0`}
+                dangerouslySetInnerHTML={{ __html: tokenizedHtml }}
+            />
+            <textarea
+                ref={setRef}
+                aria-label="Note content"
+                className={`${SHARED_LAYOUT} placeholder:text-dim caret-accent relative overflow-hidden text-transparent`}
+                placeholder={placeholder ?? "Start writing..."}
+                spellCheck={spellCheck}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+            />
+        </div>
     );
 }
 
