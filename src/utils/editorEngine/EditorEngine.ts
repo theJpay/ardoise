@@ -55,7 +55,8 @@ export class EditorEngine {
     }
 
     clearCurrentLine(): void {
-        const { start, content } = this.getSelection();
+        const { start } = this.getSelection();
+        const content = this.getValue();
         const lineStart = getLineStart(content, start);
         const lineEnd = getLineEnd(content, start);
         this.replaceRange({ start: lineStart, end: lineEnd, text: "" });
@@ -64,7 +65,7 @@ export class EditorEngine {
     toggleInlineMarker(marker: string): void {
         const { start, end } = this.getSelection();
         if (this.hasInlineMarkersAround(marker)) {
-            const selected = this.textarea.value.slice(start, end);
+            const selected = this.getValue().slice(start, end);
             this.replaceRange({
                 start: start - marker.length,
                 end: end + marker.length,
@@ -72,7 +73,7 @@ export class EditorEngine {
                 cursor: { start: start - marker.length, end: end - marker.length }
             });
         } else {
-            const selected = this.textarea.value.slice(start, end);
+            const selected = this.getValue().slice(start, end);
             this.replaceRange({
                 start,
                 end,
@@ -83,7 +84,8 @@ export class EditorEngine {
     }
 
     toggleLinePrefix(prefix: string): void {
-        const { start, end, content } = this.getSelection();
+        const { start, end } = this.getSelection();
+        const content = this.getValue();
         if (start !== end && content.slice(start, end).includes("\n")) {
             this.toggleLinePrefixOverSelection(prefix);
         } else {
@@ -92,7 +94,8 @@ export class EditorEngine {
     }
 
     toggleCodeBlock(): void {
-        const { start, end, content } = this.getSelection();
+        const { start, end } = this.getSelection();
+        const content = this.getValue();
         if (this.isInsideCodeBlock()) {
             const fence = findEnclosingFence(content, start);
             if (!fence) {
@@ -140,7 +143,8 @@ export class EditorEngine {
     }
 
     toggleLink(): void {
-        const { start, end, content } = this.getSelection();
+        const { start, end } = this.getSelection();
+        const content = this.getValue();
         const selected = content.slice(start, end);
         const isUrl = /^https?:\/\//.test(selected);
 
@@ -172,12 +176,15 @@ export class EditorEngine {
         });
     }
 
-    getSelection(): { start: number; end: number; content: string } {
+    getSelection(): { start: number; end: number } {
         return {
             start: this.textarea.selectionStart,
-            end: this.textarea.selectionEnd,
-            content: this.textarea.value
+            end: this.textarea.selectionEnd
         };
+    }
+
+    getValue(): string {
+        return this.textarea.value;
     }
 
     isFocused(): boolean {
@@ -185,17 +192,20 @@ export class EditorEngine {
     }
 
     hasInlineMarkersAround(marker: string): boolean {
-        const { start, end, content } = this.getSelection();
+        const { start, end } = this.getSelection();
+        const content = this.getValue();
         return hasInlineMarkersAround(content, start, end, marker);
     }
 
     hasLinePrefix(prefix: string): boolean {
-        const { start, content } = this.getSelection();
+        const { start } = this.getSelection();
+        const content = this.getValue();
         return hasLinePrefix(content, start, prefix);
     }
 
     isInsideCodeBlock(): boolean {
-        const { start, content } = this.getSelection();
+        const { start } = this.getSelection();
+        const content = this.getValue();
         return isInsideCodeBlock(content, start);
     }
 
@@ -203,31 +213,34 @@ export class EditorEngine {
         if (slice !== undefined) {
             return parseLineListInfo(slice);
         }
-        const { start, content } = this.getSelection();
+        const { start } = this.getSelection();
+        const content = this.getValue();
         const lineStart = getLineStart(content, start);
         const lineEnd = getLineEnd(content, start);
         return parseLineListInfo(content.slice(lineStart, lineEnd));
     }
 
     getLineStart(position?: number): number {
-        const pos = position ?? this.textarea.selectionStart;
-        return getLineStart(this.textarea.value, pos);
+        const pos = position ?? this.getSelection().start;
+        return getLineStart(this.getValue(), pos);
     }
 
     getLineEnd(position?: number): number {
-        const pos = position ?? this.textarea.selectionStart;
-        return getLineEnd(this.textarea.value, pos);
+        const pos = position ?? this.getSelection().start;
+        return getLineEnd(this.getValue(), pos);
     }
 
     getSelectedLines(): { firstLineStart: number; selectedText: string; lines: string[] } {
-        const { start, end, content } = this.getSelection();
+        const { start, end } = this.getSelection();
+        const content = this.getValue();
         return getSelectedLines(content, start, end);
     }
 
     getSelectionRect(): DOMRect | null {
         const phantom = this.ensurePhantom();
         this.syncPhantomStyles(phantom);
-        const { start, end, content } = this.getSelection();
+        const { start, end } = this.getSelection();
+        const content = this.getValue();
         const before = escapeHtml(content.slice(0, start));
         const selected = escapeHtml(content.slice(start, end));
         const after = escapeHtml(content.slice(end));
@@ -259,7 +272,8 @@ export class EditorEngine {
     }
 
     private togglePrefixOnLine(prefix: string): void {
-        const { start, end, content } = this.getSelection();
+        const { start, end } = this.getSelection();
+        const content = this.getValue();
         const lineStart = getLineStart(content, start);
         const lineContent = content.slice(lineStart);
 
@@ -281,7 +295,8 @@ export class EditorEngine {
     }
 
     private toggleLinePrefixOverSelection(prefix: string): void {
-        const { start, end, content } = this.getSelection();
+        const { start, end } = this.getSelection();
+        const content = this.getValue();
         const { firstLineStart, selectedText, lines } = getSelectedLines(content, start, end);
         const allHaveIt = lines.every((line) => line.startsWith(prefix));
         const newLines = lines.map((line) =>

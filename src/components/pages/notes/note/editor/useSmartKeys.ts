@@ -77,7 +77,8 @@ function isPlainLineBreak(e: InputEvent): boolean {
 }
 
 function tryBreakEmptyListItem(engine: EditorEngine): boolean {
-    const { start: cursor, content } = engine.getSelection();
+    const { start: cursor } = engine.getSelection();
+    const content = engine.getValue();
     const lineStart = engine.getLineStart();
     const info = engine.getLineListInfo(content.slice(lineStart, cursor));
     if (!info?.isEmpty) {
@@ -93,7 +94,8 @@ function tryBreakEmptyListItem(engine: EditorEngine): boolean {
 }
 
 function tryContinueList(engine: EditorEngine) {
-    const { start: cursor, content } = engine.getSelection();
+    const { start: cursor } = engine.getSelection();
+    const content = engine.getValue();
     const prevLineEnd = cursor - 1;
     if (prevLineEnd < 0) {
         return;
