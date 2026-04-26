@@ -1,7 +1,9 @@
 import { lazy, Suspense, useRef } from "react";
 import { useParams } from "react-router";
 
+import { Editor, useEditor } from "@editor";
 import { useEditorMode } from "@hooks/useEditorMode";
+import { useSettingsQuery } from "@queries/useSettingsQuery";
 import { useDeletionState } from "@stores/deletion.store";
 
 import DeleteBanner from "./DeleteBanner";
@@ -23,10 +25,12 @@ function Note() {
 
     const { mode, toggleMode } = useEditorMode();
     const { armed, noteTitle: armedNoteTitle } = useDeletionState();
+    const { settings } = useSettingsQuery();
 
     const { isPending, selectedNote, title, content, saveStatus, retrySave, handleChange } =
         useNoteData(noteId);
 
+    const editor = useEditor();
     const titleRef = useRef<HTMLInputElement | null>(null);
 
     if (isPending) {
@@ -69,7 +73,20 @@ function Note() {
                         onChange={handleChange}
                     />
                     {mode === "edit" ? (
-                        <>{/* Future editor component */}</>
+                        <>
+                            <Editor
+                                editor={editor}
+                                spellCheck={settings.spellcheck}
+                                value={content}
+                                onChange={(content) => handleChange({ content })}
+                            />
+                            {content.length === 0 && (
+                                <div className="text-ed-body text-subtle font-mono">
+                                    Type <span className="text-accent">/</span> to insert headings,
+                                    code blocks, and more
+                                </div>
+                            )}
+                        </>
                     ) : (
                         <Suspense fallback={null}>
                             <NoteViewer content={content} onSwitchToWrite={toggleMode} />
