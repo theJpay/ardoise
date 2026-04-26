@@ -5,7 +5,7 @@ import { NoteEntity } from "@entities";
 
 import EditorStatus from "./EditorStatus";
 
-import type { SaveStatus } from "./useNoteState";
+import type { SaveStatus } from "./useNoteData";
 
 type NoteFooterProps = {
     noteContent: string;

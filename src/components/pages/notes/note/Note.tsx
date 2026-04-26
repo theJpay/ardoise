@@ -1,79 +1,33 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useRef } from "react";
 import { useParams } from "react-router";
 
 import { useEditorMode } from "@hooks/useEditorMode";
-import { useSettingsQuery } from "@queries/useSettingsQuery";
 import { useDeletionState } from "@stores/deletion.store";
 
 import DeleteBanner from "./DeleteBanner";
-import {
-    FloatingToolbar,
-    handleFormattingShortcut,
-    NoteEditor,
-    SlashMenu,
-    Toolbar,
-    useEditorCommands,
-    useEditorEngine,
-    useSlashMenu,
-    useSmartKeys
-} from "./editor";
+import { Toolbar } from "./editor";
 import NoteFooter from "./NoteFooter";
 import NoteLoadingSkeleton from "./NoteLoadingSkeleton";
 import NoteNotFound from "./NoteNotFound";
 import NoteTitle from "./NoteTitle";
 import StorageErrorBanner from "./StorageErrorBanner";
-import { useNoteState } from "./useNoteState";
+import { useNoteData } from "./useNoteData";
 
 const NoteViewer = lazy(() => import("./viewer/NoteViewer"));
 
 function Note() {
     const { noteId } = useParams<{ noteId: string }>();
+    if (!noteId) {
+        throw new Error("noteId is required");
+    }
+
     const { mode, toggleMode } = useEditorMode();
     const { armed, noteTitle: armedNoteTitle } = useDeletionState();
-    const { settings } = useSettingsQuery();
 
-    const {
-        isPending,
-        selectedNote,
-        title,
-        content,
-        selection,
-        focused,
-        editorRef,
-        titleRef,
-        scrollContainerRef,
-        saveStatus,
-        saveError,
-        retrySave,
-        resetSelection,
-        handleContentChange,
-        handleCursorChange,
-        handleScroll,
-        handleTitleChange,
-        setFocused
-    } = useNoteState(noteId, mode);
+    const { isPending, selectedNote, title, content, saveStatus, retrySave, handleChange } =
+        useNoteData(noteId);
 
-    const engine = useEditorEngine(editorRef);
-    const { runAction, isActionActive, toggleLink } = useEditorCommands(engine);
-
-    const {
-        state: slashMenuState,
-        filteredActions: slashMenuActions,
-        executeCommand,
-        handleKeyDown: handleSlashMenuKeyDown
-    } = useSlashMenu(engine, content, selection.start);
-
-    const { handleKeyDown: handleSmartKeys } = useSmartKeys(editorRef, engine);
-
-    const handleEditorKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (handleFormattingShortcut(e, runAction, toggleLink)) {
-            return;
-        }
-        if (handleSlashMenuKeyDown(e)) {
-            return;
-        }
-        handleSmartKeys(e);
-    };
+    const titleRef = useRef<HTMLInputElement | null>(null);
 
     if (isPending) {
         return <NoteLoadingSkeleton />;
@@ -90,21 +44,19 @@ function Note() {
                     mode === "edit" ? "h-10 opacity-100" : "h-0 opacity-0"
                 }`}
             >
-                <Toolbar isActive={isActionActive} onAction={runAction} />
+                <Toolbar isActive={() => false} onAction={() => {}} />
             </div>
 
             {armed ? (
                 <DeleteBanner noteTitle={armedNoteTitle} />
-            ) : saveError ? (
+            ) : saveStatus === "error" ? (
                 <StorageErrorBanner onRetry={retrySave} />
             ) : (
                 <div className="h-9 shrink-0" />
             )}
 
             <div
-                ref={scrollContainerRef}
                 className={`duration-base flex-1 scroll-pb-48 overflow-auto px-6 pt-12 pb-48 transition-opacity ${armed ? "opacity-40" : ""}`}
-                onScroll={handleScroll}
             >
                 <div
                     className={`mx-auto flex w-full flex-col gap-2 ${mode === "edit" ? "max-w-[72ch]" : "max-w-180"}`}
@@ -114,43 +66,10 @@ function Note() {
                         inputRef={titleRef}
                         mode={mode}
                         title={title}
-                        onChange={handleTitleChange}
+                        onChange={handleChange}
                     />
                     {mode === "edit" ? (
-                        <>
-                            <NoteEditor
-                                ref={editorRef}
-                                content={content}
-                                spellCheck={settings.spellcheck}
-                                onBlur={() => {
-                                    setFocused(false);
-                                    resetSelection();
-                                }}
-                                onChange={handleContentChange}
-                                onCursorChange={handleCursorChange}
-                                onFocus={() => setFocused(true)}
-                                onKeyDown={handleEditorKeyDown}
-                            />
-                            <FloatingToolbar
-                                content={content}
-                                editorFocused={focused}
-                                engine={engine}
-                                isActive={isActionActive}
-                                selection={selection}
-                                onAction={runAction}
-                                onToggleLink={toggleLink}
-                            />
-                            {slashMenuState.isOpen && (
-                                <SlashMenu
-                                    content={content}
-                                    engine={engine}
-                                    filteredActions={slashMenuActions}
-                                    selectedIndex={slashMenuState.selectedIndex}
-                                    selection={selection}
-                                    onExecute={executeCommand}
-                                />
-                            )}
-                        </>
+                        <>{/* Future editor component */}</>
                     ) : (
                         <Suspense fallback={null}>
                             <NoteViewer content={content} onSwitchToWrite={toggleMode} />

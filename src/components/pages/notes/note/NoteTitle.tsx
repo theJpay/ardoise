@@ -14,7 +14,7 @@ type NoteTitleProps = {
     date: Date;
     mode: EditorMode;
     inputRef?: RefObject<HTMLInputElement | null>;
-    onChange: (newTitle: string) => void;
+    onChange: ({ title }: { title: string }) => void;
 };
 
 function NoteTitle({ title, date, mode, inputRef, onChange }: NoteTitleProps) {
@@ -31,7 +31,7 @@ function NoteTitle({ title, date, mode, inputRef, onChange }: NoteTitleProps) {
                         className="text-editor-text placeholder:text-dim w-full border-none bg-transparent font-mono font-medium outline-none"
                         placeholder="Untitled"
                         value={title}
-                        onChange={(e) => onChange(e.target.value)}
+                        onChange={(e) => onChange({ title: e.target.value })}
                     />
                 </div>
             ) : (
