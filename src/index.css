@@ -8,7 +8,7 @@
 @import "@fontsource/ibm-plex-mono/400-italic.css";
 @import "@editor/editor.css";
 @import "./styles/preview.css";
-@import "./styles/highlight.css";
+@import "@utils/lowlight.css";
 
 @theme {
     --color-bg: #181818;
