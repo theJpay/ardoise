@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 
-import { EditorEngine } from "@utils/editorEngine";
+import { EditorEngine } from "@editor/engine";
 
 import type { RefObject } from "react";
 

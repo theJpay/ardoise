@@ -1,11 +1,11 @@
 import { Bold, Code, Italic, Link, Strikethrough } from "lucide-react";
 import { Fragment } from "react";
 
-import { ACTIONS } from "@utils/editorEngine";
+import { ACTIONS } from "@editor/engine";
 
 import { useFloatingPosition } from "./useFloatingPosition";
 
-import type { ActionName, EditorEngine } from "@utils/editorEngine";
+import type { ActionName, EditorEngine } from "@editor/engine";
 
 const FLOATING_GROUPS = [
     ["bold", "italic", "strikethrough"],

@@ -4,7 +4,7 @@ import { UnreachableError } from "@utils";
 
 import { SLASH_COMMANDS } from "./slashMenuCommands";
 
-import type { EditorEngine } from "@utils/editorEngine";
+import type { EditorEngine } from "@editor/engine";
 
 type State = {
     isOpen: boolean;

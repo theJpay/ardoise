@@ -1,8 +1,8 @@
 import { autoUpdate, flip, offset, useFloating } from "@floating-ui/react";
 import { useEffect, useMemo } from "react";
 
+import type { EditorEngine } from "@editor/engine";
 import type { Placement, ReferenceType } from "@floating-ui/react";
-import type { EditorEngine } from "@utils/editorEngine";
 
 type UseFloatingPositionOptions = {
     engine: EditorEngine | null;

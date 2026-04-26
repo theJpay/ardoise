@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 
-import type { EditorEngine } from "@utils/editorEngine";
+import type { EditorEngine } from "@editor/engine";
 import type { RefObject } from "react";
 
 export function useSmartKeys(

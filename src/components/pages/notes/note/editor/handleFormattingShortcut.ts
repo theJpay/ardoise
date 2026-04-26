@@ -1,4 +1,4 @@
-import type { ActionName } from "@utils/editorEngine";
+import type { ActionName } from "@editor/engine";
 
 type RunAction = (name: ActionName) => void;
 type ToggleLink = () => void;

@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 
-import { dispatch, isActive } from "@utils/editorEngine";
+import { dispatch, isActive } from "@editor/engine";
 
-import type { ActionName, EditorEngine } from "@utils/editorEngine";
+import type { ActionName, EditorEngine } from "@editor/engine";
 
 export function useEditorCommands(engine: EditorEngine | null) {
     const runAction = useCallback(

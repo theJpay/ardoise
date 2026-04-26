@@ -1,9 +1,9 @@
 import { Code, Heading1, Heading2, Heading3, Quote } from "lucide-react";
 import { Fragment } from "react";
 
-import { ACTIONS } from "@utils/editorEngine";
+import { ACTIONS } from "@editor/engine";
 
-import type { ActionName } from "@utils/editorEngine";
+import type { ActionName } from "@editor/engine";
 
 const TOOLBAR_GROUPS = [
     ["heading-1", "heading-2", "heading-3"],
