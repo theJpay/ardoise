@@ -51,47 +51,49 @@ function Note() {
                 <Toolbar isActive={() => false} onAction={() => {}} />
             </div>
 
-            {armed ? (
-                <DeleteBanner noteTitle={armedNoteTitle} />
-            ) : saveStatus === "error" ? (
-                <StorageErrorBanner onRetry={retrySave} />
-            ) : (
-                <div className="h-9 shrink-0" />
-            )}
+            <div className="flex-1 scroll-pb-48 overflow-auto">
+                <div className="sticky top-0 z-10 min-h-9">
+                    {armed ? (
+                        <DeleteBanner noteTitle={armedNoteTitle} />
+                    ) : saveStatus === "error" ? (
+                        <StorageErrorBanner onRetry={retrySave} />
+                    ) : null}
+                </div>
 
-            <div
-                className={`duration-base flex-1 scroll-pb-48 overflow-auto px-6 pt-12 pb-48 transition-opacity ${armed ? "opacity-40" : ""}`}
-            >
                 <div
-                    className={`mx-auto flex w-full flex-col gap-2 ${mode === "edit" ? "max-w-[72ch]" : "max-w-180"}`}
+                    className={`duration-base px-6 pt-12 pb-48 transition-opacity ${armed ? "opacity-40" : ""}`}
                 >
-                    <NoteTitle
-                        date={selectedNote.updatedAt}
-                        inputRef={titleRef}
-                        mode={mode}
-                        title={title}
-                        onChange={handleChange}
-                    />
-                    {mode === "edit" ? (
-                        <>
-                            <Editor
-                                editor={editor}
-                                spellCheck={settings.spellcheck}
-                                value={content}
-                                onChange={(content) => handleChange({ content })}
-                            />
-                            {content.length === 0 && (
-                                <div className="text-ed-body text-subtle font-mono">
-                                    Type <span className="text-accent">/</span> to insert headings,
-                                    code blocks, and more
-                                </div>
-                            )}
-                        </>
-                    ) : (
-                        <Suspense fallback={null}>
-                            <NoteViewer content={content} onSwitchToWrite={toggleMode} />
-                        </Suspense>
-                    )}
+                    <div
+                        className={`mx-auto flex w-full flex-col gap-2 ${mode === "edit" ? "max-w-[72ch]" : "max-w-180"}`}
+                    >
+                        <NoteTitle
+                            date={selectedNote.updatedAt}
+                            inputRef={titleRef}
+                            mode={mode}
+                            title={title}
+                            onChange={handleChange}
+                        />
+                        {mode === "edit" ? (
+                            <>
+                                <Editor
+                                    editor={editor}
+                                    spellCheck={settings.spellcheck}
+                                    value={content}
+                                    onChange={(content) => handleChange({ content })}
+                                />
+                                {content.length === 0 && (
+                                    <div className="text-ed-body text-subtle font-mono">
+                                        Type <span className="text-accent">/</span> to insert
+                                        headings, code blocks, and more
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <Suspense fallback={null}>
+                                <NoteViewer content={content} onSwitchToWrite={toggleMode} />
+                            </Suspense>
+                        )}
+                    </div>
                 </div>
             </div>
 
