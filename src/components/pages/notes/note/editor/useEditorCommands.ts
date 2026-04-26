@@ -1,7 +1,5 @@
 import { useCallback } from "react";
 
-import { dispatch, isActive } from "@editor/engine";
-
 import type { ActionName, EditorEngine } from "@editor/engine";
 
 export function useEditorCommands(engine: EditorEngine | null) {
@@ -10,14 +8,13 @@ export function useEditorCommands(engine: EditorEngine | null) {
             if (!engine) {
                 return;
             }
-            dispatch(engine, actionName);
+            engine.run(actionName);
         },
         [engine]
     );
 
     const isActionActive = useCallback(
         (actionName: ActionName) => {
-            // console.log("Checking if action is active:", { actionName, engine });
             if (!engine || !engine.isFocused()) {
                 return false;
             }
@@ -28,7 +25,7 @@ export function useEditorCommands(engine: EditorEngine | null) {
                     return false;
                 }
             }
-            return isActive(engine, actionName);
+            return engine.isActive(actionName);
         },
         [engine]
     );

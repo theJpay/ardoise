@@ -1,11 +1,14 @@
 import { escapeHtml } from "@utils/escapeHtml";
 
+import { ACTIONS } from "./actions";
 import { findEnclosingFence } from "./lib/findEnclosingFence";
 import { hasInlineMarkersAround } from "./lib/hasInlineMarkersAround";
 import { hasLinePrefix } from "./lib/hasLinePrefix";
 import { isInsideCodeBlock } from "./lib/isInsideCodeBlock";
 import { getLineEnd, getLineStart, getSelectedLines } from "./lib/line";
 import { parseLineListInfo } from "./lib/parseLineListInfo";
+
+import type { ActionName } from "./actions";
 
 const RELEVANT_STYLE_PROPS = [
     "font",
@@ -191,19 +194,49 @@ export class EditorEngine {
         return document.activeElement === this.textarea;
     }
 
-    hasInlineMarkersAround(marker: string): boolean {
+    run(name: ActionName): void {
+        const action = ACTIONS[name];
+        switch (action.type) {
+            case "inline":
+                return this.toggleInlineMarker(action.marker);
+            case "line":
+                return this.toggleLinePrefix(action.prefix);
+            case "code-block":
+                return this.toggleCodeBlock();
+            case "link":
+                return this.toggleLink();
+            case "insert":
+                return this.insertTemplate(action.template);
+        }
+    }
+
+    isActive(name: ActionName): boolean {
+        const action = ACTIONS[name];
+        switch (action.type) {
+            case "inline":
+                return this.hasInlineMarkersAround(action.marker);
+            case "line":
+                return this.hasLinePrefix(action.prefix);
+            case "code-block":
+                return this.isInsideCodeBlock();
+            default:
+                return false;
+        }
+    }
+
+    private hasInlineMarkersAround(marker: string): boolean {
         const { start, end } = this.getSelection();
         const content = this.getValue();
         return hasInlineMarkersAround(content, start, end, marker);
     }
 
-    hasLinePrefix(prefix: string): boolean {
+    private hasLinePrefix(prefix: string): boolean {
         const { start } = this.getSelection();
         const content = this.getValue();
         return hasLinePrefix(content, start, prefix);
     }
 
-    isInsideCodeBlock(): boolean {
+    private isInsideCodeBlock(): boolean {
         const { start } = this.getSelection();
         const content = this.getValue();
         return isInsideCodeBlock(content, start);

@@ -149,7 +149,7 @@ function dedentLine(line: string): string {
 }
 
 function shouldInterceptTab(engine: EditorEngine): boolean {
-    if (engine.isInsideCodeBlock()) {
+    if (engine.isActive("code-block")) {
         return true;
     }
 
