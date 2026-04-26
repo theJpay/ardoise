@@ -1,13 +1,12 @@
 import { lazy, Suspense, useRef } from "react";
 import { useParams } from "react-router";
 
-import { Editor, useEditor } from "@editor";
+import { Editor, EditorToolbar, useEditor } from "@editor";
 import { useEditorMode } from "@hooks/useEditorMode";
 import { useSettingsQuery } from "@queries/useSettingsQuery";
 import { useDeletionState } from "@stores/deletion.store";
 
 import DeleteBanner from "./DeleteBanner";
-import { Toolbar } from "./editor";
 import NoteFooter from "./NoteFooter";
 import NoteLoadingSkeleton from "./NoteLoadingSkeleton";
 import NoteNotFound from "./NoteNotFound";
@@ -48,7 +47,7 @@ function Note() {
                     mode === "edit" ? "h-10 opacity-100" : "h-0 opacity-0"
                 }`}
             >
-                <Toolbar isActive={() => false} onAction={() => {}} />
+                <EditorToolbar editor={editor} />
             </div>
 
             <div className="flex-1 scroll-pb-48 overflow-auto">
