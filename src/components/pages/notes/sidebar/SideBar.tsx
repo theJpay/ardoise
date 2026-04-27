@@ -1,13 +1,17 @@
 import { Plus } from "lucide-react";
+import { useMemo } from "react";
 
 import { Button } from "@components/generics";
 import { useAddNote } from "@hooks/useAddNote";
 import { useNoteSearch } from "@hooks/useNoteSearch";
 import { useNotesQuery } from "@queries/useNotesQuery";
+import { useSortOrder } from "@stores/sort.store";
+import { sortNotes } from "@utils";
 
 import InlineHint from "./InlineHint";
 import NoteList from "./NoteList";
 import SearchBar from "./SearchBar";
+import SortControl from "./SortControl";
 
 import type { RefObject } from "react";
 
@@ -17,7 +21,9 @@ type SideBarProps = {
 
 function SideBar({ searchRef }: SideBarProps) {
     const { notes, isPending } = useNotesQuery();
-    const { search, setSearch, filteredNotes } = useNoteSearch(notes);
+    const order = useSortOrder();
+    const sortedNotes = useMemo(() => sortNotes(notes, order), [notes, order]);
+    const { search, setSearch, filteredNotes } = useNoteSearch(sortedNotes);
 
     const { addNote } = useAddNote();
 
@@ -29,6 +35,7 @@ function SideBar({ searchRef }: SideBarProps) {
             <div className="border-border-soft flex shrink-0 flex-col gap-2 border-b p-3">
                 <SearchBar ref={searchRef} value={search} onChange={setSearch} />
                 <Button icon={Plus} label="New note" onClick={addNote} />
+                <SortControl />
             </div>
 
             <div className="text-ui-xs text-dim shrink-0 px-3 pt-2.5 pb-0.5 font-mono">Notes</div>
