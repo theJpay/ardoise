@@ -67,8 +67,8 @@ export class EditorEngine {
 
     toggleInlineMarker(marker: string): void {
         const { start, end } = this.getSelection();
-        if (this.hasInlineMarkersAround(marker)) {
-            const selected = this.getValue().slice(start, end);
+        const selected = this.getValue().slice(start, end);
+        if (this.isInlineMarkerActive(marker)) {
             this.replaceRange({
                 start: start - marker.length,
                 end: end + marker.length,
@@ -76,7 +76,6 @@ export class EditorEngine {
                 cursor: { start: start - marker.length, end: end - marker.length }
             });
         } else {
-            const selected = this.getValue().slice(start, end);
             this.replaceRange({
                 start,
                 end,
@@ -214,7 +213,7 @@ export class EditorEngine {
         const action = ACTIONS[name];
         switch (action.type) {
             case "inline":
-                return this.hasInlineMarkersAround(action.marker);
+                return this.isInlineMarkerActive(action.marker);
             case "line":
                 return this.hasLinePrefix(action.prefix);
             case "code-block":
@@ -222,6 +221,30 @@ export class EditorEngine {
             default:
                 return false;
         }
+    }
+
+    private isInlineMarkerActive(marker: string): boolean {
+        if (marker === "*") {
+            return this.countCharsAround("*") % 2 === 1;
+        }
+        if (marker === "**") {
+            return this.countCharsAround("*") >= 2;
+        }
+        return this.hasInlineMarkersAround(marker);
+    }
+
+    private countCharsAround(char: string): number {
+        const { start, end } = this.getSelection();
+        const content = this.getValue();
+        let before = 0;
+        while (start - 1 - before >= 0 && content[start - 1 - before] === char) {
+            before++;
+        }
+        let after = 0;
+        while (end + after < content.length && content[end + after] === char) {
+            after++;
+        }
+        return Math.min(before, after);
     }
 
     private hasInlineMarkersAround(marker: string): boolean {
