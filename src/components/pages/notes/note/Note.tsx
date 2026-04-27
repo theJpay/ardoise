@@ -15,6 +15,10 @@ import StorageErrorBanner from "./StorageErrorBanner";
 import { useNoteData } from "./useNoteData";
 import { usePreserveEditState } from "./usePreserveEditState";
 
+import type { EditorHandle } from "@editor";
+import type { Note as NoteEntity } from "@entities";
+import type { RefObject } from "react";
+
 const NoteViewer = lazy(() => import("./viewer/NoteViewer"));
 
 function Note() {
@@ -35,23 +39,7 @@ function Note() {
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
     usePreserveEditState({ mode, noteId, editor, scrollContainerRef });
-
-    useEffect(() => {
-        if (!selectedNote) {
-            return;
-        }
-        const engine = editor.engine;
-        if (!engine) {
-            return;
-        }
-
-        if (selectedNote.title.trim() === "") {
-            titleRef.current?.focus();
-        } else if (engine.getValue() === "") {
-            engine.focus();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedNote?.id, editor.engine]);
+    useFocusOnNoteLoad(selectedNote, editor, titleRef);
 
     if (isPending) {
         return <NoteLoadingSkeleton />;
@@ -123,3 +111,25 @@ function Note() {
 }
 
 export default Note;
+
+function useFocusOnNoteLoad(
+    note: NoteEntity | undefined,
+    editor: EditorHandle,
+    titleRef: RefObject<HTMLInputElement | null>
+) {
+    useEffect(() => {
+        if (!note) {
+            return;
+        }
+        const engine = editor.engine;
+        if (!engine) {
+            return;
+        }
+        if (note.title.trim() === "") {
+            titleRef.current?.focus();
+        } else if (engine.getValue() === "") {
+            engine.focus();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [note?.id, editor.engine]);
+}
