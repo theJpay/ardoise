@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 
-import { ACTIONS, ICONS } from "../engine";
+import { ACTIONS, getActionTooltip, ICONS } from "../engine";
 import { useFloatingPosition } from "./useFloatingPosition";
 
 import type { ActionName } from "../engine";
@@ -16,8 +16,9 @@ type FloatingToolbarProps = {
 };
 
 export function FloatingToolbar({ editor }: FloatingToolbarProps) {
-    const hasSelection = editor.selection.start !== editor.selection.end;
-    const visible = hasSelection && editor.focused;
+    const { start, end } = editor.selection;
+    const selectedText = editor.engine?.getValue().slice(start, end) ?? "";
+    const visible = selectedText.length > 0 && !selectedText.includes("\n") && editor.focused;
 
     const { refs, floatingStyles } = useFloatingPosition({
         editor,
@@ -64,6 +65,7 @@ function FloatingButton({ editor, name }: FloatingButtonProps) {
                     ? "text-accent hover:bg-accent-surface-hover"
                     : "text-muted hover:bg-border hover:text-text"
             }`}
+            title={getActionTooltip(name)}
             onMouseDown={(e) => {
                 e.preventDefault();
                 editor.run(name);

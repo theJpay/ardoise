@@ -5,6 +5,7 @@ import { SlashMenu } from "./floating/SlashMenu";
 import { useSlashMenu } from "./floating/useSlashMenu";
 import { handleFormattingShortcut } from "./keyboard/handleFormattingShortcut";
 import { handleSmartKeys } from "./keyboard/handleSmartKeys";
+import { handleSmartPair } from "./keyboard/handleSmartPair";
 import { autoGrow, findScrollableAncestor } from "./scroll";
 import { tokenize } from "./tokenizer";
 
@@ -50,6 +51,9 @@ export function Editor({ editor, value, onChange, spellCheck, placeholder }: Edi
                         return;
                     }
                     if (handleSmartKeys(e, editor)) {
+                        return;
+                    }
+                    if (handleSmartPair(e, editor)) {
                         return;
                     }
                 }}
