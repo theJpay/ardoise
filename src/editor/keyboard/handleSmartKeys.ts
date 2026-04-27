@@ -1,3 +1,4 @@
+import { decideSmartEnter } from "./decideSmartEnter";
 import { PAIRS } from "./pairs";
 
 import type { EditorHandle } from "../useEditor";
@@ -23,26 +24,31 @@ export function handleSmartKeys(
 }
 
 function handleSmartEnter(e: KeyboardEvent<HTMLTextAreaElement>, editor: EditorHandle): boolean {
-    if (e.key !== "Enter") {
-        return false;
-    }
-    if (e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) {
-        return false;
-    }
     const engine = editor.engine;
     if (!engine) {
         return false;
     }
-    const info = engine.getLineListInfo();
-    if (!info) {
+    const { start, end } = engine.getSelection();
+    const op = decideSmartEnter({
+        key: e.key,
+        shiftKey: e.shiftKey,
+        metaKey: e.metaKey,
+        ctrlKey: e.ctrlKey,
+        altKey: e.altKey,
+        start,
+        end,
+        lineEnd: engine.getLineEnd(),
+        listInfo: engine.getLineListInfo()
+    });
+    if (!op) {
         return false;
     }
     e.preventDefault();
     e.stopPropagation();
-    if (info.isEmpty) {
+    if (op.kind === "exit-list") {
         engine.clearCurrentLine();
     } else {
-        engine.insertTemplate("\n" + info.nextMarker);
+        engine.insertTemplate("\n" + op.nextMarker);
     }
     return true;
 }
