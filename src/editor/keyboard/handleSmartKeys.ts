@@ -14,7 +14,7 @@ export function handleSmartKeys(
     if (handleSmartBackspace(e, editor)) {
         return true;
     }
-    if (handleSmartTabOnList(e, editor)) {
+    if (handleSmartTab(e, editor)) {
         return true;
     }
     return false;
@@ -85,10 +85,7 @@ function handleSmartBackspace(
 
 const INDENT = "    ";
 
-function handleSmartTabOnList(
-    e: KeyboardEvent<HTMLTextAreaElement>,
-    editor: EditorHandle
-): boolean {
+function handleSmartTab(e: KeyboardEvent<HTMLTextAreaElement>, editor: EditorHandle): boolean {
     if (e.key !== "Tab") {
         return false;
     }
@@ -99,7 +96,9 @@ function handleSmartTabOnList(
     if (!engine) {
         return false;
     }
-    if (!engine.getLineListInfo()) {
+    const onListLine = engine.getLineListInfo() !== null;
+    const inCodeBlock = engine.isActive("code-block");
+    if (!onListLine && !inCodeBlock) {
         return false;
     }
     const { start, end } = engine.getSelection();
