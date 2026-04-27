@@ -11,6 +11,9 @@ export function handleSmartKeys(
     if (handleSmartEnter(e, editor)) {
         return true;
     }
+    if (handleSmartBackspace(e, editor)) {
+        return true;
+    }
     return false;
 }
 
@@ -36,5 +39,43 @@ function handleSmartEnter(e: KeyboardEvent<HTMLTextAreaElement>, editor: EditorH
     } else {
         engine.insertTemplate("\n" + info.nextMarker);
     }
+    return true;
+}
+
+function handleSmartBackspace(
+    e: KeyboardEvent<HTMLTextAreaElement>,
+    editor: EditorHandle
+): boolean {
+    if (e.key !== "Backspace") {
+        return false;
+    }
+    if (e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) {
+        return false;
+    }
+    const engine = editor.engine;
+    if (!engine) {
+        return false;
+    }
+    const { start, end } = engine.getSelection();
+    if (start !== end) {
+        return false;
+    }
+    const info = engine.getLineListInfo();
+    if (!info) {
+        return false;
+    }
+    const lineStart = engine.getLineStart();
+    const markerEnd = lineStart + info.marker.length;
+    if (start !== markerEnd) {
+        return false;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    engine.replaceRange({
+        start: lineStart,
+        end: markerEnd,
+        text: "",
+        cursor: { start: lineStart }
+    });
     return true;
 }
