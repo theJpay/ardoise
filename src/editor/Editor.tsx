@@ -5,6 +5,7 @@ import { SlashMenu } from "./floating/SlashMenu";
 import { useSlashMenu } from "./floating/useSlashMenu";
 import { handleFormattingShortcut } from "./keyboard/handleFormattingShortcut";
 import { handleSmartKeys } from "./keyboard/handleSmartKeys";
+import { autoGrow, findScrollableAncestor } from "./scroll";
 import { tokenize } from "./tokenizer";
 
 import type { EditorHandle } from "./useEditor";
@@ -71,25 +72,4 @@ function useAutoGrow(textarea: HTMLTextAreaElement | null, content: string) {
         }
         autoGrow(textarea, scrollerRef.current);
     }, [content, textarea]);
-}
-
-function autoGrow(textarea: HTMLTextAreaElement, scroller: HTMLElement | null) {
-    const savedScrollTop = scroller?.scrollTop ?? 0;
-    textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`;
-    if (scroller && scroller.scrollTop !== savedScrollTop) {
-        scroller.scrollTop = savedScrollTop;
-    }
-}
-
-function findScrollableAncestor(el: HTMLElement): HTMLElement | null {
-    let node = el.parentElement;
-    while (node) {
-        const { overflowY } = getComputedStyle(node);
-        if (overflowY === "auto" || overflowY === "scroll") {
-            return node;
-        }
-        node = node.parentElement;
-    }
-    return null;
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { ACTIONS, ICONS } from "../engine";
+import { scrollIntoOverflowParent } from "../scroll";
 import { useFloatingPosition } from "./useFloatingPosition";
 
 import type { EditorHandle } from "../useEditor";
@@ -99,18 +100,4 @@ function useScrollIntoOverflowParent(ref: RefObject<HTMLElement | null>, active:
         }
         scrollIntoOverflowParent(ref.current);
     }, [active, ref]);
-}
-
-function scrollIntoOverflowParent(el: HTMLElement | null) {
-    const scroller = el?.parentElement;
-    if (!el || !scroller) {
-        return;
-    }
-    const elRect = el.getBoundingClientRect();
-    const scrollerRect = scroller.getBoundingClientRect();
-    if (elRect.top < scrollerRect.top) {
-        scroller.scrollTop -= scrollerRect.top - elRect.top;
-    } else if (elRect.bottom > scrollerRect.bottom) {
-        scroller.scrollTop += elRect.bottom - scrollerRect.bottom;
-    }
 }
