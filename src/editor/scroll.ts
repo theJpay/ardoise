@@ -29,15 +29,29 @@ export function autoGrow(textarea: HTMLTextAreaElement, scroller: HTMLElement | 
 }
 
 export function scrollIntoOverflowParent(el: HTMLElement | null) {
-    const scroller = el?.parentElement;
-    if (!el || !scroller) {
+    if (!el) {
         return;
     }
-    const elRect = el.getBoundingClientRect();
+    adjustScrollerToShow(el.parentElement, el.getBoundingClientRect());
+}
+
+export function scrollCaretIntoView(textarea: HTMLTextAreaElement, caretRect: DOMRect) {
+    adjustScrollerToShow(findScrollableAncestor(textarea), caretRect);
+}
+
+function adjustScrollerToShow(scroller: HTMLElement | null, rect: DOMRect) {
+    if (!scroller) {
+        return;
+    }
     const scrollerRect = scroller.getBoundingClientRect();
-    if (elRect.top < scrollerRect.top) {
-        scroller.scrollTop -= scrollerRect.top - elRect.top;
-    } else if (elRect.bottom > scrollerRect.bottom) {
-        scroller.scrollTop += elRect.bottom - scrollerRect.bottom;
+    const style = getComputedStyle(scroller);
+    const paddingTop = parseFloat(style.scrollPaddingTop) || 0;
+    const paddingBottom = parseFloat(style.scrollPaddingBottom) || 0;
+    const visibleTop = scrollerRect.top + paddingTop;
+    const visibleBottom = scrollerRect.bottom - paddingBottom;
+    if (rect.top < visibleTop) {
+        scroller.scrollTop -= visibleTop - rect.top;
+    } else if (rect.bottom > visibleBottom) {
+        scroller.scrollTop += rect.bottom - visibleBottom;
     }
 }

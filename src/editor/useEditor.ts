@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { EditorEngine } from "./engine";
+import { scrollCaretIntoView } from "./scroll";
 
 import type { ActionName } from "./engine";
 
@@ -61,6 +62,13 @@ export function useEditor(): EditorHandle {
             textarea.removeEventListener("blur", handleBlur);
         };
     }, [textarea]);
+
+    useEffect(() => {
+        if (!textarea || !engine || !focused) {
+            return;
+        }
+        scrollCaretIntoView(textarea, engine.getSelectionRect());
+    }, [selection, textarea, engine, focused]);
 
     const run = useCallback(
         (action: ActionName) => {
