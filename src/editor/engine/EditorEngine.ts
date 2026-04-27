@@ -269,7 +269,7 @@ export class EditorEngine {
         return getSelectedLines(content, start, end);
     }
 
-    getSelectionRect(): DOMRect | null {
+    getSelectionRect(): DOMRect {
         const phantom = this.ensurePhantom();
         this.syncPhantomStyles(phantom);
         const { start, end } = this.getSelection();
@@ -282,7 +282,7 @@ export class EditorEngine {
         const startMarker = phantom.querySelector("#sel-start");
         const endMarker = phantom.querySelector("#sel-end");
         if (!startMarker || !endMarker) {
-            return null;
+            return new DOMRect();
         }
         const startRect = startMarker.getBoundingClientRect();
         const endRect = endMarker.getBoundingClientRect();
