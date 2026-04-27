@@ -180,12 +180,20 @@ export class EditorEngine {
         };
     }
 
+    setSelection(start: number, end: number = start): void {
+        this.textarea.setSelectionRange(start, end);
+    }
+
     getValue(): string {
         return this.textarea.value;
     }
 
     isFocused(): boolean {
         return document.activeElement === this.textarea;
+    }
+
+    focus(): void {
+        this.textarea.focus({ preventScroll: true });
     }
 
     run(name: ActionName): void {

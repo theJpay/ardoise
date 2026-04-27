@@ -13,6 +13,7 @@ import NoteNotFound from "./NoteNotFound";
 import NoteTitle from "./NoteTitle";
 import StorageErrorBanner from "./StorageErrorBanner";
 import { useNoteData } from "./useNoteData";
+import { usePreserveEditState } from "./usePreserveEditState";
 
 const NoteViewer = lazy(() => import("./viewer/NoteViewer"));
 
@@ -31,6 +32,9 @@ function Note() {
 
     const editor = useEditor();
     const titleRef = useRef<HTMLInputElement | null>(null);
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+
+    usePreserveEditState({ mode, noteId, editor, scrollContainerRef });
 
     if (isPending) {
         return <NoteLoadingSkeleton />;
@@ -50,7 +54,7 @@ function Note() {
                 <EditorToolbar editor={editor} />
             </div>
 
-            <div className="flex-1 scroll-pb-48 overflow-auto">
+            <div ref={scrollContainerRef} className="flex-1 scroll-pb-48 overflow-auto">
                 <div className="sticky top-0 z-10 min-h-9">
                     {armed ? (
                         <DeleteBanner noteTitle={armedNoteTitle} />
