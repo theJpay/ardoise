@@ -14,6 +14,9 @@ export function handleSmartKeys(
     if (handleSmartBackspace(e, editor)) {
         return true;
     }
+    if (handleSmartTabOnList(e, editor)) {
+        return true;
+    }
     return false;
 }
 
@@ -76,6 +79,53 @@ function handleSmartBackspace(
         end: markerEnd,
         text: "",
         cursor: { start: lineStart }
+    });
+    return true;
+}
+
+const INDENT = "    ";
+
+function handleSmartTabOnList(
+    e: KeyboardEvent<HTMLTextAreaElement>,
+    editor: EditorHandle
+): boolean {
+    if (e.key !== "Tab") {
+        return false;
+    }
+    if (e.metaKey || e.ctrlKey || e.altKey) {
+        return false;
+    }
+    const engine = editor.engine;
+    if (!engine) {
+        return false;
+    }
+    if (!engine.getLineListInfo()) {
+        return false;
+    }
+    const { start, end } = engine.getSelection();
+    if (start !== end) {
+        return false;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    const lineStart = engine.getLineStart();
+    if (e.shiftKey) {
+        const content = engine.getValue();
+        if (content.slice(lineStart, lineStart + INDENT.length) === INDENT) {
+            engine.replaceRange({
+                start: lineStart,
+                end: lineStart + INDENT.length,
+                text: "",
+                cursor: { start: Math.max(lineStart, start - INDENT.length) }
+            });
+        }
+        return true;
+    }
+    engine.replaceRange({
+        start: lineStart,
+        end: lineStart,
+        text: INDENT,
+        cursor: { start: start + INDENT.length }
     });
     return true;
 }
