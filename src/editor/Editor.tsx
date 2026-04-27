@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { tokenize } from "./tokenizer";
 
@@ -41,15 +41,36 @@ export function Editor({ editor, value, onChange, spellCheck, placeholder }: Edi
 }
 
 function useAutoGrow(textarea: HTMLTextAreaElement | null, content: string) {
+    const scrollerRef = useRef<HTMLElement | null>(null);
+
     useEffect(() => {
         if (!textarea) {
             return;
         }
-        autoGrow(textarea);
+        if (!scrollerRef.current || !scrollerRef.current.contains(textarea)) {
+            scrollerRef.current = findScrollableAncestor(textarea);
+        }
+        autoGrow(textarea, scrollerRef.current);
     }, [content, textarea]);
 }
 
-function autoGrow(textarea: HTMLTextAreaElement) {
+function autoGrow(textarea: HTMLTextAreaElement, scroller: HTMLElement | null) {
+    const savedScrollTop = scroller?.scrollTop ?? 0;
     textarea.style.height = "auto";
     textarea.style.height = `${textarea.scrollHeight}px`;
+    if (scroller && scroller.scrollTop !== savedScrollTop) {
+        scroller.scrollTop = savedScrollTop;
+    }
+}
+
+function findScrollableAncestor(el: HTMLElement): HTMLElement | null {
+    let node = el.parentElement;
+    while (node) {
+        const { overflowY } = getComputedStyle(node);
+        if (overflowY === "auto" || overflowY === "scroll") {
+            return node;
+        }
+        node = node.parentElement;
+    }
+    return null;
 }
