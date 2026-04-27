@@ -16,8 +16,9 @@ type FloatingToolbarProps = {
 };
 
 export function FloatingToolbar({ editor }: FloatingToolbarProps) {
-    const hasSelection = editor.selection.start !== editor.selection.end;
-    const visible = hasSelection && editor.focused;
+    const { start, end } = editor.selection;
+    const selectedText = editor.engine?.getValue().slice(start, end) ?? "";
+    const visible = selectedText.length > 0 && !selectedText.includes("\n") && editor.focused;
 
     const { refs, floatingStyles } = useFloatingPosition({
         editor,
