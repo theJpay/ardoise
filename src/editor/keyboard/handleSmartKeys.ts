@@ -1,3 +1,5 @@
+import { PAIRS } from "./pairs";
+
 import type { EditorHandle } from "../useEditor";
 import type { KeyboardEvent } from "react";
 
@@ -62,6 +64,20 @@ function handleSmartBackspace(
     const { start, end } = engine.getSelection();
     if (start !== end) {
         return false;
+    }
+    const value = engine.getValue();
+    const before = value[start - 1];
+    const after = value[start];
+    if (before && PAIRS[before] === after) {
+        e.preventDefault();
+        e.stopPropagation();
+        engine.replaceRange({
+            start: start - 1,
+            end: start + 1,
+            text: "",
+            cursor: { start: start - 1 }
+        });
+        return true;
     }
     const info = engine.getLineListInfo();
     if (!info) {
