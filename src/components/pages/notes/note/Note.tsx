@@ -1,4 +1,4 @@
-import { lazy, Suspense, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import { useParams } from "react-router";
 
 import { Editor, EditorToolbar, useEditor } from "@editor";
@@ -35,6 +35,23 @@ function Note() {
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
     usePreserveEditState({ mode, noteId, editor, scrollContainerRef });
+
+    useEffect(() => {
+        if (!selectedNote) {
+            return;
+        }
+        const engine = editor.engine;
+        if (!engine) {
+            return;
+        }
+
+        if (selectedNote.title.trim() === "") {
+            titleRef.current?.focus();
+        } else if (engine.getValue() === "") {
+            engine.focus();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedNote?.id, editor.engine]);
 
     if (isPending) {
         return <NoteLoadingSkeleton />;
