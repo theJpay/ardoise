@@ -4,8 +4,10 @@ import { EditorEngine } from "./engine";
 
 import type { ActionName } from "./engine";
 
+type Surface = { textarea: HTMLTextAreaElement; engine: EditorEngine };
+
 export type EditorHandle = {
-    attach: (el: HTMLTextAreaElement | null) => void;
+    attach: (el: HTMLTextAreaElement) => () => void;
     textarea: HTMLTextAreaElement | null;
     engine: EditorEngine | null;
     selection: { start: number; end: number };
@@ -15,24 +17,21 @@ export type EditorHandle = {
 };
 
 export function useEditor(): EditorHandle {
-    const [textarea, setTextarea] = useState<HTMLTextAreaElement | null>(null);
-    const [engine, setEngine] = useState<EditorEngine | null>(null);
+    const [surface, setSurface] = useState<Surface | null>(null);
     const [selection, setSelection] = useState({ start: 0, end: 0 });
     const [focused, setFocused] = useState(false);
 
-    /* eslint-disable react-hooks/set-state-in-effect */
-    useEffect(() => {
-        if (!textarea) {
-            return;
-        }
-        const instance = new EditorEngine(textarea);
-        setEngine(instance);
+    const attach = useCallback((textarea: HTMLTextAreaElement) => {
+        const engine = new EditorEngine(textarea);
+        setSurface({ textarea, engine });
         return () => {
-            instance.dispose();
-            setEngine(null);
+            engine.dispose();
+            setSurface(null);
         };
-    }, [textarea]);
-    /* eslint-enable react-hooks/set-state-in-effect */
+    }, []);
+
+    const textarea = surface?.textarea ?? null;
+    const engine = surface?.engine ?? null;
 
     useEffect(() => {
         if (!textarea) {
@@ -81,5 +80,5 @@ export function useEditor(): EditorHandle {
         [engine, focused]
     );
 
-    return { attach: setTextarea, textarea, engine, selection, focused, run, isActive };
+    return { attach, textarea, engine, selection, focused, run, isActive };
 }

@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 
 import { tokenize } from "./tokenizer";
 
 import type { EditorHandle } from "./useEditor";
-import type { RefObject } from "react";
 
 type EditorProps = {
     editor: EditorHandle;
@@ -17,13 +16,7 @@ const SHARED_LAYOUT =
     "text-ed-body w-full resize-none border-none bg-transparent font-mono wrap-anywhere whitespace-pre-wrap outline-none";
 
 export function Editor({ editor, value, onChange, spellCheck, placeholder }: EditorProps) {
-    const ref = useRef<HTMLTextAreaElement | null>(null);
-    useAutoGrow(ref, value);
-
-    const setRef = (el: HTMLTextAreaElement | null) => {
-        ref.current = el;
-        editor.attach(el);
-    };
+    useAutoGrow(editor.textarea, value);
 
     const tokenizedHtml = useMemo(() => tokenize(value), [value]);
 
@@ -35,7 +28,7 @@ export function Editor({ editor, value, onChange, spellCheck, placeholder }: Edi
                 dangerouslySetInnerHTML={{ __html: tokenizedHtml }}
             />
             <textarea
-                ref={setRef}
+                ref={editor.attach}
                 aria-label="Note content"
                 className={`${SHARED_LAYOUT} placeholder:text-dim caret-accent relative overflow-hidden text-transparent`}
                 placeholder={placeholder ?? "Start writing..."}
@@ -47,13 +40,16 @@ export function Editor({ editor, value, onChange, spellCheck, placeholder }: Edi
     );
 }
 
-function useAutoGrow(ref: RefObject<HTMLTextAreaElement | null>, content: string) {
+function useAutoGrow(textarea: HTMLTextAreaElement | null, content: string) {
     useEffect(() => {
-        const el = ref.current;
-        if (!el) {
+        if (!textarea) {
             return;
         }
-        el.style.height = "auto";
-        el.style.height = `${el.scrollHeight}px`;
-    }, [content, ref]);
+        autoGrow(textarea);
+    }, [content, textarea]);
+}
+
+function autoGrow(textarea: HTMLTextAreaElement) {
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
 }
