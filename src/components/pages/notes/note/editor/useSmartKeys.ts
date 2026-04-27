@@ -108,7 +108,7 @@ function tryContinueList(engine: EditorEngine) {
     }
 
     queueMicrotask(() => {
-        engine.insertText(info.nextMarker);
+        engine.insertTemplate(info.nextMarker);
     });
 }
 

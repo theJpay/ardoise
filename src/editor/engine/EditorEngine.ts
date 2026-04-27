@@ -52,11 +52,6 @@ export class EditorEngine {
         this.phantom = null;
     }
 
-    insertText(text: string): void {
-        const { start, end } = this.getSelection();
-        this.replaceRange({ start, end, text });
-    }
-
     clearCurrentLine(): void {
         const { start } = this.getSelection();
         const content = this.getValue();
