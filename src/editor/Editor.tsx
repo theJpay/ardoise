@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 
+import { FloatingToolbar } from "./FloatingToolbar";
 import { handleFormattingShortcut } from "./handleFormattingShortcut";
 import { tokenize } from "./tokenizer";
 
@@ -38,6 +39,7 @@ export function Editor({ editor, value, onChange, spellCheck, placeholder }: Edi
                 onChange={(e) => onChange(e.target.value)}
                 onKeyDown={(e) => handleFormattingShortcut(e, editor.run)}
             />
+            <FloatingToolbar editor={editor} />
         </div>
     );
 }
