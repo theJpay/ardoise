@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 
-import { ACTIONS, ICONS } from "./engine";
+import { ACTIONS, getActionTooltip, ICONS } from "./engine";
 
 import type { ActionName } from "./engine";
 import type { EditorHandle } from "./useEditor";
@@ -45,6 +45,7 @@ function ToolbarButton({ editor, name }: ToolbarButtonProps) {
                     ? "text-accent bg-accent-surface hover:bg-accent-surface-hover"
                     : "text-subtle hover:bg-surface hover:text-muted"
             }`}
+            title={getActionTooltip(name)}
             onMouseDown={(e) => {
                 e.preventDefault();
                 editor.run(name);

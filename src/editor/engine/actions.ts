@@ -1,3 +1,5 @@
+import { isMac } from "@utils";
+
 type BaseAction = {
     name: string;
     label: string;
@@ -99,3 +101,16 @@ export const ACTIONS = {
 } as const satisfies Record<string, Action>;
 
 export type ActionName = keyof typeof ACTIONS;
+
+export function getActionTooltip(name: ActionName): string {
+    const action = ACTIONS[name];
+    if (!("shortcut" in action)) {
+        return action.label;
+    }
+    const { key, shift } = action.shortcut;
+    const upperKey = key.toUpperCase();
+    if (isMac()) {
+        return `${action.label} (⌘${shift ? "⇧" : ""}${upperKey})`;
+    }
+    return `${action.label} (Ctrl+${shift ? "Shift+" : ""}${upperKey})`;
+}

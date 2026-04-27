@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 
-import { ACTIONS, ICONS } from "../engine";
+import { ACTIONS, getActionTooltip, ICONS } from "../engine";
 import { useFloatingPosition } from "./useFloatingPosition";
 
 import type { ActionName } from "../engine";
@@ -65,6 +65,7 @@ function FloatingButton({ editor, name }: FloatingButtonProps) {
                     ? "text-accent hover:bg-accent-surface-hover"
                     : "text-muted hover:bg-border hover:text-text"
             }`}
+            title={getActionTooltip(name)}
             onMouseDown={(e) => {
                 e.preventDefault();
                 editor.run(name);
