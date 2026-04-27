@@ -9,9 +9,10 @@ import type { Note } from "@entities";
 
 type NoteItemProps = {
     note: Note;
+    dateField: "updatedAt" | "createdAt";
 };
 
-function NoteItem({ note }: NoteItemProps) {
+function NoteItem({ note, dateField }: NoteItemProps) {
     const { noteId } = useParams();
     const { buildLink } = useAppNavigate();
     const { deletingNoteId } = useDeletionState();
@@ -40,7 +41,7 @@ function NoteItem({ note }: NoteItemProps) {
                 <span className="text-ui-sm text-muted flex-1 truncate italic">Untitled</span>
             )}
             <span className="text-ui-sm text-subtle duration-fast bg-elevated before:from-elevated pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 pl-2 font-mono opacity-0 transition-opacity group-hover:opacity-100 before:absolute before:inset-y-0 before:right-full before:w-4 before:bg-linear-to-l before:to-transparent before:content-['']">
-                {formatRelativeDate(note.updatedAt)}
+                {formatRelativeDate(note[dateField])}
             </span>
         </Link>
     );
