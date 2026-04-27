@@ -2,7 +2,9 @@ import { useEffect, useMemo, useRef } from "react";
 
 import { FloatingToolbar } from "./FloatingToolbar";
 import { handleFormattingShortcut } from "./handleFormattingShortcut";
+import { SlashMenu } from "./SlashMenu";
 import { tokenize } from "./tokenizer";
+import { useSlashMenu } from "./useSlashMenu";
 
 import type { EditorHandle } from "./useEditor";
 
@@ -21,6 +23,7 @@ export function Editor({ editor, value, onChange, spellCheck, placeholder }: Edi
     useAutoGrow(editor.textarea, value);
 
     const tokenizedHtml = useMemo(() => tokenize(value), [value]);
+    const slash = useSlashMenu({ editor, content: value });
 
     return (
         <div className="relative">
@@ -31,15 +34,23 @@ export function Editor({ editor, value, onChange, spellCheck, placeholder }: Edi
             />
             <textarea
                 ref={editor.attach}
-                aria-label="Note content"
+                aria-label="Text editor"
                 className={`${SHARED_LAYOUT} placeholder:text-dim caret-accent relative overflow-hidden text-transparent`}
                 placeholder={placeholder ?? "Start writing..."}
                 spellCheck={spellCheck}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                onKeyDown={(e) => handleFormattingShortcut(e, editor.run)}
+                onKeyDown={(e) => {
+                    if (handleFormattingShortcut(e, editor.run)) {
+                        return;
+                    }
+                    if (slash.handleKeyDown(e)) {
+                        return;
+                    }
+                }}
             />
             <FloatingToolbar editor={editor} />
+            <SlashMenu editor={editor} slash={slash} />
         </div>
     );
 }
