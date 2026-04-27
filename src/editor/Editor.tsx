@@ -4,6 +4,7 @@ import { FloatingToolbar } from "./floating/FloatingToolbar";
 import { SlashMenu } from "./floating/SlashMenu";
 import { useSlashMenu } from "./floating/useSlashMenu";
 import { handleFormattingShortcut } from "./keyboard/handleFormattingShortcut";
+import { handleSmartKeys } from "./keyboard/handleSmartKeys";
 import { tokenize } from "./tokenizer";
 
 import type { EditorHandle } from "./useEditor";
@@ -45,6 +46,9 @@ export function Editor({ editor, value, onChange, spellCheck, placeholder }: Edi
                         return;
                     }
                     if (slash.handleKeyDown(e)) {
+                        return;
+                    }
+                    if (handleSmartKeys(e, editor)) {
                         return;
                     }
                 }}
