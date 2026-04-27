@@ -1,6 +1,6 @@
-import { ACTIONS } from "./engine";
+import { ACTIONS } from "../engine";
 
-import type { ActionName } from "./engine";
+import type { ActionName } from "../engine";
 import type { KeyboardEvent } from "react";
 
 export function handleFormattingShortcut(

@@ -1,10 +1,10 @@
 import { Fragment } from "react";
 
-import { ACTIONS, ICONS } from "./engine";
+import { ACTIONS, ICONS } from "../engine";
 import { useFloatingPosition } from "./useFloatingPosition";
 
-import type { ActionName } from "./engine";
-import type { EditorHandle } from "./useEditor";
+import type { ActionName } from "../engine";
+import type { EditorHandle } from "../useEditor";
 
 const FLOATING_GROUPS = [
     ["bold", "italic", "strikethrough"],

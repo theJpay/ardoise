@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef } from "react";
 
-import { FloatingToolbar } from "./FloatingToolbar";
-import { handleFormattingShortcut } from "./handleFormattingShortcut";
-import { SlashMenu } from "./SlashMenu";
+import { FloatingToolbar } from "./floating/FloatingToolbar";
+import { SlashMenu } from "./floating/SlashMenu";
+import { useSlashMenu } from "./floating/useSlashMenu";
+import { handleFormattingShortcut } from "./keyboard/handleFormattingShortcut";
 import { tokenize } from "./tokenizer";
-import { useSlashMenu } from "./useSlashMenu";
 
 import type { EditorHandle } from "./useEditor";
 

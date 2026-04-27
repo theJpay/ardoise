@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useReducer } from "react";
 
-import { ACTIONS } from "./engine";
+import { ACTIONS } from "../engine";
 
-import type { ActionName } from "./engine";
-import type { EditorHandle } from "./useEditor";
+import type { ActionName } from "../engine";
+import type { EditorHandle } from "../useEditor";
 import type { KeyboardEvent } from "react";
 
 const SLASH_MENU_ACTIONS = [

@@ -1,7 +1,7 @@
 import { autoUpdate, flip, offset, useFloating } from "@floating-ui/react";
 import { useEffect, useMemo } from "react";
 
-import type { EditorHandle } from "./useEditor";
+import type { EditorHandle } from "../useEditor";
 import type { Placement, ReferenceType } from "@floating-ui/react";
 
 type UseFloatingPositionOptions = {

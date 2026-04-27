@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 
-import { ACTIONS, ICONS } from "./engine";
+import { ACTIONS, ICONS } from "../engine";
 import { useFloatingPosition } from "./useFloatingPosition";
 
-import type { EditorHandle } from "./useEditor";
+import type { EditorHandle } from "../useEditor";
 import type { useSlashMenu } from "./useSlashMenu";
 import type { ComponentType, RefObject } from "react";
 
