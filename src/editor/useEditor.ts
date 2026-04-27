@@ -41,7 +41,10 @@ export function useEditor(): EditorHandle {
             setSelection({ start: textarea.selectionStart, end: textarea.selectionEnd });
         };
         const handleFocus = () => setFocused(true);
-        const handleBlur = () => setFocused(false);
+        const handleBlur = () => {
+            setFocused(false);
+            setSelection({ start: 0, end: 0 });
+        };
 
         textarea.addEventListener("select", syncSelection);
         textarea.addEventListener("click", syncSelection);
