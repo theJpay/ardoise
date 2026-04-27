@@ -7,7 +7,11 @@ export function getLineEnd(text: string, position: number): number {
     return next === -1 ? text.length : next;
 }
 
-export function getSelectedLines(text: string, selectionStart: number, selectionEnd: number) {
+export function getSelectedLines(
+    text: string,
+    selectionStart: number,
+    selectionEnd: number
+): { firstLineStart: number; selectedText: string; lines: string[] } {
     const firstLineStart = getLineStart(text, selectionStart);
     const selectedText = text.slice(firstLineStart, selectionEnd);
     const lines = selectedText.split("\n");

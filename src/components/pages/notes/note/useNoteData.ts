@@ -6,78 +6,68 @@ import { useNotesMutations, useNotesQuery } from "@queries/useNotesQuery";
 
 import type { Note } from "@entities";
 
-export type SaveStatus = "saved" | "writing";
+export type SaveStatus = "saved" | "writing" | "error";
 
-export function useNoteData(noteId: string | undefined) {
+type NoteFields = { title?: string; content?: string };
+
+export function useNoteData(noteId: string) {
     const { notes, isPending } = useNotesQuery();
     const { updateNote } = useNotesMutations();
 
     const selectedNote = notes.find((note) => note.id === noteId);
 
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
     const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
-    const [saveError, setSaveError] = useState(false);
-    const lastFailedUpdate = useRef<{ id: string; fields: Record<string, string> } | null>(null);
+    const pendingUpdate = useRef<{ id: string; fields: NoteFields } | null>(null);
 
-    const { debouncedCallback: debouncedUpdateTitle } = useDebounce(
-        async (noteId: string, title: string) => {
-            try {
-                await updateNote({ id: noteId, fields: { title } });
-                setSaveStatus("saved");
-                setSaveError(false);
-            } catch {
-                setSaveError(true);
-                lastFailedUpdate.current = { id: noteId, fields: { title } };
-            }
-        }
-    );
-    const { debouncedCallback: debouncedUpdateContent } = useDebounce(
-        async (noteId: string, content: string) => {
-            try {
-                await updateNote({ id: noteId, fields: { content } });
-                setSaveStatus("saved");
-                setSaveError(false);
-            } catch {
-                setSaveError(true);
-                lastFailedUpdate.current = { id: noteId, fields: { content } };
-            }
-        }
-    );
+    const lastSyncedIdRef = useRef<string | undefined>(undefined);
+    if (selectedNote?.id !== lastSyncedIdRef.current) {
+        lastSyncedIdRef.current = selectedNote?.id;
+        setTitle(selectedNote?.title ?? "");
+        setContent(selectedNote?.content ?? "");
+    }
 
-    const retrySave = useCallback(async () => {
-        if (!lastFailedUpdate.current) {
+    const flushPendingUpdate = useCallback(async () => {
+        const pending = pendingUpdate.current;
+        if (!pending) {
             return;
         }
         try {
-            const { id, fields } = lastFailedUpdate.current;
-            await updateNote({ id, fields });
-            setSaveStatus("saved");
-            setSaveError(false);
-            lastFailedUpdate.current = null;
+            await updateNote(pending);
+            if (pendingUpdate.current === pending) {
+                pendingUpdate.current = null;
+                setSaveStatus("saved");
+            }
         } catch {
-            // Still failing — keep the error state
+            setSaveStatus("error");
         }
     }, [updateNote]);
 
-    const [title, setTitle] = useState("");
-    const [content, setContent] = useState("");
+    const debouncedFlush = useDebounce(flushPendingUpdate);
 
-    const handleContentChange = (newContent: string) => {
-        setContent(newContent);
-        setSaveStatus("writing");
-        if (selectedNote) {
-            debouncedUpdateContent(selectedNote.id, newContent);
-        }
-    };
+    const handleChange = useCallback(
+        (fields: NoteFields) => {
+            if (fields.title !== undefined) {
+                setTitle(fields.title);
+            }
+            if (fields.content !== undefined) {
+                setContent(fields.content);
+            }
 
-    const handleTitleChange = (newTitle: string) => {
-        setTitle(newTitle);
-        setSaveStatus("writing");
-        if (selectedNote) {
-            debouncedUpdateTitle(selectedNote.id, newTitle);
-        }
-    };
+            const existingFields =
+                pendingUpdate.current?.id === noteId ? pendingUpdate.current.fields : {};
+            pendingUpdate.current = {
+                id: noteId,
+                fields: { ...existingFields, ...fields }
+            };
 
-    useSyncNoteToLocalState(selectedNote, setTitle, setContent);
+            setSaveStatus("writing");
+            debouncedFlush();
+        },
+        [noteId, debouncedFlush]
+    );
+
     useDocumentTitle(title, selectedNote);
     useWarnUnsavedChanges(saveStatus);
 
@@ -87,33 +77,17 @@ export function useNoteData(noteId: string | undefined) {
         title,
         content,
         saveStatus,
-        saveError,
-        retrySave,
-        handleContentChange,
-        handleTitleChange
+        retrySave: flushPendingUpdate,
+        handleChange
     };
 }
 
-function useSyncNoteToLocalState(
-    selectedNote: Note | undefined,
-    setTitle: (title: string) => void,
-    setContent: (content: string) => void
-) {
+function useDocumentTitle(title: string, note: Note | undefined) {
     useEffect(() => {
-        if (selectedNote) {
-            setTitle(selectedNote.title);
-            setContent(selectedNote.content);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedNote?.id]);
-}
-
-function useDocumentTitle(title: string, selectedNote: Note | undefined) {
-    useEffect(() => {
-        if (selectedNote) {
+        if (note) {
             document.title = `${NoteEntity.getTitle({ title })} — Ardoise`;
         }
-    }, [title, selectedNote]);
+    }, [title, note]);
 }
 
 function useWarnUnsavedChanges(saveStatus: SaveStatus) {

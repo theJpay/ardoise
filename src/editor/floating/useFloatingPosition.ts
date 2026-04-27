@@ -1,41 +1,34 @@
 import { autoUpdate, flip, offset, useFloating } from "@floating-ui/react";
 import { useEffect, useMemo } from "react";
 
-import { getSelectionRect } from "./utils/getSelectionRect";
-
+import type { EditorHandle } from "../useEditor";
 import type { Placement, ReferenceType } from "@floating-ui/react";
-import type { RefObject } from "react";
 
 type UseFloatingPositionOptions = {
-    measureRef: RefObject<HTMLDivElement | null>;
-    content: string;
-    selection: { start: number; end: number };
+    editor: EditorHandle;
     placement: Placement;
     offset: number;
-    visible?: boolean;
+    visible: boolean;
 };
 
 export function useFloatingPosition({
-    measureRef,
-    content,
-    selection,
+    editor,
     placement,
     offset: offsetValue,
-    visible = true
+    visible
 }: UseFloatingPositionOptions) {
+    const { engine, selection } = editor;
+
     const reference = useMemo<ReferenceType | null>(() => {
-        if (!visible) {
+        if (!visible || !engine) {
             return null;
         }
         return {
-            getBoundingClientRect: () => {
-                if (!measureRef.current) {
-                    return new DOMRect();
-                }
-                return getSelectionRect(measureRef.current, content, selection) ?? new DOMRect();
-            }
+            getBoundingClientRect: () => engine.getSelectionRect()
         };
-    }, [visible, measureRef, content, selection]);
+        // selection is a dep so floating-ui re-positions as the user selects
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [visible, engine, selection]);
 
     const { refs, floatingStyles } = useFloating<ReferenceType>({
         placement,
@@ -47,5 +40,5 @@ export function useFloatingPosition({
         refs.setReference(reference);
     }, [reference, refs]);
 
-    return { refs, floatingStyles, isPositioned: !!reference };
+    return { refs, floatingStyles };
 }
