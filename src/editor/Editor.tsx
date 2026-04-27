@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 
+import { handleFormattingShortcut } from "./handleFormattingShortcut";
 import { tokenize } from "./tokenizer";
 
 import type { EditorHandle } from "./useEditor";
@@ -35,6 +36,7 @@ export function Editor({ editor, value, onChange, spellCheck, placeholder }: Edi
                 spellCheck={spellCheck}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
+                onKeyDown={(e) => handleFormattingShortcut(e, editor.run)}
             />
         </div>
     );

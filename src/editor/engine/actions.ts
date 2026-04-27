@@ -2,6 +2,7 @@ type BaseAction = {
     name: string;
     label: string;
     description?: string;
+    shortcut?: { key: string; shift: boolean };
 };
 
 type InlineAction = BaseAction & { type: "inline"; marker: string };
@@ -47,11 +48,40 @@ export const ACTIONS = {
         label: "Code block",
         description: "Fenced code"
     },
-    bold: { name: "bold", type: "inline", marker: "**", label: "Bold" },
-    italic: { name: "italic", type: "inline", marker: "*", label: "Italic" },
-    strikethrough: { name: "strikethrough", type: "inline", marker: "~~", label: "Strikethrough" },
-    code: { name: "code", type: "inline", marker: "`", label: "Inline code" },
-    link: { name: "link", type: "link", label: "Link" },
+    bold: {
+        name: "bold",
+        type: "inline",
+        marker: "**",
+        label: "Bold",
+        shortcut: { key: "b", shift: false }
+    },
+    italic: {
+        name: "italic",
+        type: "inline",
+        marker: "*",
+        label: "Italic",
+        shortcut: { key: "i", shift: false }
+    },
+    strikethrough: {
+        name: "strikethrough",
+        type: "inline",
+        marker: "~~",
+        label: "Strikethrough",
+        shortcut: { key: "x", shift: true }
+    },
+    code: {
+        name: "code",
+        type: "inline",
+        marker: "`",
+        label: "Inline code",
+        shortcut: { key: "e", shift: false }
+    },
+    link: {
+        name: "link",
+        type: "link",
+        label: "Link",
+        shortcut: { key: "k", shift: false }
+    },
     "task-list": {
         name: "task-list",
         type: "insert",
