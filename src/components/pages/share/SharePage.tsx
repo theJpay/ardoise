@@ -2,6 +2,7 @@ import { useLocation } from "react-router";
 
 import { parseShareUrl } from "@utils";
 
+import ShareError from "./ShareError";
 import ShareView from "./ShareView";
 
 function SharePage() {
@@ -9,11 +10,7 @@ function SharePage() {
     const payload = parseShareUrl(hash.slice(1));
 
     if (!payload) {
-        return (
-            <div className="flex h-full items-center justify-center px-6">
-                <p className="text-ui-base text-muted">This shared link is invalid or corrupted.</p>
-            </div>
-        );
+        return <ShareError />;
     }
 
     return <ShareView payload={payload} />;
