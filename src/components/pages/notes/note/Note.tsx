@@ -63,7 +63,7 @@ function Note() {
                 />
             </div>
 
-            <div ref={scrollContainerRef} className="flex-1 scroll-pb-48 overflow-auto">
+            <div ref={scrollContainerRef} className="flex-1 scroll-pt-9 scroll-pb-48 overflow-auto">
                 <div className="sticky top-0 z-10 min-h-9">
                     {armed ? (
                         <DeleteBanner noteTitle={armedNoteTitle} />
