@@ -27,4 +27,18 @@ db.version(3)
             })
     );
 
+db.version(4)
+    .stores({
+        notes: "id, title, updatedAt, deletedAt, pinnedAt, archivedAt",
+        settings: "id"
+    })
+    .upgrade((tx) =>
+        tx
+            .table("notes")
+            .toCollection()
+            .modify((note) => {
+                note.archivedAt = null;
+            })
+    );
+
 export default db;

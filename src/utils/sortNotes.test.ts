@@ -13,6 +13,7 @@ function note(overrides: Partial<Note>): Note {
         createdAt: overrides.createdAt ?? new Date(2026, 0, 1),
         updatedAt: overrides.updatedAt ?? new Date(2026, 0, 1),
         pinnedAt: overrides.pinnedAt ?? null,
+        archivedAt: overrides.archivedAt ?? null,
         deletedAt: overrides.deletedAt ?? null
     };
 }

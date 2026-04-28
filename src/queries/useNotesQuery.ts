@@ -5,6 +5,7 @@ import {
     createNote,
     deleteNote,
     duplicateNote,
+    getArchivedNotes,
     getNotes,
     hardDeleteAllNotes,
     hardDeleteNote,
@@ -15,11 +16,15 @@ import {
 
 import type { NoteUpdate } from "@entities";
 
-const NOTES_KEY = ["notes"] as const;
+const noteKeys = {
+    all: ["notes"],
+    active: ["notes", "active"],
+    archived: ["notes", "archived"]
+} as const;
 
 export function useNotesQuery() {
     const { isPending, error, data } = useQuery({
-        queryKey: NOTES_KEY,
+        queryKey: noteKeys.active,
         queryFn: getNotes
     });
 
@@ -30,60 +35,73 @@ export function useNotesQuery() {
     };
 }
 
+export function useArchivedNotesQuery() {
+    const { isPending, error, data } = useQuery({
+        queryKey: noteKeys.archived,
+        queryFn: getArchivedNotes
+    });
+
+    return {
+        isPending,
+        error,
+        archivedNotes: data ?? []
+    };
+}
+
 export function useNotesMutations() {
     const createNoteMutation = useMutation({
         mutationFn: createNote,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
+            queryClient.invalidateQueries({ queryKey: noteKeys.all });
         }
     });
 
     const duplicateNoteMutation = useMutation({
         mutationFn: duplicateNote,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
+            queryClient.invalidateQueries({ queryKey: noteKeys.all });
         }
     });
 
     const updateNoteMutation = useMutation({
         mutationFn: ({ id, fields }: UpdateMutationArgs) => updateNote(id, fields),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
+            queryClient.invalidateQueries({ queryKey: noteKeys.all });
         }
     });
 
     const pinNoteMutation = useMutation({
         mutationFn: pinNote,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
+            queryClient.invalidateQueries({ queryKey: noteKeys.all });
         }
     });
 
     const unpinNoteMutation = useMutation({
         mutationFn: unpinNote,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
+            queryClient.invalidateQueries({ queryKey: noteKeys.all });
         }
     });
 
     const deleteNoteMutation = useMutation({
         mutationFn: deleteNote,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
+            queryClient.invalidateQueries({ queryKey: noteKeys.all });
         }
     });
 
     const hardDeleteNoteMutation = useMutation({
         mutationFn: hardDeleteNote,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
+            queryClient.invalidateQueries({ queryKey: noteKeys.all });
         }
     });
 
     const hardDeleteAllNotesMutation = useMutation({
         mutationFn: hardDeleteAllNotes,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
+            queryClient.invalidateQueries({ queryKey: noteKeys.all });
         }
     });
 

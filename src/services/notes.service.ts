@@ -3,7 +3,15 @@ import db from "./db";
 import type { Note, NoteUpdate, NoteWrite } from "@entities";
 
 export async function getNotes(): Promise<Note[]> {
-    return await db.notes.filter((note) => note.deletedAt === null).toArray();
+    return await db.notes
+        .filter((note) => note.deletedAt === null && note.archivedAt === null)
+        .toArray();
+}
+
+export async function getArchivedNotes(): Promise<Note[]> {
+    return await db.notes
+        .filter((note) => note.archivedAt !== null && note.deletedAt === null)
+        .toArray();
 }
 
 export async function createNote(write: NoteWrite): Promise<Note> {
@@ -13,6 +21,7 @@ export async function createNote(write: NoteWrite): Promise<Note> {
         createdAt: new Date(),
         updatedAt: new Date(),
         pinnedAt: null,
+        archivedAt: null,
         deletedAt: null
     });
 

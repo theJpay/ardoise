@@ -5,6 +5,7 @@ export type Note = {
     createdAt: Date;
     updatedAt: Date;
     pinnedAt: Date | null;
+    archivedAt: Date | null;
     deletedAt: Date | null;
 };
 
