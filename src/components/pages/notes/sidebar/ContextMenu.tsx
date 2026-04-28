@@ -1,12 +1,9 @@
 import { Command, Copy, Delete, Trash2 } from "lucide-react";
-import { useEffect } from "react";
 
-import { DepletionBar, ShortcutKey } from "@components/generics";
+import { DepletionBar, Popover, ShortcutKey } from "@components/generics";
 import { NoteEntity } from "@entities";
 import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useArmedAction } from "@hooks/useArmedAction";
-import { useClickOutside } from "@hooks/useClickOutside";
-import { useFloatingMenu } from "@hooks/useFloatingMenu";
 import { useNotesMutations } from "@queries/useNotesQuery";
 import { useDeletionActions } from "@stores/deletion.store";
 
@@ -21,9 +18,6 @@ type ContextMenuProps = {
 };
 
 function ContextMenu({ note, position, onClose }: ContextMenuProps) {
-    const { refs, floatingStyles } = useFloatingMenu({
-        anchor: { type: "coordinates", x: position.x, y: position.y }
-    });
     const { duplicateNote, deleteNote, hardDeleteNote } = useNotesMutations();
     const { setDeleting, reset } = useDeletionActions();
     const { navigate } = useAppNavigate();
@@ -43,30 +37,17 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
         }
     });
 
-    useClickOutside(refs.floating, onClose);
-
-    useEffect(() => {
-        const handleEscape = (e: KeyboardEvent) => {
-            if (e.key === "Escape") {
-                onClose();
-            }
-        };
-        document.addEventListener("keydown", handleEscape);
-        return () => {
-            document.removeEventListener("keydown", handleEscape);
-        };
-    }, [onClose]);
-
     const handleDuplicate = async () => {
         await duplicateNote(note.id);
         onClose();
     };
 
     return (
-        <div
-            ref={refs.setFloating}
-            className="bg-elevated border-border shadow-float z-50 w-48 rounded border p-1"
-            style={floatingStyles}
+        <Popover
+            anchor={{ type: "coordinates", x: position.x, y: position.y }}
+            className="w-48 rounded p-1"
+            open={true}
+            onClose={onClose}
         >
             <button
                 className="text-ui-base text-muted hover:bg-accent-surface hover:text-text duration-fast flex w-full items-center gap-2 rounded-sm px-2.5 py-1.5 transition-colors"
@@ -98,7 +79,7 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
                 </span>
                 {armed && <DepletionBar />}
             </button>
-        </div>
+        </Popover>
     );
 }
 

@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react";
 import type { Placement, ReferenceType } from "@floating-ui/react";
 import type { RefObject } from "react";
 
-type Anchor =
+export type Anchor =
     | { type: "coordinates"; x: number; y: number }
     | { type: "element"; ref: RefObject<HTMLElement | null> };
 
