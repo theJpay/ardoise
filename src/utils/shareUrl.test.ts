@@ -1,7 +1,7 @@
 import { gzipSync, strToU8 } from "fflate";
 import { describe, expect, it } from "vitest";
 
-import { parseShareUrl } from "./shareUrl";
+import { getShareUrlIfFits, parseShareUrl } from "./shareUrl";
 
 function encode(value: unknown): string {
     const json = JSON.stringify(value);
@@ -11,6 +11,16 @@ function encode(value: unknown): string {
         binary += String.fromCharCode(byte);
     }
     return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function generateIncompressible(length: number): string {
+    const buf = new Uint8Array(length);
+    crypto.getRandomValues(buf);
+    let out = "";
+    for (const byte of buf) {
+        out += String.fromCharCode(33 + (byte % 94));
+    }
+    return out;
 }
 
 describe("parseShareUrl", () => {
@@ -71,5 +81,31 @@ describe("parseShareUrl", () => {
         const result = parseShareUrl(encoded);
 
         expect(result).toEqual(payload);
+    });
+});
+
+describe("getShareUrlIfFits", () => {
+    it("returns a URL containing the share path and a hash", () => {
+        const url = getShareUrlIfFits({ title: "hi", content: "body" });
+
+        expect(url).toContain("/share#");
+    });
+
+    it("round-trips through encode and decode", () => {
+        const payload = { title: "Hello", content: "**World**" };
+
+        const url = getShareUrlIfFits(payload);
+        const hash = url?.split("#")[1] ?? "";
+        const decoded = parseShareUrl(hash);
+
+        expect(decoded).toEqual(payload);
+    });
+
+    it("returns null when the compressed payload exceeds the budget", () => {
+        const noise = generateIncompressible(20000);
+
+        const url = getShareUrlIfFits({ title: "big", content: noise });
+
+        expect(url).toBeNull();
     });
 });

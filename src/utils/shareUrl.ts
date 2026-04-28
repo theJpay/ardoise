@@ -1,8 +1,19 @@
-import { gunzipSync, strFromU8 } from "fflate";
+import { gunzipSync, gzipSync, strFromU8, strToU8 } from "fflate";
 
 import type { Note } from "@entities";
 
 export type SharePayload = Pick<Note, "title" | "content">;
+
+export const SHARE_URL_MAX_BYTES = 8192;
+
+export function getShareUrlIfFits(payload: SharePayload): string | null {
+    const json = JSON.stringify(payload);
+    const gzipped = gzipSync(strToU8(json));
+    if (gzipped.byteLength > SHARE_URL_MAX_BYTES) {
+        return null;
+    }
+    return `${getShareOrigin()}/share#${bytesToBase64Url(gzipped)}`;
+}
 
 export function parseShareUrl(encoded: string): SharePayload | null {
     if (!encoded) {
@@ -16,6 +27,18 @@ export function parseShareUrl(encoded: string): SharePayload | null {
     } catch {
         return null;
     }
+}
+
+function getShareOrigin(): string {
+    return globalThis.location?.origin ?? "";
+}
+
+function bytesToBase64Url(bytes: Uint8Array): string {
+    let binary = "";
+    for (const byte of bytes) {
+        binary += String.fromCharCode(byte);
+    }
+    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
 function isSharePayload(value: unknown): value is SharePayload {
