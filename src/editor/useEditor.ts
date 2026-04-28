@@ -67,7 +67,7 @@ export function useEditor(): EditorHandle {
         if (!textarea || !engine || !focused) {
             return;
         }
-        scrollCaretIntoView(textarea, engine.getSelectionRect());
+        scrollCaretIntoView(textarea, engine.getSelectionRect({ caret: true }));
     }, [selection, textarea, engine, focused]);
 
     const run = useCallback(

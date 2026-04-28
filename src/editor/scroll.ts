@@ -7,7 +7,7 @@
  * re-implement what the browser does for an unconstrained textarea.
  */
 
-export function findScrollableAncestor(el: HTMLElement): HTMLElement | null {
+function findScrollableAncestor(el: HTMLElement): HTMLElement | null {
     let node = el.parentElement;
     while (node) {
         const { overflowY } = getComputedStyle(node);
@@ -19,7 +19,8 @@ export function findScrollableAncestor(el: HTMLElement): HTMLElement | null {
     return null;
 }
 
-export function autoGrow(textarea: HTMLTextAreaElement, scroller: HTMLElement | null) {
+export function autoGrow(textarea: HTMLTextAreaElement) {
+    const scroller = findScrollableAncestor(textarea);
     const savedScrollTop = scroller?.scrollTop ?? 0;
     textarea.style.height = "auto";
     textarea.style.height = `${textarea.scrollHeight}px`;
