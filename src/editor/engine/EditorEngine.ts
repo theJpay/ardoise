@@ -295,14 +295,16 @@ export class EditorEngine {
         return getSelectedLines(content, start, end);
     }
 
-    getSelectionRect(): DOMRect {
+    getSelectionRect(opts: { caret?: boolean } = {}): DOMRect {
         const phantom = this.ensurePhantom();
         this.syncPhantomStyles(phantom);
         const { start, end } = this.getSelection();
+        const focusPos = this.textarea.selectionDirection === "backward" ? start : end;
+        const [from, to] = opts.caret ? [focusPos, focusPos] : [start, end];
         const content = this.getValue();
-        const before = escapeHtml(content.slice(0, start));
-        const selected = escapeHtml(content.slice(start, end));
-        const after = escapeHtml(content.slice(end));
+        const before = escapeHtml(content.slice(0, from));
+        const selected = escapeHtml(content.slice(from, to));
+        const after = escapeHtml(content.slice(to));
         phantom.innerHTML = `${before}<span id="sel-start"></span>${selected}<span id="sel-end"></span>${after}`;
 
         const startMarker = phantom.querySelector("#sel-start");
