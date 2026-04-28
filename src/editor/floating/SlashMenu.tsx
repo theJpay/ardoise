@@ -30,7 +30,7 @@ export function SlashMenu({ editor, slash }: SlashMenuProps) {
     return (
         <div
             ref={refs.setFloating}
-            className="bg-elevated border-border shadow-float z-50 w-58 rounded border p-1"
+            className="bg-elevated border-border shadow-float z-50 w-60 rounded border"
             style={floatingStyles}
         >
             <div className="text-ui-xs text-dim px-2 py-1.5 font-mono">/ commands</div>
