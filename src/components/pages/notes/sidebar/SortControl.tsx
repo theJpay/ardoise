@@ -1,8 +1,7 @@
 import { Check, ChevronDown } from "lucide-react";
 import { useRef, useState } from "react";
 
-import { useClickOutside } from "@hooks/useClickOutside";
-import { useFloatingMenu } from "@hooks/useFloatingMenu";
+import { Popover } from "@components/generics";
 import { useSortActions, useSortOrder } from "@stores/sort.store";
 import { SORT_ORDERS } from "@utils";
 
@@ -19,15 +18,6 @@ function SortControl() {
     const { setOrder } = useSortActions();
     const [isOpen, setIsOpen] = useState(false);
     const triggerRef = useRef<HTMLButtonElement>(null);
-    const { refs, floatingStyles } = useFloatingMenu({
-        anchor: { type: "element", ref: triggerRef },
-        placement: "bottom-start"
-    });
-
-    useClickOutside(refs.floating, () => setIsOpen(false), {
-        enabled: isOpen,
-        ignore: triggerRef
-    });
 
     return (
         <>
@@ -39,25 +29,27 @@ function SortControl() {
                 <span>{LABELS[order]}</span>
                 <ChevronDown className="text-dim" size={12} strokeWidth={1.5} />
             </button>
-            {isOpen && (
-                <div
-                    ref={refs.setFloating}
-                    className="bg-elevated border-border shadow-float z-50 w-44 rounded border p-1"
-                    style={floatingStyles}
-                >
-                    {SORT_ORDERS.map((opt) => (
-                        <SortControlItem
-                            key={opt}
-                            order={opt}
-                            selected={opt === order}
-                            onSelect={() => {
-                                setOrder(opt);
-                                setIsOpen(false);
-                            }}
-                        />
-                    ))}
-                </div>
-            )}
+            <Popover
+                anchor={{ type: "element", ref: triggerRef }}
+                className="w-44 rounded p-1"
+                closeOnEscape={false}
+                ignoreClickOutsideRef={triggerRef}
+                open={isOpen}
+                placement="bottom-start"
+                onClose={() => setIsOpen(false)}
+            >
+                {SORT_ORDERS.map((opt) => (
+                    <SortControlItem
+                        key={opt}
+                        order={opt}
+                        selected={opt === order}
+                        onSelect={() => {
+                            setOrder(opt);
+                            setIsOpen(false);
+                        }}
+                    />
+                ))}
+            </Popover>
         </>
     );
 }

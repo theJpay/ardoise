@@ -16,11 +16,20 @@ export function exportNotesToZip(notes: Note[]): void {
     triggerDownload(blob, `ardoise-export-${todayIso()}.zip`);
 }
 
+export async function copyNoteAsMarkdown(note: Pick<Note, "title" | "content">): Promise<void> {
+    await navigator.clipboard.writeText(buildMarkdown(note));
+}
+
+export function downloadNoteAsMarkdown(note: Pick<Note, "title" | "content">): void {
+    const blob = new Blob([buildMarkdown(note)], { type: "text/markdown" });
+    triggerDownload(blob, `${slugify(NoteEntity.getTitle(note))}.md`);
+}
+
 function buildFilename(note: Note): string {
     return `${slugify(NoteEntity.getTitle(note))}-${note.id}.md`;
 }
 
-function buildMarkdown(note: Note): string {
+function buildMarkdown(note: Pick<Note, "title" | "content">): string {
     return `# ${NoteEntity.getTitle(note)}\n\n${note.content}`;
 }
 

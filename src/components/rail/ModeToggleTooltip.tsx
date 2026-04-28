@@ -1,7 +1,6 @@
 import { ArrowBigUp, Command } from "lucide-react";
 
-import { ShortcutKey } from "@components/generics";
-import { useFloatingMenu } from "@hooks/useFloatingMenu";
+import { Popover, ShortcutKey } from "@components/generics";
 import { useOnboardingActions, useShowModeTooltip } from "@stores/onboarding.store";
 
 import type { RefObject } from "react";
@@ -13,21 +12,16 @@ type ModeToggleTooltipProps = {
 function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
     const visible = useShowModeTooltip();
     const { dismissModeTooltip } = useOnboardingActions();
-    const { refs, floatingStyles } = useFloatingMenu({
-        anchor: { type: "element", ref: anchorRef },
-        placement: "right",
-        offset: 12
-    });
-
-    if (!visible) {
-        return null;
-    }
 
     return (
-        <div
-            ref={refs.setFloating}
-            className="bg-elevated border-border shadow-float duration-base z-50 max-w-65 rounded-md border px-3.5 py-3 transition-opacity ease-out"
-            style={floatingStyles}
+        <Popover
+            anchor={{ type: "element", ref: anchorRef }}
+            className="max-w-65 rounded-md px-3.5 py-3"
+            closeOnClickOutside={false}
+            closeOnEscape={false}
+            offset={12}
+            open={visible}
+            placement="right"
         >
             <div className="text-ui-base text-text mb-1 font-medium">
                 Switch between Write and Read
@@ -49,7 +43,7 @@ function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
                     Got it
                 </button>
             </div>
-        </div>
+        </Popover>
     );
 }
 
