@@ -1,16 +1,14 @@
 import db from "./db";
 
-import type { Note, NoteUpdate } from "@entities";
+import type { Note, NoteUpdate, NoteWrite } from "@entities";
 
 export async function getNotes(): Promise<Note[]> {
     return await db.notes.filter((note) => note.deletedAt === null).toArray();
 }
 
-export async function createNote(
-    partialNote: Omit<Note, "id" | "createdAt" | "updatedAt" | "deletedAt">
-): Promise<Note> {
+export async function createNote(write: NoteWrite): Promise<Note> {
     const newNoteId = await db.notes.add({
-        ...partialNote,
+        ...write,
         id: crypto.randomUUID(),
         createdAt: new Date(),
         updatedAt: new Date(),

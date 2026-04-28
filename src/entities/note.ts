@@ -7,7 +7,9 @@ export type Note = {
     deletedAt: Date | null;
 };
 
-export type NoteUpdate = Partial<Omit<Note, "id" | "createdAt" | "updatedAt" | "deletedAt">>;
+export type NoteWrite = Pick<Note, "title" | "content">;
+
+export type NoteUpdate = Partial<NoteWrite>;
 
 const WORDS_PER_MINUTE = 200;
 
