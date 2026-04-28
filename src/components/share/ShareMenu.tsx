@@ -77,7 +77,7 @@ function ShareMenu({
     return (
         <Popover
             anchor={anchor}
-            className="w-60 rounded-md p-1"
+            className="w-64 rounded-md p-1"
             ignoreClickOutsideRef={ignoreClickOutsideRef}
             open={open}
             placement={placement}
