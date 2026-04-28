@@ -13,4 +13,18 @@ db.version(2).stores({
     settings: "id"
 });
 
+db.version(3)
+    .stores({
+        notes: "id, title, updatedAt, deletedAt, pinnedAt",
+        settings: "id"
+    })
+    .upgrade((tx) =>
+        tx
+            .table("notes")
+            .toCollection()
+            .modify((note) => {
+                note.pinnedAt = null;
+            })
+    );
+
 export default db;

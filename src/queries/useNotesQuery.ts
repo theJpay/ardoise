@@ -8,6 +8,8 @@ import {
     getNotes,
     hardDeleteAllNotes,
     hardDeleteNote,
+    pinNote,
+    unpinNote,
     updateNote
 } from "@services/notes.service";
 
@@ -50,6 +52,20 @@ export function useNotesMutations() {
         }
     });
 
+    const pinNoteMutation = useMutation({
+        mutationFn: pinNote,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
+        }
+    });
+
+    const unpinNoteMutation = useMutation({
+        mutationFn: unpinNote,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: NOTES_KEY });
+        }
+    });
+
     const deleteNoteMutation = useMutation({
         mutationFn: deleteNote,
         onSuccess: () => {
@@ -75,6 +91,8 @@ export function useNotesMutations() {
         createNote: createNoteMutation.mutateAsync,
         duplicateNote: duplicateNoteMutation.mutateAsync,
         updateNote: updateNoteMutation.mutateAsync,
+        pinNote: pinNoteMutation.mutateAsync,
+        unpinNote: unpinNoteMutation.mutateAsync,
         deleteNote: deleteNoteMutation.mutateAsync,
         hardDeleteNote: hardDeleteNoteMutation.mutateAsync,
         hardDeleteAllNotes: hardDeleteAllNotesMutation.mutateAsync

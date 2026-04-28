@@ -12,6 +12,7 @@ export async function createNote(write: NoteWrite): Promise<Note> {
         id: crypto.randomUUID(),
         createdAt: new Date(),
         updatedAt: new Date(),
+        pinnedAt: null,
         deletedAt: null
     });
 
@@ -48,6 +49,14 @@ export async function updateNote(id: string, updatedFields: NoteUpdate): Promise
         throw new Error("Failed to retrieve the updated note");
     }
     return updatedNote;
+}
+
+export async function pinNote(id: string): Promise<void> {
+    await db.notes.update(id, { pinnedAt: new Date() });
+}
+
+export async function unpinNote(id: string): Promise<void> {
+    await db.notes.update(id, { pinnedAt: null });
 }
 
 export async function deleteNote(id: string): Promise<boolean> {
