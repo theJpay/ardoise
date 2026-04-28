@@ -5,7 +5,7 @@ import { renderMarkdown } from "./renderMarkdown";
 
 type NoteViewerProps = {
     content: string;
-    onSwitchToWrite: () => void;
+    onSwitchToWrite?: () => void;
 };
 
 function NoteViewer({ content, onSwitchToWrite }: NoteViewerProps) {

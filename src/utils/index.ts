@@ -3,7 +3,9 @@ export { copyNoteAsMarkdown, downloadNoteAsMarkdown, exportNotesToZip } from "./
 export { formatRelativeDate } from "./formatRelativeDate";
 export { extractSnippet, splitByMatch } from "./highlight";
 export { isMac } from "./platform";
+export { parseShareUrl } from "./shareUrl";
 export { dateFieldForSort, DEFAULT_SORT_ORDER, SORT_ORDERS, sortNotes } from "./sortNotes";
 export { UnreachableError } from "./UnreachableError";
 export type { HighlightSegment } from "./highlight";
+export type { SharePayload } from "./shareUrl";
 export type { SortOrder } from "./sortNotes";

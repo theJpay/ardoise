@@ -36,6 +36,12 @@ export const router = createBrowserRouter([
                 ]
             },
             {
+                path: "share",
+                lazy: async () => ({
+                    Component: (await import("@components/pages/share/SharePage")).default
+                })
+            },
+            {
                 path: "settings",
                 element: <SettingsPage />,
                 children: [
