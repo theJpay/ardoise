@@ -4,6 +4,7 @@ import { ACTIONS, getActionTooltip, ICONS } from "./engine";
 
 import type { ActionName } from "./engine";
 import type { EditorHandle } from "./useEditor";
+import type { ReactNode } from "react";
 
 const TOOLBAR_GROUPS = [
     ["heading-1", "heading-2", "heading-3"],
@@ -12,9 +13,10 @@ const TOOLBAR_GROUPS = [
 
 type EditorToolbarProps = {
     editor: EditorHandle;
+    rightActions?: ReactNode;
 };
 
-export function EditorToolbar({ editor }: EditorToolbarProps) {
+export function EditorToolbar({ editor, rightActions }: EditorToolbarProps) {
     return (
         <div className="border-border-soft flex h-10 shrink-0 items-center gap-0.5 border-b px-5">
             {TOOLBAR_GROUPS.map((group, groupIndex) => (
@@ -25,6 +27,13 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                     ))}
                 </Fragment>
             ))}
+            {rightActions && (
+                <>
+                    <div className="flex-1" />
+                    <div className="bg-border-soft mx-1 h-4 w-px" />
+                    {rightActions}
+                </>
+            )}
         </div>
     );
 }

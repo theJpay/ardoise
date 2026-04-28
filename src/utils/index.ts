@@ -1,5 +1,5 @@
 export { escapeHtml } from "./escapeHtml";
-export { exportNotesToZip } from "./export";
+export { copyNoteAsMarkdown, downloadNoteAsMarkdown, exportNotesToZip } from "./export";
 export { formatRelativeDate } from "./formatRelativeDate";
 export { extractSnippet, splitByMatch } from "./highlight";
 export { isMac } from "./platform";

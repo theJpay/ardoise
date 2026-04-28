@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef } from "react";
 import { useParams } from "react-router";
 
+import { ShareButton } from "@components/share";
 import { Editor, EditorToolbar, useEditor } from "@editor";
 import { useEditorMode } from "@hooks/useEditorMode";
 import { useSettingsQuery } from "@queries/useSettingsQuery";
@@ -56,7 +57,10 @@ function Note() {
                     mode === "edit" ? "h-10 opacity-100" : "h-0 opacity-0"
                 }`}
             >
-                <EditorToolbar editor={editor} />
+                <EditorToolbar
+                    editor={editor}
+                    rightActions={<ShareButton note={{ title, content }} />}
+                />
             </div>
 
             <div ref={scrollContainerRef} className="flex-1 scroll-pb-48 overflow-auto">
