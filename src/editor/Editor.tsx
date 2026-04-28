@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 
 import { FloatingToolbar } from "./floating/FloatingToolbar";
 import { SlashMenu } from "./floating/SlashMenu";
@@ -6,7 +6,7 @@ import { useSlashMenu } from "./floating/useSlashMenu";
 import { handleFormattingShortcut } from "./keyboard/handleFormattingShortcut";
 import { handleSmartKeys } from "./keyboard/handleSmartKeys";
 import { handleSmartPair } from "./keyboard/handleSmartPair";
-import { autoGrow, findScrollableAncestor } from "./scroll";
+import { autoGrow } from "./scroll";
 import { tokenize } from "./tokenizer";
 
 import type { EditorHandle } from "./useEditor";
@@ -65,15 +65,10 @@ export function Editor({ editor, value, onChange, spellCheck, placeholder }: Edi
 }
 
 function useAutoGrow(textarea: HTMLTextAreaElement | null, content: string) {
-    const scrollerRef = useRef<HTMLElement | null>(null);
-
     useEffect(() => {
         if (!textarea) {
             return;
         }
-        if (!scrollerRef.current || !scrollerRef.current.contains(textarea)) {
-            scrollerRef.current = findScrollableAncestor(textarea);
-        }
-        autoGrow(textarea, scrollerRef.current);
+        autoGrow(textarea);
     }, [content, textarea]);
 }
