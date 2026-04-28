@@ -9,7 +9,10 @@ import type { Placement } from "@floating-ui/react";
 import type { Anchor } from "@hooks/useFloatingMenu";
 import type { ComponentType, RefObject } from "react";
 
-const COPIED_FEEDBACK_DURATION_MS = 1_000;
+const SUCCESS_FEEDBACK_DURATION_MS = 1_000;
+const FAILURE_FEEDBACK_DURATION_MS = 1_500;
+
+type Feedback = { row: "link" | "markdown"; ok: boolean };
 
 type ShareMenuProps = {
     note: Pick<Note, "title" | "content">;
@@ -28,35 +31,48 @@ function ShareMenu({
     placement = "bottom-end",
     ignoreClickOutsideRef
 }: ShareMenuProps) {
-    const [copiedRow, setCopiedRow] = useState<"link" | "markdown" | null>(null);
+    const [feedback, setFeedback] = useState<Feedback | null>(null);
     const shareUrl = open ? getShareUrlIfFits(note) : null;
 
-    const closeWithDelay = () => {
+    const closeAfter = (delayMs: number) => {
         setTimeout(() => {
-            setCopiedRow(null);
+            setFeedback(null);
             onClose();
-        }, COPIED_FEEDBACK_DURATION_MS);
+        }, delayMs);
     };
 
     const handleShareLink = async () => {
         if (!shareUrl) {
             return;
         }
-        await navigator.clipboard.writeText(shareUrl);
-        setCopiedRow("link");
-        closeWithDelay();
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            setFeedback({ row: "link", ok: true });
+            closeAfter(SUCCESS_FEEDBACK_DURATION_MS);
+        } catch {
+            setFeedback({ row: "link", ok: false });
+            closeAfter(FAILURE_FEEDBACK_DURATION_MS);
+        }
     };
 
     const handleCopyMarkdown = async () => {
-        await copyNoteAsMarkdown(note);
-        setCopiedRow("markdown");
-        closeWithDelay();
+        try {
+            await copyNoteAsMarkdown(note);
+            setFeedback({ row: "markdown", ok: true });
+            closeAfter(SUCCESS_FEEDBACK_DURATION_MS);
+        } catch {
+            setFeedback({ row: "markdown", ok: false });
+            closeAfter(FAILURE_FEEDBACK_DURATION_MS);
+        }
     };
 
     const handleDownload = () => {
         downloadNoteAsMarkdown(note);
         onClose();
     };
+
+    const linkSublabel = getLinkSublabel(feedback, shareUrl);
+    const markdownLabel = getMarkdownLabel(feedback);
 
     return (
         <Popover
@@ -71,24 +87,31 @@ function ShareMenu({
                 disabled={shareUrl === null}
                 Icon={Link2}
                 label="Share via link"
-                sublabel={
-                    copiedRow === "link"
-                        ? "Copied"
-                        : shareUrl === null
-                          ? "Note too long for a link"
-                          : "Opens in Ardoise"
-                }
+                sublabel={linkSublabel}
                 onClick={handleShareLink}
             />
             <div className="bg-border-soft mx-1 my-0.5 h-px" />
-            <ShareItem
-                Icon={Copy}
-                label={copiedRow === "markdown" ? "Copied" : "Copy as markdown"}
-                onClick={handleCopyMarkdown}
-            />
+            <ShareItem Icon={Copy} label={markdownLabel} onClick={handleCopyMarkdown} />
             <ShareItem Icon={Download} label="Download .md" onClick={handleDownload} />
         </Popover>
     );
+}
+
+function getLinkSublabel(feedback: Feedback | null, shareUrl: string | null): string {
+    if (feedback?.row === "link") {
+        return feedback.ok ? "Copied" : "Couldn't copy";
+    }
+    if (shareUrl === null) {
+        return "Note too long for a link";
+    }
+    return "Opens in Ardoise";
+}
+
+function getMarkdownLabel(feedback: Feedback | null): string {
+    if (feedback?.row === "markdown") {
+        return feedback.ok ? "Copied" : "Couldn't copy";
+    }
+    return "Copy as markdown";
 }
 
 type ShareItemProps = {
