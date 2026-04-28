@@ -5,6 +5,7 @@ import { Popover } from "@components/generics";
 import { copyNoteAsMarkdown, downloadNoteAsMarkdown } from "@utils";
 
 import type { Note } from "@entities";
+import type { Placement } from "@floating-ui/react";
 import type { Anchor } from "@hooks/useFloatingMenu";
 import type { ComponentType, RefObject } from "react";
 
@@ -15,10 +16,18 @@ type ShareMenuProps = {
     anchor: Anchor;
     open: boolean;
     onClose: () => void;
+    placement?: Placement;
     ignoreClickOutsideRef?: RefObject<HTMLElement | null>;
 };
 
-function ShareMenu({ note, anchor, open, onClose, ignoreClickOutsideRef }: ShareMenuProps) {
+function ShareMenu({
+    note,
+    anchor,
+    open,
+    onClose,
+    placement = "bottom-end",
+    ignoreClickOutsideRef
+}: ShareMenuProps) {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
@@ -41,7 +50,7 @@ function ShareMenu({ note, anchor, open, onClose, ignoreClickOutsideRef }: Share
             className="w-55 rounded-md p-1"
             ignoreClickOutsideRef={ignoreClickOutsideRef}
             open={open}
-            placement="bottom-end"
+            placement={placement}
             onClose={onClose}
         >
             <ShareItem

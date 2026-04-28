@@ -1,4 +1,4 @@
-import { Command, Copy, Delete, Trash2 } from "lucide-react";
+import { Command, Copy, Delete, Share2, Trash2 } from "lucide-react";
 
 import { DepletionBar, Popover, ShortcutKey } from "@components/generics";
 import { NoteEntity } from "@entities";
@@ -15,9 +15,10 @@ type ContextMenuProps = {
     note: Note;
     position: { x: number; y: number };
     onClose: () => void;
+    onShare: () => void;
 };
 
-function ContextMenu({ note, position, onClose }: ContextMenuProps) {
+function ContextMenu({ note, position, onClose, onShare }: ContextMenuProps) {
     const { duplicateNote, deleteNote, hardDeleteNote } = useNotesMutations();
     const { setDeleting, reset } = useDeletionActions();
     const { navigate } = useAppNavigate();
@@ -55,6 +56,14 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
             >
                 <Copy size={13} strokeWidth={1.5} />
                 Duplicate
+            </button>
+            <div className="bg-border-soft mx-1 my-0.5 h-px" />
+            <button
+                className="text-ui-base text-muted hover:bg-accent-surface hover:text-text duration-fast flex w-full items-center gap-2 rounded-sm px-2.5 py-1.5 transition-colors"
+                onClick={onShare}
+            >
+                <Share2 size={13} strokeWidth={1.5} />
+                Share
             </button>
             <div className="bg-border-soft mx-1 my-0.5 h-px" />
             <button

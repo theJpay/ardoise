@@ -3,8 +3,8 @@ import { useCallback, useState } from "react";
 import { useSortOrder } from "@stores/sort.store";
 import { dateFieldForSort } from "@utils";
 
-import ContextMenu from "./ContextMenu";
 import NoteItem from "./NoteItem";
+import NoteMenu from "./NoteMenu";
 
 import type { Note } from "@entities";
 
@@ -46,7 +46,7 @@ function NoteList({ notes }: NoteListProps) {
                 ))}
             </ul>
             {menu && (
-                <ContextMenu note={menu.note} position={menu.position} onClose={handleCloseMenu} />
+                <NoteMenu note={menu.note} position={menu.position} onClose={handleCloseMenu} />
             )}
         </>
     );
