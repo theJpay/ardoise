@@ -20,7 +20,7 @@ import type { EditorHandle } from "@editor";
 import type { Note as NoteEntity } from "@entities";
 import type { RefObject } from "react";
 
-const NoteViewer = lazy(() => import("./viewer/NoteViewer"));
+const NoteViewer = lazy(() => import("@components/preview/NoteViewer"));
 
 function Note() {
     const { noteId } = useParams<{ noteId: string }>();

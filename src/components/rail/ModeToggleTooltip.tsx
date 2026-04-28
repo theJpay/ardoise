@@ -16,7 +16,7 @@ function ModeToggleTooltip({ anchorRef }: ModeToggleTooltipProps) {
     return (
         <Popover
             anchor={{ type: "element", ref: anchorRef }}
-            className="max-w-65 rounded-md px-3.5 py-3"
+            className="max-w-64 rounded-md px-3.5 py-3"
             closeOnClickOutside={false}
             closeOnEscape={false}
             offset={12}
