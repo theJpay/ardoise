@@ -51,4 +51,6 @@
 ## Editor architecture
 
 - Textarea + mirror div for syntax highlighting, phantom div for selection measurement
-- `useEditorCommands` owns formatting logic; actions in `actions.ts` use `as const satisfies` for type-safe names
+- `EditorEngine` (class in `src/editor/engine/`) owns formatting logic and exposes `replaceRange` as a method; actions in `engine/actions.ts` use `as const satisfies` for type-safe names
+- Tokenizer lives in `src/editor/tokenizer/` as a standalone module with co-located test spec
+- Keyboard handlers split into `src/editor/keyboard/` (smart enter, smart pairs, formatting shortcuts); floating UI (toolbar, slash menu) in `src/editor/floating/`
