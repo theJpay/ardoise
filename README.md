@@ -11,7 +11,9 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178c6)
 ![Vite](https://img.shields.io/badge/Vite-8-646cff)
 
-**[Live demo →](https://ardoise.page)** · **[Open a sample note →](https://ardoise.page/share#H4sIACj68WkAA01SzYoTQRB-lY9ZwQTycxEPERTxIrhedleCbALTO1OZadPpbqtrko0h4M2LRw--ge-VJ7F6skH71FRVf_391KEQK46KWTEnV4UNQQLech1somJUVMELedH259A9ZwKTqa1vIK1NsB6pNUw1NqGmCe5agg9C0B75Smt1nhEtf7q5hpVEboXT919ovtkYqR7hwSR6-WL8ND3S50jEW2J9uA1uS_UEN7RiSi2Mr7EPHYNqhcLWeJvaycIv_J2-EsNyboed72mkEe5DpDMBE-Ny0IrENJtOzVngJJqGhj3C1RXmrZGsXnifK2OUp5-_Tz_-fCy12jSOEiLT1tLuv-aHEvmL1P-h_m0yyWgciVA_9qbEQEIcs21aARvrhmpa2KlDqnKf7yxVJ_3wtLz4lSWGbIK6oVqTcFdJx4rZc73dezGPaBXUZWCNJHeegvtXT9gYXtfZEeud9epDyiZB9lEDe6em48GFap3QkKg-FcOqwwVOs4xYlqWkhV91vhIbPBomkoE3G5plUvrv8HLBYeGhh0mJepTvybkwwrNDnj6Wrxb-2ONl2Ne4tkk0oK_dOahsm5ikPIxz-NIlwS7wus9mjPvHpW6B0RFdu76AJeZsddUuiV-qt3khddWws6IrgxVb8nVx_AswTifS6QIAAA)**
+**[Live demo →](https://ardoise.page)** · **[Open a sample note →](https://ardoise.page/share#H4sIAHb-8WkAA01SzWrbQBB-lUEpxA6SfSk9uNBQegk07SFJMcU2aC2Npa1Xu8rsyIprDL310mMPfYO-l5-ks-uIVCAkvvn9vvkOCWs2mMySOZrCNQjs4D2VTntM0qRwltGyhL-67pIQCFWpbQVcaw_agq8VYQmNK3ECDzWCdYwgMbSFYGXIYYG_3N2CZo9mA6cfv6H6rtsWyxTWyuOb19lzdirl4JF2SFK4c2aH5WRpl_ZBYFbEsHcdgettnONTWLgWzxNU265GNXPrZ9OpOjOYtKrCcexwcQHzWnGgx7QPSAb56def08-_n3JBq8qgh5Zwp7H_L_gxhzDCxxkiUKNsCa0yyIwx7TqH0doxuyYzuOF0YExKm7Ho43oRQwjtwz9x0XEsm-ZDIpaaXeArxNkLT-oK7ki6x63v95bVE9S6qo28LOqHyPONXnAPjaJtGbTR1mgrivggF_C-ldt8EH1hbVyx9VAhC1OhRcLIOPKz0DHPc_ZLu-lswdpZqAiRR1Y1OAtLydzx8AOHpQV5CGVRC_kNGuNSeHUI2cf87dIeY7_Q9h3cas9yqsfufLIgICsveyhj4FvnGXpH23ilDBZPK7gTk0WHRQBWMCctrhpuP6D3wXviKug116BgQxptGdtkWfhcfcY-HHwQ5hpukPBSBsPisdPFFvxZXMKNBGyBLw7q-34y1FWdFns7qqZiV11k56rpeHKVHP8BQ05DGUEDAAA)**
+
+_New to markdown? Here's a [quick syntax reference](https://www.markdownguide.org/basic-syntax/)._
 
 ## What is Ardoise?
 
