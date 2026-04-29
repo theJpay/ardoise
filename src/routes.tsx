@@ -48,6 +48,12 @@ export const router = createBrowserRouter([
                 })
             },
             {
+                path: "trash",
+                lazy: async () => ({
+                    Component: (await import("@components/pages/hidden/TrashPage")).default
+                })
+            },
+            {
                 path: "settings",
                 element: <SettingsPage />,
                 children: [

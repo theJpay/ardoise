@@ -16,6 +16,10 @@ export async function getArchivedNotes(): Promise<Note[]> {
         .toArray();
 }
 
+export async function getTrashedNotes(): Promise<Note[]> {
+    return await db.notes.orderBy("deletedAt").reverse().toArray();
+}
+
 export async function createNote(write: NoteWrite): Promise<Note> {
     const newNoteId = await db.notes.add({
         ...write,

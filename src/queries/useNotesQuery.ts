@@ -8,6 +8,7 @@ import {
     duplicateNote,
     getArchivedNotes,
     getNotes,
+    getTrashedNotes,
     hardDeleteAllNotes,
     hardDeleteNote,
     pinNote,
@@ -21,7 +22,8 @@ import type { NoteUpdate } from "@entities";
 const noteKeys = {
     all: ["notes"],
     active: ["notes", "active"],
-    archived: ["notes", "archived"]
+    archived: ["notes", "archived"],
+    trashed: ["notes", "trashed"]
 } as const;
 
 type UpdateMutationArgs = {
@@ -54,6 +56,19 @@ export function useArchivedNotesQuery() {
         isPending,
         error,
         archivedNotes: data ?? []
+    };
+}
+
+export function useTrashedNotesQuery() {
+    const { isPending, error, data } = useQuery({
+        queryKey: noteKeys.trashed,
+        queryFn: getTrashedNotes
+    });
+
+    return {
+        isPending,
+        error,
+        trashedNotes: data ?? []
     };
 }
 
