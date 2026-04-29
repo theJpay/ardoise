@@ -188,6 +188,12 @@ export class EditorEngine {
         return this.textarea.value;
     }
 
+    loadValue(value: string): void {
+        if (this.textarea.value !== value) {
+            this.textarea.value = value;
+        }
+    }
+
     isFocused(): boolean {
         return document.activeElement === this.textarea;
     }
