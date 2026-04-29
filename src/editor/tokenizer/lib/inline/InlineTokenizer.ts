@@ -2,15 +2,28 @@ const CODE_MARKER_OPEN = "";
 const CODE_MARKER_CLOSE = "";
 const CODE_PLACEHOLDER = new RegExp(`${CODE_MARKER_OPEN}(\\d+)${CODE_MARKER_CLOSE}`, "g");
 
+const URL_MARKER_OPEN = "";
+const URL_MARKER_CLOSE = "";
+const LINK_PATTERN = new RegExp(
+    `\\[(.+?)\\]\\(${URL_MARKER_OPEN}(\\d+)${URL_MARKER_CLOSE}\\)`,
+    "g"
+);
+
 export class InlineTokenizer {
     private html: string;
     private codeSpans: string[] = [];
+    private linkUrls: string[] = [];
 
     constructor(html: string) {
         this.html = html.replace(/`[^`]+`/g, (match) => {
             const index = this.codeSpans.length;
             this.codeSpans.push(match);
             return `${CODE_MARKER_OPEN}${index}${CODE_MARKER_CLOSE}`;
+        });
+        this.html = this.html.replace(/(\[.+?\]\()(.+?)(\))/g, (_, open, url, close) => {
+            const index = this.linkUrls.length;
+            this.linkUrls.push(url);
+            return `${open}${URL_MARKER_OPEN}${index}${URL_MARKER_CLOSE}${close}`;
         });
     }
 
@@ -62,10 +75,16 @@ export class InlineTokenizer {
     }
 
     applyLink(): this {
-        this.html = this.html.replace(
-            /\[(.+?)\]\((.+?)\)/g,
-            '<span class="ed-token-muted">[</span><span class="ed-link">$1</span><span class="ed-token-muted">](</span><span class="ed-token-dim">$2</span><span class="ed-token-muted">)</span>'
-        );
+        this.html = this.html.replace(LINK_PATTERN, (_, label, urlIndex) => {
+            const url = this.linkUrls[Number(urlIndex)];
+            return (
+                '<span class="ed-token-muted">[</span>' +
+                `<span class="ed-link">${label}</span>` +
+                '<span class="ed-token-muted">](</span>' +
+                `<span class="ed-token-dim">${url}</span>` +
+                '<span class="ed-token-muted">)</span>'
+            );
+        });
         return this;
     }
 
