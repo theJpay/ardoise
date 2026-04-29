@@ -39,7 +39,11 @@ export function useEditor(): EditorHandle {
             return;
         }
         const syncSelection = () => {
-            setSelection({ start: textarea.selectionStart, end: textarea.selectionEnd });
+            setSelection((prev) => {
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                return prev.start === start && prev.end === end ? prev : { start, end };
+            });
         };
         const handleFocus = () => setFocused(true);
         const handleBlur = () => {
