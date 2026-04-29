@@ -16,6 +16,7 @@ export const router = createBrowserRouter([
     {
         path: "/",
         Component: App,
+        HydrateFallback: () => <div className="bg-bg h-dvh" />,
         errorElement: <ErrorFallback />,
         children: [
             {

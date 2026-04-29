@@ -64,13 +64,15 @@ function Note() {
             </div>
 
             <div ref={scrollContainerRef} className="flex-1 scroll-pt-9 scroll-pb-48 overflow-auto">
-                <div className="sticky top-0 z-10 min-h-9">
-                    {armed ? (
-                        <DeleteBanner noteTitle={armedNoteTitle} />
-                    ) : saveStatus === "error" ? (
-                        <StorageErrorBanner onRetry={retrySave} />
-                    ) : null}
-                </div>
+                {(armed || saveStatus === "error") && (
+                    <div className="sticky top-0 z-10">
+                        {armed ? (
+                            <DeleteBanner noteTitle={armedNoteTitle} />
+                        ) : (
+                            <StorageErrorBanner onRetry={retrySave} />
+                        )}
+                    </div>
+                )}
 
                 <div
                     className={`duration-base px-6 pt-12 pb-48 transition-opacity ${armed ? "opacity-40" : ""}`}

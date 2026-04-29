@@ -23,6 +23,15 @@ const SHARED_LAYOUT =
     "text-ed-body w-full resize-none border-none bg-transparent font-mono wrap-anywhere whitespace-pre-wrap outline-none";
 
 export function Editor({ editor, value, onChange, spellCheck, placeholder }: EditorProps) {
+    const { engine } = editor;
+
+    // Textarea is uncontrolled to avoid React re-applying `value` mid-keystroke,
+    // which races with `input` and drops characters in Chrome. Sync DOM ← state
+    // only when the prop diverges (note switch, undo, programmatic reset).
+    useEffect(() => {
+        engine?.loadValue(value);
+    }, [engine, value]);
+
     useAutoGrow(editor.textarea, value);
 
     const tokenizedHtml = useMemo(() => tokenize(value), [value]);
@@ -39,9 +48,9 @@ export function Editor({ editor, value, onChange, spellCheck, placeholder }: Edi
                 ref={editor.attach}
                 aria-label="Text editor"
                 className={`${SHARED_LAYOUT} placeholder:text-dim caret-accent relative overflow-hidden text-transparent`}
+                defaultValue={value}
                 placeholder={placeholder ?? "Start writing..."}
                 spellCheck={spellCheck}
-                value={value}
                 onChange={(e) => onChange(e.target.value)}
                 onKeyDown={(e) => {
                     if (handleFormattingShortcut(e, editor.run)) {
