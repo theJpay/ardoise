@@ -69,7 +69,7 @@ function SortControlItem({ order, selected, onSelect }: SortControlItemProps) {
             onClick={onSelect}
         >
             <span>{LABELS[order]}</span>
-            {selected && <Check className="text-accent" size={12} strokeWidth={1.8} />}
+            {selected && <Check className="text-accent" size={12} strokeWidth={1.5} />}
         </button>
     );
 }
