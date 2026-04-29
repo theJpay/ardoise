@@ -7,7 +7,7 @@ type PreviewErrorProps = {
 function PreviewError({ onSwitchToWrite }: PreviewErrorProps) {
     return (
         <div className="bg-danger-surface border-danger-border text-ui-sm text-danger mb-4 flex items-center gap-2 rounded border px-3.5 py-2 font-mono">
-            <AlertCircle className="shrink-0" size={12} strokeWidth={1.8} />
+            <AlertCircle className="shrink-0" size={12} strokeWidth={1.5} />
             <span>Preview error — unable to render markdown.</span>
             {onSwitchToWrite && (
                 <button

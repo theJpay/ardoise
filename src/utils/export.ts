@@ -4,16 +4,28 @@ import { NoteEntity } from "@entities";
 
 import type { Note } from "@entities";
 
-export function exportNotesToZip(notes: Note[]): void {
+type ExportBuckets = {
+    active: Note[];
+    archived: Note[];
+    trashed: Note[];
+};
+
+export function exportNotesToZip({ active, archived, trashed }: ExportBuckets): void {
     const files: Record<string, Uint8Array> = {};
 
-    for (const note of notes) {
-        files[buildFilename(note)] = strToU8(buildMarkdown(note));
-    }
+    addBucket(files, "notes", active);
+    addBucket(files, "archived", archived);
+    addBucket(files, "trash", trashed);
 
     const zipped = zipSync(files);
     const blob = new Blob([zipped as unknown as BlobPart], { type: "application/zip" });
     triggerDownload(blob, `ardoise-export-${todayIso()}.zip`);
+}
+
+function addBucket(files: Record<string, Uint8Array>, folder: string, notes: Note[]): void {
+    for (const note of notes) {
+        files[`${folder}/${buildFilename(note)}`] = strToU8(buildMarkdown(note));
+    }
 }
 
 export async function copyNoteAsMarkdown(note: Pick<Note, "title" | "content">): Promise<void> {
@@ -26,7 +38,7 @@ export function downloadNoteAsMarkdown(note: Pick<Note, "title" | "content">): v
 }
 
 function buildFilename(note: Note): string {
-    return `${slugify(NoteEntity.getTitle(note))}-${note.id}.md`;
+    return `${slugify(NoteEntity.getTitle(note))}-${note.id.slice(0, 8)}.md`;
 }
 
 function buildMarkdown(note: Pick<Note, "title" | "content">): string {

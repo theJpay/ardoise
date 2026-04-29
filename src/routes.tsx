@@ -42,6 +42,18 @@ export const router = createBrowserRouter([
                 })
             },
             {
+                path: "archive",
+                lazy: async () => ({
+                    Component: (await import("@components/pages/hidden/ArchivePage")).default
+                })
+            },
+            {
+                path: "trash",
+                lazy: async () => ({
+                    Component: (await import("@components/pages/hidden/TrashPage")).default
+                })
+            },
+            {
                 path: "settings",
                 element: <SettingsPage />,
                 children: [

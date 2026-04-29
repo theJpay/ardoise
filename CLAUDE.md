@@ -15,6 +15,7 @@
 - Use typographic utilities (`text-ui-*` / `text-ed-*`) instead of inline sizes
 - Base HTML is `font-sans`; only set `font-mono` when overriding
 - Design specs in `~/Downloads/ardoise/` are a guide for intent and layout, not a source of truth — the code is the design. Reuse existing typography, colors, icon sizes, and components rather than transcribing spec values
+- Lucide icons: `strokeWidth={1.5}` for size ≥12, `strokeWidth={2}` for size ≤11. Filled buttons (`Button` primary/ghost/danger) keep `strokeWidth={2}` at size 14 to read alongside bold text on a colored background.
 
 ## Code
 

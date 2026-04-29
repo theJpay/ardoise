@@ -1,4 +1,4 @@
-import { CircleHelp, File, PanelLeft, Settings } from "lucide-react";
+import { Archive, CircleHelp, File, PanelLeft, Settings, Trash2 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { useMatch } from "react-router";
 
@@ -35,6 +35,16 @@ function Rail() {
                     icon={<File size={16} strokeWidth={1.5} />}
                     label="My notes"
                     to="/notes"
+                />
+                <RailButton
+                    icon={<Archive size={16} strokeWidth={1.5} />}
+                    label="Archive"
+                    to="/archive"
+                />
+                <RailButton
+                    icon={<Trash2 size={16} strokeWidth={1.5} />}
+                    label="Trash"
+                    to="/trash"
                 />
             </div>
 
