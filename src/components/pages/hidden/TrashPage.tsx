@@ -1,3 +1,4 @@
+import { TRASH_RETENTION_DAYS } from "@entities";
 import { useNotesMutations, useTrashedNotesQuery } from "@queries/useNotesQuery";
 import { formatRelativeDate } from "@utils";
 
@@ -6,7 +7,6 @@ import HiddenNoteRow from "./HiddenNoteRow";
 import HiddenNotesPage from "./HiddenNotesPage";
 import RestoreButton from "./RestoreButton";
 
-const TRASH_RETENTION_DAYS = 30;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 function TrashPage() {

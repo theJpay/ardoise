@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 import { queryClient } from "@queries/queryClient";
 import {
@@ -14,6 +15,7 @@ import {
     pinNote,
     restoreFromArchive,
     restoreFromTrash,
+    sweepExpiredTrash,
     unpinNote,
     updateNote
 } from "@services/notes.service";
@@ -120,4 +122,21 @@ export function useNotesMutations() {
         hardDeleteNote: hardDeleteNoteMutation.mutateAsync,
         hardDeleteAllNotes: hardDeleteAllNotesMutation.mutateAsync
     };
+}
+
+export function useTrashSweep() {
+    const { mutateAsync } = useMutation({
+        mutationFn: sweepExpiredTrash,
+        onSuccess: (count) => {
+            if (count > 0) {
+                queryClient.invalidateQueries({ queryKey: noteKeys.trashed });
+            }
+        }
+    });
+
+    useEffect(() => {
+        mutateAsync().catch((err) => {
+            console.error("trash sweep failed", err);
+        });
+    }, [mutateAsync]);
 }

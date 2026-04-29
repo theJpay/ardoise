@@ -15,6 +15,8 @@ export type NoteUpdate = Partial<NoteWrite>;
 
 const WORDS_PER_MINUTE = 200;
 
+export const TRASH_RETENTION_DAYS = 30;
+
 export const NoteEntity = {
     isEmpty: (note: Note) => note.title.trim() === "" && note.content.trim() === "",
     isPinned: (note: Pick<Note, "pinnedAt">) => note.pinnedAt !== null,

@@ -1,6 +1,10 @@
+import { TRASH_RETENTION_DAYS } from "@entities";
+
 import db from "./db";
 
 import type { Note, NoteUpdate, NoteWrite } from "@entities";
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 export async function getNotes(): Promise<Note[]> {
     return await db.notes
@@ -94,6 +98,11 @@ export async function deleteNote(id: string): Promise<boolean> {
 
 export async function hardDeleteNote(id: string): Promise<void> {
     await db.notes.delete(id);
+}
+
+export async function sweepExpiredTrash(): Promise<number> {
+    const cutoff = new Date(Date.now() - TRASH_RETENTION_DAYS * MS_PER_DAY);
+    return await db.notes.where("deletedAt").below(cutoff).delete();
 }
 
 export async function hardDeleteAllNotes(): Promise<void> {
