@@ -20,7 +20,7 @@ function ShareView({ payload }: ShareViewProps) {
 
     const handleSave = async () => {
         const note = await createNote(payload);
-        navigate(`/notes/${note.id}?mode=preview`, { replace: true });
+        navigate(`/notes/${note.id}?mode=edit`, { replace: true });
     };
 
     return (
