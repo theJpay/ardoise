@@ -82,6 +82,10 @@ export async function restoreFromArchive(id: string): Promise<void> {
     await db.notes.update(id, { archivedAt: null });
 }
 
+export async function restoreFromTrash(id: string): Promise<void> {
+    await db.notes.update(id, { deletedAt: null });
+}
+
 export async function deleteNote(id: string): Promise<boolean> {
     const nbUpdated = await db.notes.update(id, { deletedAt: new Date(), archivedAt: null });
 

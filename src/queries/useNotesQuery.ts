@@ -13,6 +13,7 @@ import {
     hardDeleteNote,
     pinNote,
     restoreFromArchive,
+    restoreFromTrash,
     unpinNote,
     updateNote
 } from "@services/notes.service";
@@ -92,6 +93,10 @@ export function useNotesMutations() {
         mutationFn: restoreFromArchive,
         onSuccess: invalidateNotes
     });
+    const restoreFromTrashMutation = useMutation({
+        mutationFn: restoreFromTrash,
+        onSuccess: invalidateNotes
+    });
     const deleteNoteMutation = useMutation({ mutationFn: deleteNote, onSuccess: invalidateNotes });
     const hardDeleteNoteMutation = useMutation({
         mutationFn: hardDeleteNote,
@@ -110,6 +115,7 @@ export function useNotesMutations() {
         unpinNote: unpinNoteMutation.mutateAsync,
         archiveNote: archiveNoteMutation.mutateAsync,
         restoreFromArchive: restoreFromArchiveMutation.mutateAsync,
+        restoreFromTrash: restoreFromTrashMutation.mutateAsync,
         deleteNote: deleteNoteMutation.mutateAsync,
         hardDeleteNote: hardDeleteNoteMutation.mutateAsync,
         hardDeleteAllNotes: hardDeleteAllNotesMutation.mutateAsync
