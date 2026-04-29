@@ -10,7 +10,9 @@ export async function getNotes(): Promise<Note[]> {
 
 export async function getArchivedNotes(): Promise<Note[]> {
     return await db.notes
-        .filter((note) => note.archivedAt !== null && note.deletedAt === null)
+        .orderBy("archivedAt")
+        .reverse()
+        .filter((note) => note.deletedAt === null)
         .toArray();
 }
 
@@ -66,6 +68,14 @@ export async function pinNote(id: string): Promise<void> {
 
 export async function unpinNote(id: string): Promise<void> {
     await db.notes.update(id, { pinnedAt: null });
+}
+
+export async function archiveNote(id: string): Promise<void> {
+    await db.notes.update(id, { archivedAt: new Date() });
+}
+
+export async function restoreFromArchive(id: string): Promise<void> {
+    await db.notes.update(id, { archivedAt: null });
 }
 
 export async function deleteNote(id: string): Promise<boolean> {

@@ -1,9 +1,12 @@
+import type { ReactNode } from "react";
+
 type HiddenNotesPageProps = {
     title: string;
     subtitle?: string;
     isPending: boolean;
     isEmpty: boolean;
     emptyMessage: string;
+    children?: ReactNode;
 };
 
 function HiddenNotesPage({
@@ -11,7 +14,8 @@ function HiddenNotesPage({
     subtitle,
     isPending,
     isEmpty,
-    emptyMessage
+    emptyMessage,
+    children
 }: HiddenNotesPageProps) {
     return (
         <div className="bg-bg h-full overflow-y-auto px-8 py-7">
@@ -33,7 +37,9 @@ function HiddenNotesPage({
                     <div className="border-border text-ui-base text-muted border-l-2 px-2.5 py-2">
                         {emptyMessage}
                     </div>
-                ) : null}
+                ) : (
+                    <div className="flex flex-col gap-px">{children}</div>
+                )}
             </div>
         </div>
     );

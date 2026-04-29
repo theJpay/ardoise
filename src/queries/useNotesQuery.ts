@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { queryClient } from "@queries/queryClient";
 import {
+    archiveNote,
     createNote,
     deleteNote,
     duplicateNote,
@@ -10,6 +11,7 @@ import {
     hardDeleteAllNotes,
     hardDeleteNote,
     pinNote,
+    restoreFromArchive,
     unpinNote,
     updateNote
 } from "@services/notes.service";
@@ -67,6 +69,14 @@ export function useNotesMutations() {
     });
     const pinNoteMutation = useMutation({ mutationFn: pinNote, onSuccess: invalidateNotes });
     const unpinNoteMutation = useMutation({ mutationFn: unpinNote, onSuccess: invalidateNotes });
+    const archiveNoteMutation = useMutation({
+        mutationFn: archiveNote,
+        onSuccess: invalidateNotes
+    });
+    const restoreFromArchiveMutation = useMutation({
+        mutationFn: restoreFromArchive,
+        onSuccess: invalidateNotes
+    });
     const deleteNoteMutation = useMutation({ mutationFn: deleteNote, onSuccess: invalidateNotes });
     const hardDeleteNoteMutation = useMutation({
         mutationFn: hardDeleteNote,
@@ -83,6 +93,8 @@ export function useNotesMutations() {
         updateNote: updateNoteMutation.mutateAsync,
         pinNote: pinNoteMutation.mutateAsync,
         unpinNote: unpinNoteMutation.mutateAsync,
+        archiveNote: archiveNoteMutation.mutateAsync,
+        restoreFromArchive: restoreFromArchiveMutation.mutateAsync,
         deleteNote: deleteNoteMutation.mutateAsync,
         hardDeleteNote: hardDeleteNoteMutation.mutateAsync,
         hardDeleteAllNotes: hardDeleteAllNotesMutation.mutateAsync

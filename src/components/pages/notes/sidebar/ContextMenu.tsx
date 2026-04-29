@@ -1,4 +1,5 @@
-import { Command, Copy, Delete, Pin, Share2, Trash2 } from "lucide-react";
+import { Archive, Command, Copy, Delete, Pin, Share2, Trash2 } from "lucide-react";
+import { useMatch } from "react-router";
 
 import { DepletionBar, Popover, ShortcutKey } from "@components/generics";
 import { NoteEntity } from "@entities";
@@ -21,8 +22,11 @@ type ContextMenuProps = {
 
 function ContextMenu({ note, position, onClose, onShare }: ContextMenuProps) {
     const { navigate } = useAppNavigate();
-    const { duplicateNote, pinNote, unpinNote, deleteNote, hardDeleteNote } = useNotesMutations();
+    const { duplicateNote, pinNote, unpinNote, archiveNote, deleteNote, hardDeleteNote } =
+        useNotesMutations();
     const { setDeleting, reset } = useDeletionActions();
+    const currentNoteMatch = useMatch("/notes/:noteId");
+    const isCurrent = currentNoteMatch?.params.noteId === note.id;
     const { armed, trigger } = useArmedAction({
         onConfirm: () => {
             onClose();
@@ -55,6 +59,14 @@ function ContextMenu({ note, position, onClose, onShare }: ContextMenuProps) {
         onClose();
     };
 
+    const handleArchive = async () => {
+        onClose();
+        await archiveNote(note.id);
+        if (isCurrent) {
+            navigate("/notes");
+        }
+    };
+
     return (
         <Popover
             anchor={{ type: "coordinates", x: position.x, y: position.y }}
@@ -72,6 +84,7 @@ function ContextMenu({ note, position, onClose, onShare }: ContextMenuProps) {
                 label={isPinned ? "Unpin" : "Pin"}
                 onClick={handleTogglePin}
             />
+            <MenuItem icon={Archive} label="Archive" onClick={handleArchive} />
             <MenuDivider />
             <button
                 className={`text-ui-base duration-fast relative flex w-full items-center justify-between overflow-hidden rounded-sm px-2.5 py-1.5 transition-colors ${
