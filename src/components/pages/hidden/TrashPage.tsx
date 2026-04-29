@@ -1,6 +1,7 @@
 import { useNotesMutations, useTrashedNotesQuery } from "@queries/useNotesQuery";
 import { formatRelativeDate } from "@utils";
 
+import DeleteRowButton from "./DeleteRowButton";
 import HiddenNoteRow from "./HiddenNoteRow";
 import HiddenNotesPage from "./HiddenNotesPage";
 import RestoreButton from "./RestoreButton";
@@ -10,7 +11,7 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 function TrashPage() {
     const { trashedNotes, isPending } = useTrashedNotesQuery();
-    const { restoreFromTrash } = useNotesMutations();
+    const { restoreFromTrash, hardDeleteNote } = useNotesMutations();
 
     return (
         <HiddenNotesPage
@@ -23,7 +24,12 @@ function TrashPage() {
             {trashedNotes.map((note) => (
                 <HiddenNoteRow
                     key={note.id}
-                    actions={<RestoreButton onClick={() => restoreFromTrash(note.id)} />}
+                    actions={
+                        <>
+                            <RestoreButton onClick={() => restoreFromTrash(note.id)} />
+                            <DeleteRowButton onConfirm={() => hardDeleteNote(note.id)} />
+                        </>
+                    }
                     meta={trashRowMeta(note.deletedAt!)}
                     note={note}
                 />
