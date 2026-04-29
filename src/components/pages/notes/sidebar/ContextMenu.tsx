@@ -1,99 +1,96 @@
-import { Command, Copy, Delete, Trash2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Archive, Command, Copy, Delete, Pin, Share2, Trash2 } from "lucide-react";
+import { useMatch } from "react-router";
 
-import { ShortcutKey } from "@components/generics";
+import { DepletionBar, Popover, ShortcutKey } from "@components/generics";
 import { NoteEntity } from "@entities";
 import { useAppNavigate } from "@hooks/useAppNavigate";
-import { useClickOutside } from "@hooks/useClickOutside";
-import { useFloatingMenu } from "@hooks/useFloatingMenu";
+import { useArmedAction } from "@hooks/useArmedAction";
 import { useNotesMutations } from "@queries/useNotesQuery";
 import { useDeletionActions } from "@stores/deletion.store";
 
 import type { Note } from "@entities";
+import type { LucideIcon } from "lucide-react";
 
-const CONFIRM_TIMEOUT = 3000;
 const EXIT_ANIMATION_DURATION = 150;
 
 type ContextMenuProps = {
     note: Note;
     position: { x: number; y: number };
     onClose: () => void;
+    onShare: () => void;
 };
 
-function ContextMenu({ note, position, onClose }: ContextMenuProps) {
-    const { refs, floatingStyles } = useFloatingMenu({
-        anchor: { type: "coordinates", x: position.x, y: position.y }
-    });
-    const { duplicateNote, deleteNote, hardDeleteNote } = useNotesMutations();
-    const { setDeleting, reset } = useDeletionActions();
+function ContextMenu({ note, position, onClose, onShare }: ContextMenuProps) {
     const { navigate } = useAppNavigate();
-    const [armed, setArmed] = useState(false);
-    const timerRef = useRef<number | null>(null);
+    const { duplicateNote, pinNote, unpinNote, archiveNote, deleteNote, hardDeleteNote } =
+        useNotesMutations();
+    const { setDeleting, reset } = useDeletionActions();
+    const currentNoteMatch = useMatch("/notes/:noteId");
+    const isCurrent = currentNoteMatch?.params.noteId === note.id;
+    const { armed, trigger } = useArmedAction({
+        onConfirm: () => {
+            onClose();
+            setDeleting(note.id);
+            setTimeout(async () => {
+                if (NoteEntity.isEmpty(note)) {
+                    await hardDeleteNote(note.id);
+                } else {
+                    await deleteNote(note.id);
+                }
+                reset();
+                navigate("/notes");
+            }, EXIT_ANIMATION_DURATION);
+        }
+    });
 
-    useClickOutside(refs.floating, onClose);
-
-    useEffect(() => {
-        const handleEscape = (e: KeyboardEvent) => {
-            if (e.key === "Escape") {
-                onClose();
-            }
-        };
-        document.addEventListener("keydown", handleEscape);
-        return () => {
-            document.removeEventListener("keydown", handleEscape);
-            if (timerRef.current) {
-                clearTimeout(timerRef.current);
-            }
-        };
-    }, [onClose]);
+    const isPinned = NoteEntity.isPinned(note);
 
     const handleDuplicate = async () => {
         await duplicateNote(note.id);
         onClose();
     };
 
-    const handleDelete = () => {
-        if (!armed) {
-            setArmed(true);
-            timerRef.current = setTimeout(() => {
-                setArmed(false);
-            }, CONFIRM_TIMEOUT);
-            return;
+    const handleTogglePin = async () => {
+        if (isPinned) {
+            await unpinNote(note.id);
+        } else {
+            await pinNote(note.id);
         }
-
         onClose();
-        setDeleting(note.id);
+    };
 
-        setTimeout(async () => {
-            if (NoteEntity.isEmpty(note)) {
-                await hardDeleteNote(note.id);
-            } else {
-                await deleteNote(note.id);
-            }
-            reset();
+    const handleArchive = async () => {
+        onClose();
+        await archiveNote(note.id);
+        if (isCurrent) {
             navigate("/notes");
-        }, EXIT_ANIMATION_DURATION);
+        }
     };
 
     return (
-        <div
-            ref={refs.setFloating}
-            className="bg-elevated border-border shadow-float z-50 w-48 rounded border p-1"
-            style={floatingStyles}
+        <Popover
+            anchor={{ type: "coordinates", x: position.x, y: position.y }}
+            className="w-48 rounded p-1"
+            open={true}
+            onClose={onClose}
         >
+            <MenuItem icon={Copy} label="Duplicate" onClick={handleDuplicate} />
+            <MenuDivider />
+            <MenuItem icon={Share2} label="Share" onClick={onShare} />
+            <MenuDivider />
+            <MenuItem
+                accent={isPinned}
+                icon={Pin}
+                label={isPinned ? "Unpin" : "Pin"}
+                onClick={handleTogglePin}
+            />
+            <MenuItem icon={Archive} label="Archive" onClick={handleArchive} />
+            <MenuDivider />
             <button
-                className="text-ui-base text-muted hover:bg-accent-surface hover:text-text flex w-full items-center gap-2 rounded-sm px-2.5 py-1.5 transition-colors"
-                onClick={handleDuplicate}
-            >
-                <Copy size={13} strokeWidth={1.5} />
-                Duplicate
-            </button>
-            <div className="bg-border-soft mx-1 my-0.5 h-px" />
-            <button
-                className={`text-ui-base relative flex w-full items-center justify-between overflow-hidden rounded-sm px-2.5 py-1.5 transition-colors ${
+                className={`text-ui-base duration-fast relative flex w-full items-center justify-between overflow-hidden rounded-sm px-2.5 py-1.5 transition-colors ${
                     armed ? "bg-danger-surface text-danger" : "text-danger hover:bg-danger-surface"
                 }`}
-                onClick={handleDelete}
+                onClick={trigger}
             >
                 <span className="flex items-center gap-2">
                     <Trash2 size={13} strokeWidth={1.5} />
@@ -109,15 +106,35 @@ function ContextMenu({ note, position, onClose }: ContextMenuProps) {
                         </span>
                     )}
                 </span>
-                {armed && (
-                    <span
-                        className="bg-danger absolute bottom-0 left-0 h-[1.5px] w-full origin-left"
-                        style={{ animation: "timer-deplete 3s linear forwards" }}
-                    />
-                )}
+                {armed && <DepletionBar />}
             </button>
-        </div>
+        </Popover>
     );
+}
+
+type MenuItemProps = {
+    icon: LucideIcon;
+    label: string;
+    onClick: () => void;
+    accent?: boolean;
+};
+
+function MenuItem({ icon: Icon, label, onClick, accent = false }: MenuItemProps) {
+    return (
+        <button
+            className={`text-ui-base hover:bg-accent-surface duration-fast flex w-full items-center gap-2 rounded-sm px-2.5 py-1.5 transition-colors ${
+                accent ? "text-accent" : "text-muted hover:text-text"
+            }`}
+            onClick={onClick}
+        >
+            <Icon size={13} strokeWidth={1.5} />
+            {label}
+        </button>
+    );
+}
+
+function MenuDivider() {
+    return <div className="bg-border-soft mx-1 my-0.5 h-px" />;
 }
 
 export default ContextMenu;

@@ -1,77 +1,46 @@
+import { lazy, Suspense, useEffect, useRef } from "react";
 import { useParams } from "react-router";
 
+import { ShareButton } from "@components/share";
+import { Editor, EditorToolbar, useEditor } from "@editor";
 import { useEditorMode } from "@hooks/useEditorMode";
 import { useSettingsQuery } from "@queries/useSettingsQuery";
 import { useDeletionState } from "@stores/deletion.store";
 
 import DeleteBanner from "./DeleteBanner";
-import {
-    FloatingToolbar,
-    handleFormattingShortcut,
-    NoteEditor,
-    SlashMenu,
-    Toolbar,
-    useEditorCommands,
-    useSlashMenu,
-    useSmartKeys
-} from "./editor";
 import NoteFooter from "./NoteFooter";
 import NoteLoadingSkeleton from "./NoteLoadingSkeleton";
 import NoteNotFound from "./NoteNotFound";
 import NoteTitle from "./NoteTitle";
 import StorageErrorBanner from "./StorageErrorBanner";
-import { useNoteState } from "./useNoteState";
-import { NoteViewer } from "./viewer";
+import { useNoteData } from "./useNoteData";
+import { usePreserveEditState } from "./usePreserveEditState";
+
+import type { EditorHandle } from "@editor";
+import type { Note as NoteEntity } from "@entities";
+import type { RefObject } from "react";
+
+const NoteViewer = lazy(() => import("@components/preview/NoteViewer"));
 
 function Note() {
     const { noteId } = useParams<{ noteId: string }>();
+    if (!noteId) {
+        throw new Error("noteId is required");
+    }
+
     const { mode, toggleMode } = useEditorMode();
     const { armed, noteTitle: armedNoteTitle } = useDeletionState();
     const { settings } = useSettingsQuery();
 
-    const {
-        isPending,
-        selectedNote,
-        title,
-        content,
-        selection,
-        focused,
-        editorRef,
-        titleRef,
-        phantomRef,
-        scrollContainerRef,
-        saveStatus,
-        saveError,
-        retrySave,
-        resetSelection,
-        handleContentChange,
-        handleCursorChange,
-        handleScroll,
-        handleTitleChange,
-        setFocused
-    } = useNoteState(noteId, mode);
+    const { isPending, selectedNote, title, content, saveStatus, retrySave, handleChange } =
+        useNoteData(noteId);
 
-    const { toggleBlock, isBlockActive, toggleInline, isInlineActive, toggleLink } =
-        useEditorCommands(editorRef, content, handleContentChange);
+    const editor = useEditor();
+    const titleRef = useRef<HTMLInputElement | null>(null);
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
-    const {
-        state: slashMenuState,
-        filteredActions: slashMenuActions,
-        executeCommand,
-        handleKeyDown: handleSlashMenuKeyDown
-    } = useSlashMenu(editorRef, content, selection.start, handleContentChange);
-
-    const { handleKeyDown: handleSmartKeys } = useSmartKeys(editorRef, handleContentChange);
-
-    const handleEditorKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (handleFormattingShortcut(e, toggleInline, toggleLink)) {
-            return;
-        }
-        if (handleSlashMenuKeyDown(e)) {
-            return;
-        }
-        handleSmartKeys(e);
-    };
+    usePreserveEditState({ mode, noteId, editor, scrollContainerRef });
+    useFocusOnNoteLoad(selectedNote, editor, titleRef);
 
     if (isPending) {
         return <NoteLoadingSkeleton />;
@@ -84,75 +53,59 @@ function Note() {
     return (
         <div className="flex h-full flex-col">
             <div
-                className={`overflow-hidden transition-[height,opacity] duration-200 ease-out ${
+                className={`duration-layout overflow-hidden transition-[height,opacity] ease-out ${
                     mode === "edit" ? "h-10 opacity-100" : "h-0 opacity-0"
                 }`}
             >
-                <Toolbar isBlockActive={isBlockActive} onToggleBlock={toggleBlock} />
+                <EditorToolbar
+                    editor={editor}
+                    rightActions={<ShareButton note={{ title, content }} />}
+                />
             </div>
 
-            {armed ? (
-                <DeleteBanner noteTitle={armedNoteTitle} />
-            ) : saveError ? (
-                <StorageErrorBanner onRetry={retrySave} />
-            ) : (
-                <div className="h-9 shrink-0" />
-            )}
+            <div ref={scrollContainerRef} className="flex-1 scroll-pt-9 scroll-pb-48 overflow-auto">
+                <div className="sticky top-0 z-10 min-h-9">
+                    {armed ? (
+                        <DeleteBanner noteTitle={armedNoteTitle} />
+                    ) : saveStatus === "error" ? (
+                        <StorageErrorBanner onRetry={retrySave} />
+                    ) : null}
+                </div>
 
-            <div
-                ref={scrollContainerRef}
-                className={`flex-1 scroll-pb-48 overflow-auto px-6 pt-12 pb-48 transition-opacity duration-150 ${armed ? "opacity-40" : ""}`}
-                onScroll={handleScroll}
-            >
                 <div
-                    className={`mx-auto flex w-full flex-col gap-2 ${mode === "edit" ? "max-w-[72ch]" : "max-w-180"}`}
+                    className={`duration-base px-6 pt-12 pb-48 transition-opacity ${armed ? "opacity-40" : ""}`}
                 >
-                    <NoteTitle
-                        date={selectedNote.updatedAt}
-                        inputRef={titleRef}
-                        mode={mode}
-                        title={title}
-                        onChange={handleTitleChange}
-                    />
-                    {mode === "edit" ? (
-                        <>
-                            <NoteEditor
-                                ref={editorRef}
-                                content={content}
-                                phantomRef={phantomRef}
-                                spellCheck={settings.spellcheck}
-                                onBlur={() => {
-                                    setFocused(false);
-                                    resetSelection();
-                                }}
-                                onChange={handleContentChange}
-                                onCursorChange={handleCursorChange}
-                                onFocus={() => setFocused(true)}
-                                onKeyDown={handleEditorKeyDown}
-                            />
-                            <FloatingToolbar
-                                content={content}
-                                editorFocused={focused}
-                                isInlineActive={isInlineActive}
-                                phantomRef={phantomRef}
-                                selection={selection}
-                                onToggleInline={toggleInline}
-                                onToggleLink={toggleLink}
-                            />
-                            {slashMenuState.isOpen && (
-                                <SlashMenu
-                                    content={content}
-                                    filteredActions={slashMenuActions}
-                                    phantomRef={phantomRef}
-                                    selectedIndex={slashMenuState.selectedIndex}
-                                    selection={selection}
-                                    onExecute={executeCommand}
+                    <div
+                        className={`mx-auto flex w-full flex-col gap-2 ${mode === "edit" ? "max-w-[72ch]" : "max-w-180"}`}
+                    >
+                        <NoteTitle
+                            date={selectedNote.updatedAt}
+                            inputRef={titleRef}
+                            mode={mode}
+                            title={title}
+                            onChange={handleChange}
+                        />
+                        {mode === "edit" ? (
+                            <>
+                                <Editor
+                                    editor={editor}
+                                    spellCheck={settings.spellcheck}
+                                    value={content}
+                                    onChange={(content) => handleChange({ content })}
                                 />
-                            )}
-                        </>
-                    ) : (
-                        <NoteViewer content={content} onSwitchToWrite={toggleMode} />
-                    )}
+                                {content.length === 0 && (
+                                    <div className="text-ed-body text-subtle font-mono">
+                                        Type <span className="text-accent">/</span> to insert
+                                        headings, code blocks, and more
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <Suspense fallback={null}>
+                                <NoteViewer content={content} onSwitchToWrite={toggleMode} />
+                            </Suspense>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -162,3 +115,25 @@ function Note() {
 }
 
 export default Note;
+
+function useFocusOnNoteLoad(
+    note: NoteEntity | undefined,
+    editor: EditorHandle,
+    titleRef: RefObject<HTMLInputElement | null>
+) {
+    useEffect(() => {
+        if (!note) {
+            return;
+        }
+        const engine = editor.engine;
+        if (!engine) {
+            return;
+        }
+        if (note.title.trim() === "") {
+            titleRef.current?.focus();
+        } else if (engine.getValue() === "") {
+            engine.focus();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [note?.id, editor.engine]);
+}

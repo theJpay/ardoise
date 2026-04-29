@@ -15,7 +15,7 @@ function EditorModeToggler({ disabled }: EditorModeTogglerProps) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const buttonClass = (isActive: boolean) =>
-        `flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-100 disabled:bg-transparent disabled:text-dim ${
+        `flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-fast disabled:bg-transparent disabled:text-dim ${
             isActive
                 ? "bg-accent-surface text-accent hover:bg-accent-surface-hover"
                 : "text-subtle hover:bg-elevated hover:text-muted"

@@ -1,3 +1,8 @@
+type FormatOptions = {
+    now?: Date;
+    short?: boolean;
+};
+
 const shortMonthDay = new Intl.DateTimeFormat("en", { month: "short", day: "numeric" });
 const shortMonthDayYear = new Intl.DateTimeFormat("en", {
     month: "short",
@@ -5,7 +10,8 @@ const shortMonthDayYear = new Intl.DateTimeFormat("en", {
     year: "numeric"
 });
 
-export function formatRelativeDate(date: Date, now: Date = new Date()): string {
+export function formatRelativeDate(date: Date, options: FormatOptions = {}): string {
+    const { now = new Date(), short = false } = options;
     const time = date.getTime();
     if (!Number.isFinite(time)) {
         return "—";
@@ -14,10 +20,10 @@ export function formatRelativeDate(date: Date, now: Date = new Date()): string {
     const diffSec = Math.floor((now.getTime() - time) / 1000);
 
     if (Math.abs(diffSec) < 60) {
-        return "just now";
+        return short ? "now" : "just now";
     }
     if (diffSec < 0) {
-        return formatAbsolute(date, now);
+        return formatAbsolute(date, now, short);
     }
 
     const calendarDays = calendarDaysBetween(date, now);
@@ -25,24 +31,26 @@ export function formatRelativeDate(date: Date, now: Date = new Date()): string {
     if (calendarDays === 0) {
         const diffMin = Math.floor(diffSec / 60);
         if (diffMin < 60) {
-            return `${diffMin} min ago`;
+            return short ? `${diffMin}m` : `${diffMin} min ago`;
         }
-        return `${Math.floor(diffMin / 60)}h ago`;
+        const diffHours = Math.floor(diffMin / 60);
+        return short ? `${diffHours}h` : `${diffHours}h ago`;
     }
     if (calendarDays === 1) {
-        return "yesterday";
+        return short ? "1d" : "yesterday";
     }
     if (calendarDays <= 29) {
-        return `${calendarDays} days ago`;
+        return short ? `${calendarDays}d` : `${calendarDays} days ago`;
     }
 
-    return formatAbsolute(date, now);
+    return formatAbsolute(date, now, short);
 }
 
-function formatAbsolute(date: Date, now: Date): string {
-    return date.getFullYear() === now.getFullYear()
-        ? shortMonthDay.format(date)
-        : shortMonthDayYear.format(date);
+function formatAbsolute(date: Date, now: Date, short: boolean): string {
+    if (short || date.getFullYear() === now.getFullYear()) {
+        return shortMonthDay.format(date);
+    }
+    return shortMonthDayYear.format(date);
 }
 
 function calendarDaysBetween(past: Date, now: Date): number {

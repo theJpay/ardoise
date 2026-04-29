@@ -18,6 +18,8 @@
             "@assets/*": ["./src/assets/*"],
             "@components": ["./src/components"],
             "@components/*": ["./src/components/*"],
+            "@editor": ["./src/editor"],
+            "@editor/*": ["./src/editor/*"],
             "@entities": ["./src/entities"],
             "@entities/*": ["./src/entities/*"],
             "@hooks/*": ["./src/hooks/*"],

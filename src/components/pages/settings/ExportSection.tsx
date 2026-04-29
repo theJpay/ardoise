@@ -1,7 +1,7 @@
 import { Download } from "lucide-react";
 
 import { Button } from "@components/generics";
-import { useNotesQuery } from "@queries/useNotesQuery";
+import { useArchivedNotesQuery, useNotesQuery, useTrashedNotesQuery } from "@queries/useNotesQuery";
 import { exportNotesToZip } from "@utils";
 
 import SettingsRow from "./SettingsRow";
@@ -9,9 +9,15 @@ import SettingsSection from "./SettingsSection";
 
 function ExportSection() {
     const { notes } = useNotesQuery();
+    const { archivedNotes } = useArchivedNotesQuery();
+    const { trashedNotes } = useTrashedNotesQuery();
 
     const handleExport = () => {
-        exportNotesToZip(notes);
+        exportNotesToZip({
+            active: notes,
+            archived: archivedNotes,
+            trashed: trashedNotes
+        });
     };
 
     return (

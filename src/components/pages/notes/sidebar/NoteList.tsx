@@ -1,7 +1,10 @@
 import { useCallback, useState } from "react";
 
-import ContextMenu from "./ContextMenu";
+import { useSortOrder } from "@stores/sort.store";
+import { dateFieldForSort } from "@utils";
+
 import NoteItem from "./NoteItem";
+import NoteMenu from "./NoteMenu";
 
 import type { Note } from "@entities";
 
@@ -16,6 +19,7 @@ type MenuState = {
 
 function NoteList({ notes }: NoteListProps) {
     const [menu, setMenu] = useState<MenuState>(null);
+    const dateField = dateFieldForSort(useSortOrder());
 
     const handleContextMenu = useCallback(
         (e: React.MouseEvent, noteId: string) => {
@@ -37,12 +41,12 @@ function NoteList({ notes }: NoteListProps) {
             <ul>
                 {notes.map((note) => (
                     <li key={note.id} onContextMenu={(e) => handleContextMenu(e, note.id)}>
-                        <NoteItem note={note} />
+                        <NoteItem dateField={dateField} note={note} />
                     </li>
                 ))}
             </ul>
             {menu && (
-                <ContextMenu note={menu.note} position={menu.position} onClose={handleCloseMenu} />
+                <NoteMenu note={menu.note} position={menu.position} onClose={handleCloseMenu} />
             )}
         </>
     );

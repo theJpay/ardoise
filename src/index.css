@@ -1,4 +1,14 @@
 @import "tailwindcss";
+@import "@fontsource/ibm-plex-sans/300.css";
+@import "@fontsource/ibm-plex-sans/400.css";
+@import "@fontsource/ibm-plex-sans/500.css";
+@import "@fontsource/ibm-plex-mono/300.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "@fontsource/ibm-plex-mono/400-italic.css";
+@import "@editor/editor.css";
+@import "./styles/preview.css";
+@import "@utils/lowlight.css";
 
 @theme {
     --color-bg: #181818;
@@ -26,6 +36,10 @@
     --font-mono: "IBM Plex Mono", monospace;
 
     --shadow-float: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+    --duration-fast: 100ms;
+    --duration-base: 150ms;
+    --duration-layout: 250ms;
 }
 
 @layer base {
@@ -196,6 +210,10 @@
     to {
         transform: scaleX(0);
     }
+}
+
+@utility animate-timer-deplete {
+    animation: timer-deplete 3s linear forwards;
 }
 
 @utility text-ui-xs {

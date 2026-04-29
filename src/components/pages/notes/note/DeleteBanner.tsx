@@ -1,6 +1,6 @@
 import { Command, Delete } from "lucide-react";
 
-import { ShortcutKey } from "@components/generics";
+import { DepletionBar, ShortcutKey } from "@components/generics";
 import { NoteEntity } from "@entities";
 
 type DeleteBannerProps = {
@@ -22,10 +22,7 @@ function DeleteBanner({ noteTitle }: DeleteBannerProps) {
                 <span className="text-subtle text-ui-sm">·</span>
                 <span className="text-subtle text-ui-sm">Esc to cancel</span>
             </div>
-            <div
-                className="bg-danger absolute bottom-0 left-0 h-[1.5px] w-full origin-left"
-                style={{ animation: "timer-deplete 3s linear forwards" }}
-            />
+            <DepletionBar />
         </div>
     );
 }
