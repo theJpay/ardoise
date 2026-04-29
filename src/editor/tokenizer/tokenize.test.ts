@@ -590,6 +590,20 @@ describe("tokenize — html escaping", () => {
         );
     });
 
+    it("does not apply inline transforms inside a link URL", () => {
+        const input = "[doc](https://example.com/_a_b_c_)";
+
+        const result = tokenize(input);
+
+        expect(result).toBe(
+            '<span class="ed-token-muted">[</span>' +
+                '<span class="ed-link">doc</span>' +
+                '<span class="ed-token-muted">](</span>' +
+                '<span class="ed-token-dim">https://example.com/_a_b_c_</span>' +
+                '<span class="ed-token-muted">)</span>'
+        );
+    });
+
     it("escapes HTML in a code block with no language", () => {
         const input = "```\n<script>&\n```";
 
