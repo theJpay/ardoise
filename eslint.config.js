@@ -59,7 +59,7 @@ export default defineConfig([
                     pathGroups: [
                         {
                             pattern:
-                                "@{assets,components,editor,entities,hooks,queries,services,stores,utils}{,/**}",
+                                "@{assets,components,editor,entities,hooks,services,stores,utils}{,/**}",
                             group: "internal"
                         }
                     ],
