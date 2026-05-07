@@ -3,17 +3,6 @@ import { decideSmartPair } from "./decideSmartPair";
 import type { EditorHandle } from "../useEditor";
 import type { KeyboardEvent } from "react";
 
-function isShortcutChord(e: KeyboardEvent<HTMLTextAreaElement>): boolean {
-    if (e.metaKey) {
-        return true;
-    }
-    // Ctrl alone is a shortcut, but Ctrl+Alt is AltGr — needed to type [ ] { } on AZERTY
-    if (e.ctrlKey && !e.altKey) {
-        return true;
-    }
-    return false;
-}
-
 export function handleSmartPair(
     e: KeyboardEvent<HTMLTextAreaElement>,
     editor: EditorHandle
@@ -64,4 +53,15 @@ export function handleSmartPair(
         cursor: { start: start + 1 }
     });
     return true;
+}
+
+function isShortcutChord(e: KeyboardEvent<HTMLTextAreaElement>): boolean {
+    if (e.metaKey) {
+        return true;
+    }
+    // Ctrl alone is a shortcut, but Ctrl+Alt is AltGr — needed to type [ ] { } on AZERTY
+    if (e.ctrlKey && !e.altKey) {
+        return true;
+    }
+    return false;
 }
