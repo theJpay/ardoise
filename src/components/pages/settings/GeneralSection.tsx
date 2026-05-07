@@ -1,12 +1,13 @@
 import { Select, Toggle } from "@components/generics";
-import { useSettingsMutations, useSettingsQuery } from "@queries/useSettingsQuery";
+import { useSettingsMutations } from "@queries/useSettingsQuery";
+import { useSettings } from "@stores/settings.store";
 
 import AccentSwatchPicker from "./AccentSwatchPicker";
 import SettingsRow from "./SettingsRow";
 import SettingsSection from "./SettingsSection";
 
 function GeneralSection() {
-    const { settings } = useSettingsQuery();
+    const { settings } = useSettings();
     const { updateSettings } = useSettingsMutations();
 
     return (
