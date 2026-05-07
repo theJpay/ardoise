@@ -8,7 +8,6 @@ import {
     deleteNote,
     duplicateNote,
     getArchivedNotes,
-    getNotes,
     getTrashedNotes,
     hardDeleteAllNotes,
     hardDeleteNote,
@@ -24,7 +23,6 @@ import type { NoteUpdate } from "@entities";
 
 const noteKeys = {
     all: ["notes"],
-    active: ["notes", "active"],
     archived: ["notes", "archived"],
     trashed: ["notes", "trashed"]
 } as const;
@@ -35,19 +33,6 @@ type UpdateMutationArgs = {
 };
 
 const invalidateNotes = () => queryClient.invalidateQueries({ queryKey: noteKeys.all });
-
-export function useNotesQuery() {
-    const { isPending, error, data } = useQuery({
-        queryKey: noteKeys.active,
-        queryFn: getNotes
-    });
-
-    return {
-        isPending,
-        error,
-        notes: data ?? []
-    };
-}
 
 export function useArchivedNotesQuery() {
     const { isPending, error, data } = useQuery({

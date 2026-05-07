@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { NoteEntity } from "@entities";
 import { useDebounce } from "@hooks/useDebounce";
-import { useNotesMutations, useNotesQuery } from "@queries/useNotesQuery";
+import { useNotesMutations } from "@queries/useNotesQuery";
+import { useNotes } from "@stores/notes.store";
 
 import type { Note } from "@entities";
 
@@ -11,7 +12,7 @@ export type SaveStatus = "saved" | "writing" | "error";
 type NoteFields = { title?: string; content?: string };
 
 export function useNoteData(noteId: string) {
-    const { notes, isPending } = useNotesQuery();
+    const { notes, isPending } = useNotes();
     const { updateNote } = useNotesMutations();
 
     const selectedNote = notes.find((note) => note.id === noteId);

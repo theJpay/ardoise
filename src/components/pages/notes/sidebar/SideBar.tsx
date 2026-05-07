@@ -5,7 +5,7 @@ import { Button } from "@components/generics";
 import { NoteEntity } from "@entities";
 import { useAddNote } from "@hooks/useAddNote";
 import { useNoteSearch } from "@hooks/useNoteSearch";
-import { useNotesQuery } from "@queries/useNotesQuery";
+import { useNotes } from "@stores/notes.store";
 import { useSortOrder } from "@stores/sort.store";
 import { sortNotes } from "@utils";
 
@@ -21,7 +21,7 @@ type SideBarProps = {
 };
 
 function SideBar({ searchRef }: SideBarProps) {
-    const { notes, isPending } = useNotesQuery();
+    const { notes, isPending } = useNotes();
     const order = useSortOrder();
     const sortedNotes = useMemo(() => sortNotes(notes, order), [notes, order]);
     const { search, setSearch, filteredNotes } = useNoteSearch(sortedNotes);
