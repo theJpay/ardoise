@@ -1,13 +1,18 @@
+import { useEffect } from "react";
 import { Outlet } from "react-router";
 
 import { CommandPalette } from "@components/palette";
 import { Rail } from "@components/rail";
 import { useThemeSync } from "@hooks/useThemeSync";
-import { useTrashSweep } from "@queries/useNotesQuery";
+import { sweepExpiredTrash } from "@services/notes.service";
 
 function App() {
     useThemeSync();
-    useTrashSweep();
+    useEffect(() => {
+        sweepExpiredTrash().catch((err) => {
+            console.error("trash sweep failed", err);
+        });
+    }, []);
     return (
         <div
             className="bg-bg grid h-screen overflow-hidden"

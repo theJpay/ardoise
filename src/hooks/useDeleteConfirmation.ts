@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { NoteEntity } from "@entities";
 import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useArmedAction } from "@hooks/useArmedAction";
-import { useNotesMutations } from "@queries/useNotesQuery";
+import { deleteNote, hardDeleteNote } from "@services/notes.service";
 import { useDeletionActions, useDeletionState } from "@stores/deletion.store";
 
 import type { Note } from "@entities";
@@ -12,7 +12,6 @@ const EXIT_ANIMATION_DURATION = 150;
 
 export function useDeleteConfirmation() {
     const { navigate } = useAppNavigate();
-    const { deleteNote, hardDeleteNote } = useNotesMutations();
     const { noteId } = useDeletionState();
     const { arm: armStore, cancel: cancelStore, setDeleting, reset } = useDeletionActions();
 
@@ -29,7 +28,7 @@ export function useDeleteConfirmation() {
                 navigate("/notes");
             }, EXIT_ANIMATION_DURATION);
         },
-        [setDeleting, deleteNote, hardDeleteNote, reset, navigate]
+        [setDeleting, reset, navigate]
     );
 
     const onConfirm = useCallback(async () => {

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { NoteEntity } from "@entities";
 import { useDebounce } from "@hooks/useDebounce";
-import { useNotesMutations } from "@queries/useNotesQuery";
+import { updateNote } from "@services/notes.service";
 import { useNotes } from "@stores/notes.store";
 
 import type { Note } from "@entities";
@@ -13,7 +13,6 @@ type NoteFields = { title?: string; content?: string };
 
 export function useNoteData(noteId: string) {
     const { notes, isPending } = useNotes();
-    const { updateNote } = useNotesMutations();
 
     const selectedNote = notes.find((note) => note.id === noteId);
 
@@ -35,7 +34,7 @@ export function useNoteData(noteId: string) {
             return;
         }
         try {
-            await updateNote(pending);
+            await updateNote(pending.id, pending.fields);
             if (pendingUpdate.current === pending) {
                 pendingUpdate.current = null;
                 setSaveStatus("saved");
@@ -43,7 +42,7 @@ export function useNoteData(noteId: string) {
         } catch {
             setSaveStatus("error");
         }
-    }, [updateNote]);
+    }, []);
 
     const debouncedFlush = useDebounce(flushPendingUpdate);
 

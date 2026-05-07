@@ -5,7 +5,14 @@ import { DepletionBar, Popover, ShortcutKey } from "@components/generics";
 import { NoteEntity } from "@entities";
 import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useArmedAction } from "@hooks/useArmedAction";
-import { useNotesMutations } from "@queries/useNotesQuery";
+import {
+    archiveNote,
+    deleteNote,
+    duplicateNote,
+    hardDeleteNote,
+    pinNote,
+    unpinNote
+} from "@services/notes.service";
 import { useDeletionActions } from "@stores/deletion.store";
 
 import type { Note } from "@entities";
@@ -22,8 +29,6 @@ type ContextMenuProps = {
 
 function ContextMenu({ note, position, onClose, onShare }: ContextMenuProps) {
     const { navigate } = useAppNavigate();
-    const { duplicateNote, pinNote, unpinNote, archiveNote, deleteNote, hardDeleteNote } =
-        useNotesMutations();
     const { setDeleting, reset } = useDeletionActions();
     const currentNoteMatch = useMatch("/notes/:noteId");
     const isCurrent = currentNoteMatch?.params.noteId === note.id;
