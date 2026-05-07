@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import { queryClient } from "@queries/queryClient";
@@ -7,7 +7,6 @@ import {
     createNote,
     deleteNote,
     duplicateNote,
-    getTrashedNotes,
     hardDeleteAllNotes,
     hardDeleteNote,
     pinNote,
@@ -31,19 +30,6 @@ type UpdateMutationArgs = {
 };
 
 const invalidateNotes = () => queryClient.invalidateQueries({ queryKey: noteKeys.all });
-
-export function useTrashedNotesQuery() {
-    const { isPending, error, data } = useQuery({
-        queryKey: noteKeys.trashed,
-        queryFn: getTrashedNotes
-    });
-
-    return {
-        isPending,
-        error,
-        trashedNotes: data ?? []
-    };
-}
 
 export function useNotesMutations() {
     const createNoteMutation = useMutation({ mutationFn: createNote, onSuccess: invalidateNotes });

@@ -1,5 +1,6 @@
 import { TRASH_RETENTION_DAYS } from "@entities";
-import { useNotesMutations, useTrashedNotesQuery } from "@queries/useNotesQuery";
+import { useNotesMutations } from "@queries/useNotesQuery";
+import { useTrashedNotes } from "@stores/notes.store";
 import { formatRelativeDate } from "@utils";
 
 import DeleteRowButton from "./DeleteRowButton";
@@ -10,7 +11,7 @@ import RestoreButton from "./RestoreButton";
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 function TrashPage() {
-    const { trashedNotes, isPending } = useTrashedNotesQuery();
+    const { trashedNotes, isPending } = useTrashedNotes();
     const { restoreFromTrash, hardDeleteNote } = useNotesMutations();
 
     return (

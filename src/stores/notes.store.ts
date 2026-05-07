@@ -1,18 +1,20 @@
 import { liveQuery } from "dexie";
 import { create } from "zustand";
 
-import { getArchivedNotes, getNotes } from "@services/notes.service";
+import { getArchivedNotes, getNotes, getTrashedNotes } from "@services/notes.service";
 
 import type { Note } from "@entities";
 
 type NotesStore = {
     notes: Note[] | undefined;
     archivedNotes: Note[] | undefined;
+    trashedNotes: Note[] | undefined;
 };
 
 const useNotesStore = create<NotesStore>(() => ({
     notes: undefined,
-    archivedNotes: undefined
+    archivedNotes: undefined,
+    trashedNotes: undefined
 }));
 
 liveQuery(getNotes).subscribe((notes) => {
@@ -21,6 +23,10 @@ liveQuery(getNotes).subscribe((notes) => {
 
 liveQuery(getArchivedNotes).subscribe((archivedNotes) => {
     useNotesStore.setState({ archivedNotes });
+});
+
+liveQuery(getTrashedNotes).subscribe((trashedNotes) => {
+    useNotesStore.setState({ trashedNotes });
 });
 
 export function useNotes() {
@@ -38,5 +44,14 @@ export function useArchivedNotes() {
     return {
         isPending: archivedNotes === undefined,
         archivedNotes: archivedNotes ?? []
+    };
+}
+
+export function useTrashedNotes() {
+    const trashedNotes = useNotesStore((state) => state.trashedNotes);
+
+    return {
+        isPending: trashedNotes === undefined,
+        trashedNotes: trashedNotes ?? []
     };
 }
