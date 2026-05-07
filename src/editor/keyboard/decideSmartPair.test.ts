@@ -20,6 +20,54 @@ describe("decideSmartPair", () => {
         expect(result).toEqual({ kind: "insert", opener, closer });
     });
 
+    it.each(["(", "[", "{", '"'])("inserts a pair when typing %s before whitespace", (opener) => {
+        const result = decideSmartPair({ key: opener, value: " x", start: 0, end: 0 });
+
+        expect(result).toMatchObject({ kind: "insert", opener });
+    });
+
+    it.each(["(", "[", "{", '"'])("inserts a pair when typing %s before punctuation", (opener) => {
+        const result = decideSmartPair({ key: opener, value: ".", start: 0, end: 0 });
+
+        expect(result).toMatchObject({ kind: "insert", opener });
+    });
+
+    it.each(["(", "[", "{", '"'])(
+        "returns null when typing %s directly before a letter",
+        (opener) => {
+            const result = decideSmartPair({ key: opener, value: "word", start: 0, end: 0 });
+
+            expect(result).toBeNull();
+        }
+    );
+
+    it.each(["(", "[", "{", '"'])(
+        "returns null when typing %s directly before a digit",
+        (opener) => {
+            const result = decideSmartPair({ key: opener, value: "42", start: 0, end: 0 });
+
+            expect(result).toBeNull();
+        }
+    );
+
+    it.each(["(", "[", "{", '"'])(
+        "returns null when typing %s directly before an underscore",
+        (opener) => {
+            const result = decideSmartPair({ key: opener, value: "_id", start: 0, end: 0 });
+
+            expect(result).toBeNull();
+        }
+    );
+
+    it.each(["(", "[", "{", '"'])(
+        "returns null when typing %s directly before a non-ASCII letter",
+        (opener) => {
+            const result = decideSmartPair({ key: opener, value: "été", start: 0, end: 0 });
+
+            expect(result).toBeNull();
+        }
+    );
+
     it.each([
         ["(", ")"],
         ["[", "]"],

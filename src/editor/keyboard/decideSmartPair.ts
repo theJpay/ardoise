@@ -1,6 +1,7 @@
 import { PAIRS } from "./pairs";
 
 const CLOSERS = new Set(Object.values(PAIRS));
+const WORD_CHAR = /[\p{L}\p{N}_]/u;
 
 export type SmartPairOp =
     | { kind: "wrap"; opener: string; closer: string }
@@ -37,6 +38,10 @@ export function decideSmartPair({
     const closer = PAIRS[key];
     if (start !== end) {
         return { kind: "wrap", opener: key, closer };
+    }
+    const next = value[start];
+    if (next !== undefined && WORD_CHAR.test(next)) {
+        return null;
     }
     return { kind: "insert", opener: key, closer };
 }
