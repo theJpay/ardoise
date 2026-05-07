@@ -6,6 +6,7 @@ import { updateNote } from "@services/notes.service";
 import { useNotes } from "@stores/notes.store";
 
 import type { Note } from "@entities";
+import type { RefObject } from "react";
 
 export type SaveStatus = "saved" | "writing" | "error";
 
@@ -78,6 +79,7 @@ export function useNoteData(noteId: string) {
 
     useDocumentTitle(title, selectedNote);
     useWarnUnsavedChanges(saveStatus);
+    useExternalEditsSync({ note: selectedNote, pendingUpdate, setTitle, setContent });
 
     return {
         isPending,
@@ -96,6 +98,30 @@ function useDocumentTitle(title: string, note: Note | undefined) {
             document.title = `${NoteEntity.getTitle({ title })} — Ardoise`;
         }
     }, [title, note]);
+}
+
+function useExternalEditsSync({
+    note,
+    pendingUpdate,
+    setTitle,
+    setContent
+}: {
+    note: Note | undefined;
+    pendingUpdate: RefObject<{ id: string; fields: NoteFields } | null>;
+    setTitle: (value: string) => void;
+    setContent: (value: string) => void;
+}) {
+    useEffect(() => {
+        if (!note) {
+            return;
+        }
+        const pending = pendingUpdate.current;
+        if (pending?.id === note.id) {
+            return;
+        }
+        setTitle(note.title);
+        setContent(note.content);
+    }, [note, pendingUpdate, setTitle, setContent]);
 }
 
 function useWarnUnsavedChanges(saveStatus: SaveStatus) {
