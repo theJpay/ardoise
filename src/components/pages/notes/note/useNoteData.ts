@@ -40,11 +40,19 @@ export function useNoteData(noteId: string) {
                 setSaveStatus("saved");
             }
         } catch {
-            setSaveStatus("error");
+            if (pendingUpdate.current === pending) {
+                setSaveStatus("error");
+            }
         }
     }, []);
 
     const debouncedFlush = useDebounce(flushPendingUpdate);
+
+    useEffect(() => {
+        return () => {
+            flushPendingUpdate();
+        };
+    }, [noteId, flushPendingUpdate]);
 
     const handleChange = useCallback(
         (fields: NoteFields) => {
