@@ -1,12 +1,12 @@
 import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useEditorMode } from "@hooks/useEditorMode";
-import { useNotesMutations, useNotesQuery } from "@queries/useNotesQuery";
+import { createNote } from "@services/notes.service";
+import { useNotes } from "@stores/notes.store";
 import { useOnboardingActions } from "@stores/onboarding.store";
 
 export function useAddNote() {
     const { navigate } = useAppNavigate();
-    const { notes } = useNotesQuery();
-    const { createNote } = useNotesMutations();
+    const { notes } = useNotes();
     const { setMode } = useEditorMode();
     const { triggerModeTooltip } = useOnboardingActions();
 

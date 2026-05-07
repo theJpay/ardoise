@@ -2,9 +2,9 @@ import { useEffect, useRef } from "react";
 import { useParams } from "react-router";
 
 import { useEditorMode } from "@hooks/useEditorMode";
-import { useNotesQuery } from "@queries/useNotesQuery";
 import { useDeletionState } from "@stores/deletion.store";
 import { useLayoutActions } from "@stores/layout.store";
+import { useNotes } from "@stores/notes.store";
 import { UnreachableError } from "@utils";
 
 import { useAddNote } from "./useAddNote";
@@ -12,7 +12,7 @@ import { useDeleteConfirmation } from "./useDeleteConfirmation";
 
 export function useNotesShortcuts() {
     const { noteId } = useParams();
-    const { notes } = useNotesQuery();
+    const { notes } = useNotes();
     const { addNote } = useAddNote();
     const { armed, noteId: armedNoteId } = useDeletionState();
     const { armDelete, confirmDelete, cancelDelete } = useDeleteConfirmation();

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 
 import { Button } from "@components/generics";
 import { NoteEntity } from "@entities";
-import { useNotesMutations } from "@queries/useNotesQuery";
+import { createNote } from "@services/notes.service";
 
 import type { SharePayload } from "@utils";
 
@@ -15,7 +15,6 @@ type ShareViewProps = {
 };
 
 function ShareView({ payload }: ShareViewProps) {
-    const { createNote } = useNotesMutations();
     const navigate = useNavigate();
 
     const handleSave = async () => {

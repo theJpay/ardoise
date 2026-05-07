@@ -4,13 +4,13 @@ import { useEffect } from "react";
 import { Button } from "@components/generics";
 import LogoMark from "@components/rail/LogoMark";
 import { useAddNote } from "@hooks/useAddNote";
-import { useNotesQuery } from "@queries/useNotesQuery";
+import { useNotes } from "@stores/notes.store";
 
 function NoteIndex() {
     useEffect(() => {
         document.title = "Ardoise";
     }, []);
-    const { notes, isPending } = useNotesQuery();
+    const { notes, isPending } = useNotes();
     const { addNote } = useAddNote();
 
     if (isPending) {

@@ -2,14 +2,13 @@ import { useNavigate } from "react-router";
 
 import { Button } from "@components/generics";
 import { useArmedAction } from "@hooks/useArmedAction";
-import { useNotesMutations } from "@queries/useNotesQuery";
+import { hardDeleteAllNotes } from "@services/notes.service";
 
 import SettingsRow from "./SettingsRow";
 import SettingsSection from "./SettingsSection";
 
 function DangerZoneSection() {
     const navigate = useNavigate();
-    const { hardDeleteAllNotes } = useNotesMutations();
     const { armed, trigger } = useArmedAction({
         onConfirm: async () => {
             await hardDeleteAllNotes();

@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { useSearchParams } from "react-router";
 
-import { useSettingsQuery } from "@queries/useSettingsQuery";
+import { useSettings } from "@stores/settings.store";
 
 export type EditorMode = "edit" | "preview";
 
@@ -9,7 +9,7 @@ const VALID_MODES: string[] = ["edit", "preview"] satisfies EditorMode[];
 
 export function useEditorMode() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const { settings } = useSettingsQuery();
+    const { settings } = useSettings();
 
     const rawMode = searchParams.get("mode");
     const mode: EditorMode =

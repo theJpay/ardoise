@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 
-import { useSettingsQuery } from "@queries/useSettingsQuery";
 import { applyThemeAttributes, mirrorThemeToLocalStorage } from "@services/theme.storage";
+import { useSettings } from "@stores/settings.store";
 
 export function useThemeSync() {
-    const { settings } = useSettingsQuery();
+    const { settings } = useSettings();
 
     useEffect(() => {
         applyThemeAttributes(settings.theme, settings.accent);

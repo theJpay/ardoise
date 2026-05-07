@@ -1,4 +1,5 @@
-import { useArchivedNotesQuery, useNotesMutations } from "@queries/useNotesQuery";
+import { deleteNote, restoreFromArchive } from "@services/notes.service";
+import { useArchivedNotes } from "@stores/notes.store";
 import { formatRelativeDate } from "@utils";
 
 import DeleteRowButton from "./DeleteRowButton";
@@ -7,8 +8,7 @@ import HiddenNotesPage from "./HiddenNotesPage";
 import RestoreButton from "./RestoreButton";
 
 function ArchivePage() {
-    const { archivedNotes, isPending } = useArchivedNotesQuery();
-    const { restoreFromArchive, deleteNote } = useNotesMutations();
+    const { archivedNotes, isPending } = useArchivedNotes();
 
     return (
         <HiddenNotesPage

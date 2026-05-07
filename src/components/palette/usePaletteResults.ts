@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { useNotesQuery } from "@queries/useNotesQuery";
+import { useNotes } from "@stores/notes.store";
 import { extractSnippet } from "@utils";
 
 import type { Note } from "@entities";
@@ -18,7 +18,7 @@ export type PaletteResults = {
 };
 
 export function usePaletteResults(query: string): PaletteResults {
-    const { notes } = useNotesQuery();
+    const { notes } = useNotes();
 
     return useMemo(() => {
         if (query === "") {

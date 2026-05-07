@@ -2,17 +2,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { NoteEntity } from "@entities";
 import { useDebounce } from "@hooks/useDebounce";
-import { useNotesMutations, useNotesQuery } from "@queries/useNotesQuery";
+import { updateNote } from "@services/notes.service";
+import { useNotes } from "@stores/notes.store";
 
 import type { Note } from "@entities";
+import type { RefObject } from "react";
 
 export type SaveStatus = "saved" | "writing" | "error";
 
 type NoteFields = { title?: string; content?: string };
 
 export function useNoteData(noteId: string) {
-    const { notes, isPending } = useNotesQuery();
-    const { updateNote } = useNotesMutations();
+    const { notes, isPending } = useNotes();
 
     const selectedNote = notes.find((note) => note.id === noteId);
 
@@ -34,17 +35,25 @@ export function useNoteData(noteId: string) {
             return;
         }
         try {
-            await updateNote(pending);
+            await updateNote(pending.id, pending.fields);
             if (pendingUpdate.current === pending) {
                 pendingUpdate.current = null;
                 setSaveStatus("saved");
             }
         } catch {
-            setSaveStatus("error");
+            if (pendingUpdate.current === pending) {
+                setSaveStatus("error");
+            }
         }
-    }, [updateNote]);
+    }, []);
 
     const debouncedFlush = useDebounce(flushPendingUpdate);
+
+    useEffect(() => {
+        return () => {
+            flushPendingUpdate();
+        };
+    }, [noteId, flushPendingUpdate]);
 
     const handleChange = useCallback(
         (fields: NoteFields) => {
@@ -70,6 +79,7 @@ export function useNoteData(noteId: string) {
 
     useDocumentTitle(title, selectedNote);
     useWarnUnsavedChanges(saveStatus);
+    useExternalEditsSync({ note: selectedNote, pendingUpdate, setTitle, setContent });
 
     return {
         isPending,
@@ -88,6 +98,30 @@ function useDocumentTitle(title: string, note: Note | undefined) {
             document.title = `${NoteEntity.getTitle({ title })} — Ardoise`;
         }
     }, [title, note]);
+}
+
+function useExternalEditsSync({
+    note,
+    pendingUpdate,
+    setTitle,
+    setContent
+}: {
+    note: Note | undefined;
+    pendingUpdate: RefObject<{ id: string; fields: NoteFields } | null>;
+    setTitle: (value: string) => void;
+    setContent: (value: string) => void;
+}) {
+    useEffect(() => {
+        if (!note) {
+            return;
+        }
+        const pending = pendingUpdate.current;
+        if (pending?.id === note.id) {
+            return;
+        }
+        setTitle(note.title);
+        setContent(note.content);
+    }, [note, pendingUpdate, setTitle, setContent]);
 }
 
 function useWarnUnsavedChanges(saveStatus: SaveStatus) {
