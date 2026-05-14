@@ -29,20 +29,20 @@ It is written as an implementation reference: each section captures what somethi
 
 ## 2. Decisions baked in
 
-| Decision                    | Choice                                                                  | Reason                                                                                                                    |
-| --------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Hierarchy model             | Single `notes` entity with `parentId`                                   | Smallest leap from today's schema; matches Notion's mental model.                                                         |
-| Max depth                   | **4** levels                                                            | Absorbs the "Area / Project / Topic / Note" pattern without making indent visuals cramped. Single constant; can be tuned. |
-| Sibling order               | By active sort option (no `position` field)                             | DnD is out of scope, so fractional indexing isn't needed yet.                                                             |
-| New note location           | Global → root; "New child" from menu; inline "+" inside expanded parent | Explicit user intent at each entry point; no surprise placements.                                                         |
-| Move                        | "Move to…" tree picker via context menu                                 | Covers reparenting without DnD's complexity.                                                                              |
-| Delete cascade              | Subtree cascades on soft-delete                                         | Soft-delete is recoverable; matches Notion; no confirmation needed.                                                       |
-| Restore semantics           | Re-parent to root if parent is still trashed                            | Restore stays a per-note operation.                                                                                       |
-| Recency cascade             | Separate `lastActivityAt` field, maintained on save                     | Keeps `updatedAt` accurate for display while letting sort bubble parents up.                                              |
-| Expand/collapse persistence | `localStorage`, per-device                                              | UI state; synchronous read avoids first-paint flicker.                                                                    |
-| Filter behavior             | Filter flattens the tree; parent path on results is a v2 polish         | Tree adds visual noise during search; flat is faster to scan in a narrow sidebar.                                         |
+| Decision                    | Choice                                                                     | Reason                                                                                                                    |
+| --------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Hierarchy model             | Single `notes` entity with `parentId`                                      | Smallest leap from today's schema; matches Notion's mental model.                                                         |
+| Max depth                   | **4** levels                                                               | Absorbs the "Area / Project / Topic / Note" pattern without making indent visuals cramped. Single constant; can be tuned. |
+| Sibling order               | By active sort option (no `position` field)                                | DnD is out of scope, so fractional indexing isn't needed yet.                                                             |
+| New note location           | Global → root; "New child" from menu; inline "+" inside expanded parent    | Explicit user intent at each entry point; no surprise placements.                                                         |
+| Move                        | "Move to…" tree picker via context menu                                    | Covers reparenting without DnD's complexity.                                                                              |
+| Delete cascade              | Subtree cascades on soft-delete                                            | Soft-delete is recoverable; matches Notion; no confirmation needed.                                                       |
+| Restore semantics           | Re-parent to root if parent is still trashed                               | Restore stays a per-note operation.                                                                                       |
+| Recency cascade             | Separate `lastActivityAt` field, maintained on save                        | Keeps `updatedAt` accurate for display while letting sort bubble parents up.                                              |
+| Expand/collapse persistence | `localStorage`, per-device                                                 | UI state; synchronous read avoids first-paint flicker.                                                                    |
+| Filter behavior             | Filter flattens the tree; parent path on results is a v2 polish            | Tree adds visual noise during search; flat is faster to scan in a narrow sidebar.                                         |
 | Export hierarchy            | Mirror the tree as folders in `notes/`; `archived/` and `trash/` stay flat | Filesystem-native; matches Notion-export pattern. Non-canonical states don't need to preserve hierarchy.                  |
-| DB version                  | Dexie **v5**                                                            | One migration adds `parentId` and `lastActivityAt`.                                                                       |
+| DB version                  | Dexie **v5**                                                               | One migration adds `parentId` and `lastActivityAt`.                                                                       |
 
 ---
 

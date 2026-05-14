@@ -276,16 +276,16 @@ Pending designer input:
 
 ## 10. Commit sequence
 
-| #   | Commit                                     | Type           | Effect                                                                                                                                                                                |
-| --- | ------------------------------------------ | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | `refactor: add tags schema`                | iso-functional | Dexie v6 migration: `tags` table + `tagIds: []` on every note. No UI change.                                                                                                          |
-| 2   | `feat: tag notes from the editor`          | functional     | Chip input below the title in the editor; inline-create + autocomplete from existing tags; case-insensitive name resolution.                                                          |
-| 3   | `feat: show tags on the note viewer`       | functional     | Read-only chips on the viewer; clicking a chip opens the palette with `tag:that-tag` pre-filled.                                                                                      |
-| 4   | `feat: filter palette results by tag`      | functional     | Palette parses `tag:foo` prefix; uses the multiEntry index; remaining text is the body search.                                                                                        |
-| 5   | `feat: autocomplete tags in the palette`   | functional     | Typing `tag:ardo` suggests existing tags; Tab commits.                                                                                                                                |
-| 6   | `feat: manage tags in settings`            | functional     | Tags section in settings: list + usage count + rename + delete-with-toast-undo. (May depend on a small iso-functional commit introducing a toast primitive if one doesn't exist yet.) |
-| 7   | `feat: color tags from the accent palette` | functional     | v2 polish; color stored on the tag entity; chips use it.                                                                                                                              |
-| 8   | `feat: include note metadata in note export` | functional   | Each exported `.md` carries a YAML front-matter block with `id`, `tags` (by name), `createdAt`, `updatedAt`, and `parentId`. Sets up roundtrip-able exports.                          |
+| #   | Commit                                       | Type           | Effect                                                                                                                                                                                |
+| --- | -------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `refactor: add tags schema`                  | iso-functional | Dexie v6 migration: `tags` table + `tagIds: []` on every note. No UI change.                                                                                                          |
+| 2   | `feat: tag notes from the editor`            | functional     | Chip input below the title in the editor; inline-create + autocomplete from existing tags; case-insensitive name resolution.                                                          |
+| 3   | `feat: show tags on the note viewer`         | functional     | Read-only chips on the viewer; clicking a chip opens the palette with `tag:that-tag` pre-filled.                                                                                      |
+| 4   | `feat: filter palette results by tag`        | functional     | Palette parses `tag:foo` prefix; uses the multiEntry index; remaining text is the body search.                                                                                        |
+| 5   | `feat: autocomplete tags in the palette`     | functional     | Typing `tag:ardo` suggests existing tags; Tab commits.                                                                                                                                |
+| 6   | `feat: manage tags in settings`              | functional     | Tags section in settings: list + usage count + rename + delete-with-toast-undo. (May depend on a small iso-functional commit introducing a toast primitive if one doesn't exist yet.) |
+| 7   | `feat: color tags from the accent palette`   | functional     | v2 polish; color stored on the tag entity; chips use it.                                                                                                                              |
+| 8   | `feat: include note metadata in note export` | functional     | Each exported `.md` carries a YAML front-matter block with `id`, `tags` (by name), `createdAt`, `updatedAt`, and `parentId`. Sets up roundtrip-able exports.                          |
 
 After step 2 the feature is usable end-to-end inside the editor. After step 4 it's a discovery feature in the palette. Step 6 makes tag housekeeping possible. Step 7 is iterative polish. Step 8 surfaces all the structured metadata that exists by then in the exported markdown.
 
@@ -303,7 +303,7 @@ id: 8f3a9c2d-4b1e-4f0a-9c7d-2a5b8e1f3c0d
 tags: [Work, Ardoise]
 createdAt: 2026-04-12T10:30:00Z
 updatedAt: 2026-05-14T14:22:00Z
-parentId: 12345678-90ab-cdef-1234-567890abcdef  # omitted if null
+parentId: 12345678-90ab-cdef-1234-567890abcdef # omitted if null
 ---
 
 # Note title
