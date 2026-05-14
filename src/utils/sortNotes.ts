@@ -2,20 +2,24 @@ import { UnreachableError } from "./UnreachableError";
 
 import type { Note } from "@entities";
 
-export const SORT_ORDERS = ["updated", "alphabetical", "created"] as const;
+export const SORT_ORDERS = {
+    UPDATED: "updated",
+    CREATED: "created",
+    ALPHABETICAL: "alphabetical"
+} as const;
 
-export type SortOrder = (typeof SORT_ORDERS)[number];
+export type SortOrder = (typeof SORT_ORDERS)[keyof typeof SORT_ORDERS];
 
-export const DEFAULT_SORT_ORDER: SortOrder = "updated";
+export const DEFAULT_SORT_ORDER: SortOrder = SORT_ORDERS.UPDATED;
 
 export function sortNotes(notes: Note[], order: SortOrder): Note[] {
     const copy = [...notes];
     switch (order) {
-        case "updated":
+        case SORT_ORDERS.UPDATED:
             return copy.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
-        case "created":
+        case SORT_ORDERS.CREATED:
             return copy.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-        case "alphabetical":
+        case SORT_ORDERS.ALPHABETICAL:
             return copy.sort(compareAlphabetical);
         default:
             throw new UnreachableError(order);
@@ -24,10 +28,10 @@ export function sortNotes(notes: Note[], order: SortOrder): Note[] {
 
 export function dateFieldForSort(order: SortOrder): "updatedAt" | "createdAt" {
     switch (order) {
-        case "updated":
-        case "alphabetical":
+        case SORT_ORDERS.UPDATED:
+        case SORT_ORDERS.ALPHABETICAL:
             return "updatedAt";
-        case "created":
+        case SORT_ORDERS.CREATED:
             return "createdAt";
         default:
             throw new UnreachableError(order);

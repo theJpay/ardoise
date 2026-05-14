@@ -38,7 +38,7 @@ function SortControl() {
                 placement="bottom-start"
                 onClose={() => setIsOpen(false)}
             >
-                {SORT_ORDERS.map((opt) => (
+                {Object.values(SORT_ORDERS).map((opt) => (
                     <SortControlItem
                         key={opt}
                         order={opt}
