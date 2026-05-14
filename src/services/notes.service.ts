@@ -90,10 +90,8 @@ export async function restoreFromTrash(id: string): Promise<void> {
     await db.notes.update(id, { deletedAt: null });
 }
 
-export async function deleteNote(id: string): Promise<boolean> {
-    const nbUpdated = await db.notes.update(id, { deletedAt: new Date(), archivedAt: null });
-
-    return nbUpdated > 0;
+export async function deleteNote(id: string): Promise<void> {
+    await db.notes.update(id, { deletedAt: new Date(), archivedAt: null });
 }
 
 export async function hardDeleteNote(id: string): Promise<void> {
