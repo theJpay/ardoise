@@ -25,11 +25,14 @@ export async function getTrashedNotes(): Promise<Note[]> {
 }
 
 export async function createNote(write: NoteWrite): Promise<Note> {
+    const now = new Date();
     const newNoteId = await db.notes.add({
         ...write,
         id: crypto.randomUUID(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: now,
+        updatedAt: now,
+        lastActivityAt: now,
+        parentId: null,
         pinnedAt: null,
         archivedAt: null,
         deletedAt: null
