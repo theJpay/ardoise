@@ -2,23 +2,26 @@ import { useIsTreeRowExpanded, useTreeExpansionActions } from "@stores/treeExpan
 
 import NoteItem from "./NoteItem";
 
+import type { Anchor } from "@hooks/useFloatingMenu";
 import type { NoteTreeNode } from "@utils/noteTree";
 
 type NoteTreeProps = {
     nodes: NoteTreeNode[];
-    dateField: "updatedAt" | "createdAt";
-    onContextMenu: (e: React.MouseEvent, noteId: string) => void;
+    menuOpenNoteId: string | null;
+    onOpenMenu: (noteId: string, anchor: Anchor) => void;
+    onCloseMenu: () => void;
 };
 
-function NoteTree({ nodes, dateField, onContextMenu }: NoteTreeProps) {
+function NoteTree({ nodes, menuOpenNoteId, onOpenMenu, onCloseMenu }: NoteTreeProps) {
     return (
         <ul>
             {nodes.map((node) => (
                 <NoteTreeRow
                     key={node.note.id}
-                    dateField={dateField}
+                    menuOpenNoteId={menuOpenNoteId}
                     node={node}
-                    onContextMenu={onContextMenu}
+                    onCloseMenu={onCloseMenu}
+                    onOpenMenu={onOpenMenu}
                 />
             ))}
         </ul>
@@ -27,20 +30,30 @@ function NoteTree({ nodes, dateField, onContextMenu }: NoteTreeProps) {
 
 type NoteTreeRowProps = {
     node: NoteTreeNode;
-    dateField: "updatedAt" | "createdAt";
-    onContextMenu: (e: React.MouseEvent, noteId: string) => void;
+    menuOpenNoteId: string | null;
+    onOpenMenu: (noteId: string, anchor: Anchor) => void;
+    onCloseMenu: () => void;
 };
 
-function NoteTreeRow({ node, dateField, onContextMenu }: NoteTreeRowProps) {
+function NoteTreeRow({ node, menuOpenNoteId, onOpenMenu, onCloseMenu }: NoteTreeRowProps) {
     const isExpanded = useIsTreeRowExpanded(node.note.id);
     const { toggle } = useTreeExpansionActions();
     const hasChildren = node.children.length > 0;
 
     return (
         <>
-            <li onContextMenu={(e) => onContextMenu(e, node.note.id)}>
+            <li
+                onContextMenu={(e) => {
+                    e.preventDefault();
+                    onOpenMenu(node.note.id, {
+                        type: "coordinates",
+                        x: e.clientX,
+                        y: e.clientY
+                    });
+                }}
+            >
                 <NoteItem
-                    dateField={dateField}
+                    isMenuOpen={menuOpenNoteId === node.note.id}
                     note={node.note}
                     treeRow={{
                         depth: node.depth,
@@ -48,13 +61,16 @@ function NoteTreeRow({ node, dateField, onContextMenu }: NoteTreeRowProps) {
                         isExpanded,
                         onToggleExpand: () => toggle(node.note.id)
                     }}
+                    onCloseMenu={onCloseMenu}
+                    onOpenMenu={(anchor) => onOpenMenu(node.note.id, anchor)}
                 />
             </li>
             {hasChildren && isExpanded && (
                 <NoteTree
-                    dateField={dateField}
+                    menuOpenNoteId={menuOpenNoteId}
                     nodes={node.children}
-                    onContextMenu={onContextMenu}
+                    onCloseMenu={onCloseMenu}
+                    onOpenMenu={onOpenMenu}
                 />
             )}
         </>

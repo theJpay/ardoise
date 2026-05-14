@@ -16,18 +16,19 @@ import {
 import { useDeletionActions } from "@stores/deletion.store";
 
 import type { Note } from "@entities";
+import type { Anchor } from "@hooks/useFloatingMenu";
 import type { LucideIcon } from "lucide-react";
 
 const EXIT_ANIMATION_DURATION = 150;
 
 type ContextMenuProps = {
     note: Note;
-    position: { x: number; y: number };
+    anchor: Anchor;
     onClose: () => void;
     onShare: () => void;
 };
 
-function ContextMenu({ note, position, onClose, onShare }: ContextMenuProps) {
+function ContextMenu({ note, anchor, onClose, onShare }: ContextMenuProps) {
     const { navigate } = useAppNavigate();
     const { setDeleting, reset } = useDeletionActions();
     const currentNoteMatch = useMatch("/notes/:noteId");
@@ -73,12 +74,7 @@ function ContextMenu({ note, position, onClose, onShare }: ContextMenuProps) {
     };
 
     return (
-        <Popover
-            anchor={{ type: "coordinates", x: position.x, y: position.y }}
-            className="w-48 rounded p-1"
-            open={true}
-            onClose={onClose}
-        >
+        <Popover anchor={anchor} className="w-48 rounded p-1" open={true} onClose={onClose}>
             <MenuItem icon={Copy} label="Duplicate" onClick={handleDuplicate} />
             <MenuDivider />
             <MenuItem icon={Share2} label="Share" onClick={onShare} />

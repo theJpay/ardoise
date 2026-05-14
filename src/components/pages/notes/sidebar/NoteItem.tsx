@@ -1,11 +1,12 @@
-import { ChevronRight, File } from "lucide-react";
+import { ChevronRight, File, MoreHorizontal } from "lucide-react";
+import { useRef } from "react";
 import { Link, useParams } from "react-router";
 
 import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useDeletionState } from "@stores/deletion.store";
-import { formatRelativeDate } from "@utils";
 
 import type { Note } from "@entities";
+import type { Anchor } from "@hooks/useFloatingMenu";
 
 type TreeRowProps = {
     depth: number;
@@ -16,7 +17,9 @@ type TreeRowProps = {
 
 type NoteItemProps = {
     note: Note;
-    dateField: "updatedAt" | "createdAt";
+    isMenuOpen: boolean;
+    onOpenMenu: (anchor: Anchor) => void;
+    onCloseMenu: () => void;
     treeRow?: TreeRowProps;
 };
 
@@ -25,7 +28,7 @@ const TREE_DEPTH_STEP_PX = 14;
 const FLAT_PADDING_PX = 34;
 const ACTIVE_BORDER_OFFSET_PX = 2;
 
-function NoteItem({ note, dateField, treeRow }: NoteItemProps) {
+function NoteItem({ note, isMenuOpen, onOpenMenu, onCloseMenu, treeRow }: NoteItemProps) {
     const { noteId } = useParams();
     const { buildLink } = useAppNavigate();
     const { deletingNoteId } = useDeletionState();
@@ -45,7 +48,9 @@ function NoteItem({ note, dateField, treeRow }: NoteItemProps) {
                     ? "pointer-events-none -translate-y-1 opacity-0"
                     : isActive
                       ? "border-accent bg-elevated"
-                      : "hover:bg-elevated border-transparent"
+                      : isMenuOpen
+                        ? "bg-elevated border-transparent"
+                        : "hover:bg-elevated border-transparent"
             }`}
             style={{ paddingLeft: `${paddingLeft}px` }}
             to={buildLink(`/notes/${note.id}`)}
@@ -61,9 +66,7 @@ function NoteItem({ note, dateField, treeRow }: NoteItemProps) {
             ) : (
                 <span className="text-ui-sm text-muted flex-1 truncate italic">Untitled</span>
             )}
-            <span className="text-ui-sm text-subtle duration-fast bg-elevated before:from-elevated pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 pl-2 font-mono opacity-0 transition-opacity group-hover:opacity-100 before:absolute before:inset-y-0 before:right-full before:w-4 before:bg-linear-to-l before:to-transparent before:content-['']">
-                {formatRelativeDate(note[dateField], { short: true })}
-            </span>
+            <MenuButton isMenuOpen={isMenuOpen} onCloseMenu={onCloseMenu} onOpenMenu={onOpenMenu} />
         </Link>
     );
 }
@@ -89,6 +92,40 @@ function ChevronToggle({ hasChildren, isExpanded, onToggleExpand }: TreeRowProps
                 size={11}
                 strokeWidth={2}
             />
+        </button>
+    );
+}
+
+type MenuButtonProps = {
+    isMenuOpen: boolean;
+    onOpenMenu: (anchor: Anchor) => void;
+    onCloseMenu: () => void;
+};
+
+function MenuButton({ isMenuOpen, onOpenMenu, onCloseMenu }: MenuButtonProps) {
+    const buttonRef = useRef<HTMLButtonElement>(null);
+
+    return (
+        <button
+            ref={buttonRef}
+            aria-label="Note actions"
+            className={`text-subtle hover:bg-border duration-fast absolute inset-y-0 right-1 my-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-sm transition-opacity ${
+                isMenuOpen
+                    ? "opacity-100"
+                    : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100"
+            }`}
+            type="button"
+            onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isMenuOpen) {
+                    onCloseMenu();
+                } else {
+                    onOpenMenu({ type: "element", ref: buttonRef });
+                }
+            }}
+        >
+            <MoreHorizontal size={13} strokeWidth={1.5} />
         </button>
     );
 }

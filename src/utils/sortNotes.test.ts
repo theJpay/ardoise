@@ -2,9 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { generateNote } from "@entities/note.fixtures";
 
-import { dateFieldForSort, sortNotes } from "./sortNotes";
-
-import type { SortOrder } from "./sortNotes";
+import { sortNotes } from "./sortNotes";
 
 describe("sortNotes", () => {
     it("orders by updatedAt descending under 'updated'", () => {
@@ -53,15 +51,5 @@ describe("sortNotes", () => {
         sortNotes(input, "updated");
 
         expect(input.map((n) => n.id)).toEqual(["a", "b"]);
-    });
-});
-
-describe("dateFieldForSort", () => {
-    it.each<[SortOrder, "updatedAt" | "createdAt"]>([
-        ["updated", "updatedAt"],
-        ["alphabetical", "updatedAt"],
-        ["created", "createdAt"]
-    ])("maps %s to %s", (order, expected) => {
-        expect(dateFieldForSort(order)).toBe(expected);
     });
 });

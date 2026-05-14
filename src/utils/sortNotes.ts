@@ -26,18 +26,6 @@ export function sortNotes(notes: Note[], order: SortOrder): Note[] {
     }
 }
 
-export function dateFieldForSort(order: SortOrder): "updatedAt" | "createdAt" {
-    switch (order) {
-        case SORT_ORDERS.UPDATED:
-        case SORT_ORDERS.ALPHABETICAL:
-            return "updatedAt";
-        case SORT_ORDERS.CREATED:
-            return "createdAt";
-        default:
-            throw new UnreachableError(order);
-    }
-}
-
 function compareAlphabetical(a: Note, b: Note): number {
     const aEmpty = a.title.trim() === "";
     const bEmpty = b.title.trim() === "";

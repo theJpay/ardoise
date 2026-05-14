@@ -9,7 +9,7 @@ import { useNoteSearch } from "@hooks/useNoteSearch";
 import { useNotes } from "@stores/notes.store";
 import { useSortOrder } from "@stores/sort.store";
 import { useTreeExpansionActions } from "@stores/treeExpansion.store";
-import { dateFieldForSort, sortNotes } from "@utils";
+import { sortNotes } from "@utils";
 import { buildNoteTree } from "@utils/noteTree";
 
 import InlineHint from "./InlineHint";
@@ -20,15 +20,19 @@ import SearchBar from "./SearchBar";
 import SortControl from "./SortControl";
 
 import type { Note } from "@entities";
+import type { Anchor } from "@hooks/useFloatingMenu";
 import type { RefObject } from "react";
 
 type SideBarProps = {
     searchRef: RefObject<HTMLInputElement | null>;
 };
 
+type MenuSource = "pinned" | "notes";
+
 type MenuState = {
     note: Note;
-    position: { x: number; y: number };
+    anchor: Anchor;
+    source: MenuSource;
 } | null;
 
 function SideBar({ searchRef }: SideBarProps) {
@@ -56,23 +60,32 @@ function SideBar({ searchRef }: SideBarProps) {
     );
 
     const [menu, setMenu] = useState<MenuState>(null);
-    const handleContextMenu = useCallback(
-        (e: React.MouseEvent, noteId: string) => {
-            e.preventDefault();
+    const openPinnedMenu = useCallback(
+        (noteId: string, anchor: Anchor) => {
             const note = notes.find((n) => n.id === noteId);
             if (note) {
-                setMenu({ note, position: { x: e.clientX, y: e.clientY } });
+                setMenu({ note, anchor, source: "pinned" });
+            }
+        },
+        [notes]
+    );
+    const openNotesMenu = useCallback(
+        (noteId: string, anchor: Anchor) => {
+            const note = notes.find((n) => n.id === noteId);
+            if (note) {
+                setMenu({ note, anchor, source: "notes" });
             }
         },
         [notes]
     );
     const handleCloseMenu = useCallback(() => setMenu(null), []);
+    const pinnedMenuOpenId = menu?.source === "pinned" ? menu.note.id : null;
+    const notesMenuOpenId = menu?.source === "notes" ? menu.note.id : null;
 
     useAutoExpandAncestors(notes);
     useOneTimePrune(notes, isPending);
 
     const { addNote } = useAddNote();
-    const dateField = dateFieldForSort(order);
 
     const noNotes = notes.length === 0;
     const noSearchResults = filteredNotes.length === 0 && isSearchMode;
@@ -108,9 +121,10 @@ function SideBar({ searchRef }: SideBarProps) {
                             <>
                                 <SectionTitle label="Pinned" />
                                 <NoteList
-                                    dateField={dateField}
+                                    menuOpenNoteId={pinnedMenuOpenId}
                                     notes={pinnedNotes}
-                                    onContextMenu={handleContextMenu}
+                                    onCloseMenu={handleCloseMenu}
+                                    onOpenMenu={openPinnedMenu}
                                 />
                             </>
                         )}
@@ -119,9 +133,10 @@ function SideBar({ searchRef }: SideBarProps) {
                                   <>
                                       <SectionTitle label="Notes" />
                                       <NoteList
-                                          dateField={dateField}
+                                          menuOpenNoteId={notesMenuOpenId}
                                           notes={flatUnpinnedMatches}
-                                          onContextMenu={handleContextMenu}
+                                          onCloseMenu={handleCloseMenu}
+                                          onOpenMenu={openNotesMenu}
                                       />
                                   </>
                               )
@@ -129,9 +144,10 @@ function SideBar({ searchRef }: SideBarProps) {
                                   <>
                                       <SectionTitle label="Notes" />
                                       <NoteTree
-                                          dateField={dateField}
+                                          menuOpenNoteId={notesMenuOpenId}
                                           nodes={tree}
-                                          onContextMenu={handleContextMenu}
+                                          onCloseMenu={handleCloseMenu}
+                                          onOpenMenu={openNotesMenu}
                                       />
                                   </>
                               )}
@@ -139,9 +155,7 @@ function SideBar({ searchRef }: SideBarProps) {
                 )}
             </div>
 
-            {menu && (
-                <NoteMenu note={menu.note} position={menu.position} onClose={handleCloseMenu} />
-            )}
+            {menu && <NoteMenu anchor={menu.anchor} note={menu.note} onClose={handleCloseMenu} />}
         </div>
     );
 }
