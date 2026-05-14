@@ -1,54 +1,22 @@
-import { useCallback, useState } from "react";
-
-import { useSortOrder } from "@stores/sort.store";
-import { dateFieldForSort } from "@utils";
-
 import NoteItem from "./NoteItem";
-import NoteMenu from "./NoteMenu";
 
 import type { Note } from "@entities";
 
 type NoteListProps = {
     notes: Note[];
+    dateField: "updatedAt" | "createdAt";
+    onContextMenu: (e: React.MouseEvent, noteId: string) => void;
 };
 
-type MenuState = {
-    note: Note;
-    position: { x: number; y: number };
-} | null;
-
-function NoteList({ notes }: NoteListProps) {
-    const [menu, setMenu] = useState<MenuState>(null);
-    const dateField = dateFieldForSort(useSortOrder());
-
-    const handleContextMenu = useCallback(
-        (e: React.MouseEvent, noteId: string) => {
-            e.preventDefault();
-            const note = notes.find((n) => n.id === noteId);
-            if (note) {
-                setMenu({ note, position: { x: e.clientX, y: e.clientY } });
-            }
-        },
-        [notes]
-    );
-
-    const handleCloseMenu = useCallback(() => {
-        setMenu(null);
-    }, []);
-
+function NoteList({ notes, dateField, onContextMenu }: NoteListProps) {
     return (
-        <>
-            <ul>
-                {notes.map((note) => (
-                    <li key={note.id} onContextMenu={(e) => handleContextMenu(e, note.id)}>
-                        <NoteItem dateField={dateField} note={note} />
-                    </li>
-                ))}
-            </ul>
-            {menu && (
-                <NoteMenu note={menu.note} position={menu.position} onClose={handleCloseMenu} />
-            )}
-        </>
+        <ul>
+            {notes.map((note) => (
+                <li key={note.id} onContextMenu={(e) => onContextMenu(e, note.id)}>
+                    <NoteItem dateField={dateField} note={note} />
+                </li>
+            ))}
+        </ul>
     );
 }
 

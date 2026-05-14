@@ -13,7 +13,7 @@ function NotesPage() {
         <div
             className="duration-layout grid h-full transition-[grid-template-columns] ease-in-out"
             style={{
-                gridTemplateColumns: isSidebarOpen ? "240px 1fr" : "0px 1fr"
+                gridTemplateColumns: isSidebarOpen ? "260px 1fr" : "0px 1fr"
             }}
         >
             <aside

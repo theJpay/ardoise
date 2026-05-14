@@ -1,41 +1,81 @@
 import { Plus } from "lucide-react";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button } from "@components/generics";
 import { NoteEntity } from "@entities";
 import { useAddNote } from "@hooks/useAddNote";
+import { useAutoExpandAncestors } from "@hooks/useAutoExpandAncestors";
 import { useNoteSearch } from "@hooks/useNoteSearch";
 import { useNotes } from "@stores/notes.store";
 import { useSortOrder } from "@stores/sort.store";
-import { sortNotes } from "@utils";
+import { useTreeExpansionActions } from "@stores/treeExpansion.store";
+import { dateFieldForSort, sortNotes } from "@utils";
+import { buildNoteTree } from "@utils/noteTree";
 
 import InlineHint from "./InlineHint";
 import NoteList from "./NoteList";
+import NoteMenu from "./NoteMenu";
+import NoteTree from "./NoteTree";
 import SearchBar from "./SearchBar";
 import SortControl from "./SortControl";
 
+import type { Note } from "@entities";
 import type { RefObject } from "react";
 
 type SideBarProps = {
     searchRef: RefObject<HTMLInputElement | null>;
 };
 
+type MenuState = {
+    note: Note;
+    position: { x: number; y: number };
+} | null;
+
 function SideBar({ searchRef }: SideBarProps) {
     const { notes, isPending } = useNotes();
     const order = useSortOrder();
-    const sortedNotes = useMemo(() => sortNotes(notes, order), [notes, order]);
-    const { search, setSearch, filteredNotes } = useNoteSearch(sortedNotes);
+    const { search, setSearch, filteredNotes } = useNoteSearch(notes);
+    const isSearchMode = search.trim() !== "";
 
-    const pinnedNotes = useMemo(() => filteredNotes.filter(NoteEntity.isPinned), [filteredNotes]);
-    const unpinnedNotes = useMemo(
-        () => filteredNotes.filter((note) => !NoteEntity.isPinned(note)),
-        [filteredNotes]
+    const sortedFilteredNotes = useMemo(
+        () => sortNotes(filteredNotes, order),
+        [filteredNotes, order]
+    );
+    const pinnedNotes = useMemo(
+        () => sortedFilteredNotes.filter(NoteEntity.isPinned),
+        [sortedFilteredNotes]
+    );
+    const flatUnpinnedMatches = useMemo(
+        () => sortedFilteredNotes.filter((note) => !NoteEntity.isPinned(note)),
+        [sortedFilteredNotes]
     );
 
+    const tree = useMemo(
+        () => (isSearchMode ? [] : buildNoteTree(notes, order)),
+        [notes, order, isSearchMode]
+    );
+
+    const [menu, setMenu] = useState<MenuState>(null);
+    const handleContextMenu = useCallback(
+        (e: React.MouseEvent, noteId: string) => {
+            e.preventDefault();
+            const note = notes.find((n) => n.id === noteId);
+            if (note) {
+                setMenu({ note, position: { x: e.clientX, y: e.clientY } });
+            }
+        },
+        [notes]
+    );
+    const handleCloseMenu = useCallback(() => setMenu(null), []);
+
+    useAutoExpandAncestors(notes);
+    useOneTimePrune(notes, isPending);
+
     const { addNote } = useAddNote();
+    const dateField = dateFieldForSort(order);
 
     const noNotes = notes.length === 0;
-    const noSearchResults = filteredNotes.length === 0 && search.trim() !== "";
+    const noSearchResults = filteredNotes.length === 0 && isSearchMode;
 
     return (
         <div className="flex h-full flex-col">
@@ -67,24 +107,59 @@ function SideBar({ searchRef }: SideBarProps) {
                         {pinnedNotes.length > 0 && (
                             <>
                                 <SectionTitle label="Pinned" />
-                                <NoteList notes={pinnedNotes} />
+                                <NoteList
+                                    dateField={dateField}
+                                    notes={pinnedNotes}
+                                    onContextMenu={handleContextMenu}
+                                />
                             </>
                         )}
-                        {unpinnedNotes.length > 0 && (
-                            <>
-                                <SectionTitle label="Notes" />
-                                <NoteList notes={unpinnedNotes} />
-                            </>
-                        )}
+                        {isSearchMode
+                            ? flatUnpinnedMatches.length > 0 && (
+                                  <>
+                                      <SectionTitle label="Notes" />
+                                      <NoteList
+                                          dateField={dateField}
+                                          notes={flatUnpinnedMatches}
+                                          onContextMenu={handleContextMenu}
+                                      />
+                                  </>
+                              )
+                            : tree.length > 0 && (
+                                  <>
+                                      <SectionTitle label="Notes" />
+                                      <NoteTree
+                                          dateField={dateField}
+                                          nodes={tree}
+                                          onContextMenu={handleContextMenu}
+                                      />
+                                  </>
+                              )}
                     </>
                 )}
             </div>
+
+            {menu && (
+                <NoteMenu note={menu.note} position={menu.position} onClose={handleCloseMenu} />
+            )}
         </div>
     );
 }
 
 function SectionTitle({ label }: { label: string }) {
     return <div className="text-ui-xs text-dim shrink-0 px-3 pt-2.5 pb-0.5 font-mono">{label}</div>;
+}
+
+function useOneTimePrune(notes: Note[], isPending: boolean) {
+    const { pruneTo } = useTreeExpansionActions();
+    const hasPruned = useRef(false);
+    useEffect(() => {
+        if (isPending || hasPruned.current) {
+            return;
+        }
+        pruneTo(new Set(notes.map((n) => n.id)));
+        hasPruned.current = true;
+    }, [isPending, notes, pruneTo]);
 }
 
 export default SideBar;
