@@ -1,4 +1,4 @@
-import { escapeHtml } from "@utils/escapeHtml";
+import { escapeHtml } from "@editor/escapeHtml";
 
 export function tokenizeHr(line: string): string | null {
     if (/^(---+|\*\*\*+|___+)$/.test(line)) {

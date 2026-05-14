@@ -1,4 +1,4 @@
-import { escapeHtml } from "@utils/escapeHtml";
+import { escapeHtml } from "@editor/escapeHtml";
 
 import { formatCodeBlock, matchFenceOpen, tokenizeCodeFenceOpen } from "./lib/codeBlock";
 import { tokenizeLine } from "./lib/tokenizeLine";
