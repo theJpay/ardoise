@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 
+import { generateNote } from "@entities/note.fixtures";
+
 import { dateFieldForSort, sortNotes } from "./sortNotes";
 
 import type { SortOrder } from "./sortNotes";
-import type { Note } from "@entities";
 
 describe("sortNotes", () => {
     it("orders by updatedAt descending under 'updated'", () => {
@@ -64,18 +65,3 @@ describe("dateFieldForSort", () => {
         expect(dateFieldForSort(order)).toBe(expected);
     });
 });
-
-function generateNote(overrides: Partial<Note>): Note {
-    return {
-        id: overrides.id ?? "id",
-        title: overrides.title ?? "",
-        content: overrides.content ?? "",
-        createdAt: overrides.createdAt ?? new Date(2026, 0, 1),
-        updatedAt: overrides.updatedAt ?? new Date(2026, 0, 1),
-        lastActivityAt: overrides.lastActivityAt ?? new Date(2026, 0, 1),
-        parentId: overrides.parentId ?? null,
-        pinnedAt: overrides.pinnedAt ?? null,
-        archivedAt: overrides.archivedAt ?? null,
-        deletedAt: overrides.deletedAt ?? null
-    };
-}
