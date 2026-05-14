@@ -28,7 +28,7 @@ It is written as an implementation reference: each section captures what somethi
 - **Server-side search or filters over note content.** E2EE makes this structurally impossible. Search remains entirely client-side.
 - **Native mobile apps.** No React Native, Capacitor, or app-store builds. The mobile experience is the PWA.
 - **Self-hosting story for other users.** The codebase will be open enough to self-host in principle, but the deployment is single-instance and not designed as multi-tenant SaaS.
-- **Account recovery without the recovery code.** Lost password *and* lost recovery code = lost data, by design. This is the cost of e2ee and will be communicated clearly during signup.
+- **Account recovery without the recovery code.** Lost password _and_ lost recovery code = lost data, by design. This is the cost of e2ee and will be communicated clearly during signup.
 - **Public or anonymous note creation.** All writes require an authenticated account.
 - **Plugin / third-party extension API.** Not in scope.
 - **AI features that work offline.** The AI surface always requires network and a provider; there is no local LLM fallback.
@@ -73,20 +73,20 @@ The backend talks to Supabase Postgres using a service-role key (full access; se
 
 ### Stack
 
-| Layer | Choice | Notes |
-|---|---|---|
-| Client framework | Vite + React + TypeScript | Existing. |
-| Local store | Dexie (IndexedDB) | Existing. Source of truth on the client. |
-| Client crypto | Web Crypto API | Native, no dependency. AES-GCM + PBKDF2/Argon2id (via WASM lib if Argon2id chosen — see §5). |
-| Auth client | `@supabase/supabase-js` | For signup / signin / session. JWTs forwarded to the Nest backend. |
-| Backend framework | Nest.js (Node 20+) | Familiar shape, opinionated structure, TypeScript end-to-end. |
-| Backend JWT | `jose` (or `@nestjs/jwt`) | Verifies Supabase JWTs via the project's JWKS endpoint. |
-| DB | Supabase Postgres | Schema versioned via Supabase CLI migrations. |
-| Auth provider | Supabase Auth (GoTrue) | Email + password, email verification, password reset. |
-| Object storage | Supabase Storage | Added later, with STT (audio uploads). Not v1. |
-| Shared package | `packages/shared` | Isomorphic TS: types, Zod schemas for API contracts, pure entity helpers, constants. No platform APIs, no heavy deps. |
-| Client host | Vercel | Existing. |
-| Backend host | Railway | Two environments: `beta`, `production`. |
+| Layer             | Choice                    | Notes                                                                                                                 |
+| ----------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Client framework  | Vite + React + TypeScript | Existing.                                                                                                             |
+| Local store       | Dexie (IndexedDB)         | Existing. Source of truth on the client.                                                                              |
+| Client crypto     | Web Crypto API            | Native, no dependency. AES-GCM + PBKDF2/Argon2id (via WASM lib if Argon2id chosen — see §5).                          |
+| Auth client       | `@supabase/supabase-js`   | For signup / signin / session. JWTs forwarded to the Nest backend.                                                    |
+| Backend framework | Nest.js (Node 20+)        | Familiar shape, opinionated structure, TypeScript end-to-end.                                                         |
+| Backend JWT       | `jose` (or `@nestjs/jwt`) | Verifies Supabase JWTs via the project's JWKS endpoint.                                                               |
+| DB                | Supabase Postgres         | Schema versioned via Supabase CLI migrations.                                                                         |
+| Auth provider     | Supabase Auth (GoTrue)    | Email + password, email verification, password reset.                                                                 |
+| Object storage    | Supabase Storage          | Added later, with STT (audio uploads). Not v1.                                                                        |
+| Shared package    | `packages/shared`         | Isomorphic TS: types, Zod schemas for API contracts, pure entity helpers, constants. No platform APIs, no heavy deps. |
+| Client host       | Vercel                    | Existing.                                                                                                             |
+| Backend host      | Railway                   | Two environments: `beta`, `production`.                                                                               |
 
 ### Monorepo layout
 
@@ -125,16 +125,16 @@ ardoise/
 
 The server stores **only opaque ciphertext and the metadata required for sync mechanics**. Everything a user would consider "the note" — title, body, tags, pinned/archived state, per-note settings — is encrypted into a single payload before it leaves the client.
 
-| Visible to server | Encrypted into payload |
-|---|---|
-| `id` (UUID, client-generated) | title |
-| `owner_id` | body (markdown) |
-| `version` (monotonic, server-assigned) | tags |
-| `updated_at`, `created_at`, `deleted_at` | pinned / archived flags |
-| `ciphertext` + `ciphertext_iv` (opaque blob) | per-note settings |
-| ciphertext size (inherent) | |
+| Visible to server                            | Encrypted into payload  |
+| -------------------------------------------- | ----------------------- |
+| `id` (UUID, client-generated)                | title                   |
+| `owner_id`                                   | body (markdown)         |
+| `version` (monotonic, server-assigned)       | tags                    |
+| `updated_at`, `created_at`, `deleted_at`     | pinned / archived flags |
+| `ciphertext` + `ciphertext_iv` (opaque blob) | per-note settings       |
+| ciphertext size (inherent)                   |                         |
 
-What the server *can* infer: the user has N notes, each of approximate size S, with timestamps T. It cannot infer titles, content, tags, or which notes are pinned. This is the minimum metadata leakage compatible with a sync server.
+What the server _can_ infer: the user has N notes, each of approximate size S, with timestamps T. It cannot infer titles, content, tags, or which notes are pinned. This is the minimum metadata leakage compatible with a sync server.
 
 ### Postgres tables
 
@@ -142,41 +142,41 @@ The schema is versioned via Supabase CLI migrations under `supabase/migrations/`
 
 **`notes`** — one row per logical note.
 
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `uuid` PK | Client-generated. Same UUID across all of a user's devices. |
-| `owner_id` | `uuid` FK → `auth.users(id)` | Indexed. |
-| `ciphertext` | `bytea` | AES-GCM encrypted payload (see §5). Includes title, body, tags, flags. |
-| `ciphertext_iv` | `bytea` | 12-byte nonce for AES-GCM. New nonce per encryption. |
-| `version` | `bigint` | Server-assigned, monotonic per note. Incremented on every successful write. |
-| `updated_at` | `timestamptz` | Client-stamped (with server-side bound to prevent absurd values). LWW tiebreaker. |
-| `created_at` | `timestamptz` | Server-assigned on first insert. |
-| `deleted_at` | `timestamptz` nullable | Soft delete. Row remains so other devices can sync the deletion. Hard-pruned by a background job after a retention window. |
+| Column          | Type                         | Notes                                                                                                                      |
+| --------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `id`            | `uuid` PK                    | Client-generated. Same UUID across all of a user's devices.                                                                |
+| `owner_id`      | `uuid` FK → `auth.users(id)` | Indexed.                                                                                                                   |
+| `ciphertext`    | `bytea`                      | AES-GCM encrypted payload (see §5). Includes title, body, tags, flags.                                                     |
+| `ciphertext_iv` | `bytea`                      | 12-byte nonce for AES-GCM. New nonce per encryption.                                                                       |
+| `version`       | `bigint`                     | Server-assigned, monotonic per note. Incremented on every successful write.                                                |
+| `updated_at`    | `timestamptz`                | Client-stamped (with server-side bound to prevent absurd values). LWW tiebreaker.                                          |
+| `created_at`    | `timestamptz`                | Server-assigned on first insert.                                                                                           |
+| `deleted_at`    | `timestamptz` nullable       | Soft delete. Row remains so other devices can sync the deletion. Hard-pruned by a background job after a retention window. |
 
 Indexes: `(owner_id, updated_at DESC)` for sync pulls; `(owner_id, id)` is the natural PK lookup.
 
 **`user_keys`** — wrapped data-encryption key per user. Details and the key hierarchy are specified in §5; this table is its at-rest representation.
 
-| Column | Type | Notes |
-|---|---|---|
-| `user_id` | `uuid` PK FK → `auth.users(id)` | One row per user. |
-| `kek_password_salt` | `bytea` | Salt for password → KEK derivation. |
-| `kek_recovery_salt` | `bytea` | Salt for recovery-code → KEK derivation. |
-| `wrapped_dek_by_password` | `bytea` | DEK encrypted with password-derived KEK. |
-| `wrapped_dek_by_recovery` | `bytea` | DEK encrypted with recovery-derived KEK. |
-| `kdf_params` | `jsonb` | KDF algorithm and parameters (algo, memory, iterations) for forward compatibility. |
-| `created_at` / `updated_at` | `timestamptz` | |
+| Column                      | Type                            | Notes                                                                              |
+| --------------------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
+| `user_id`                   | `uuid` PK FK → `auth.users(id)` | One row per user.                                                                  |
+| `kek_password_salt`         | `bytea`                         | Salt for password → KEK derivation.                                                |
+| `kek_recovery_salt`         | `bytea`                         | Salt for recovery-code → KEK derivation.                                           |
+| `wrapped_dek_by_password`   | `bytea`                         | DEK encrypted with password-derived KEK.                                           |
+| `wrapped_dek_by_recovery`   | `bytea`                         | DEK encrypted with recovery-derived KEK.                                           |
+| `kdf_params`                | `jsonb`                         | KDF algorithm and parameters (algo, memory, iterations) for forward compatibility. |
+| `created_at` / `updated_at` | `timestamptz`                   |                                                                                    |
 
 **`share_tokens`** — read-only share links.
 
-| Column | Type | Notes |
-|---|---|---|
-| `token` | `text` PK | Random URL-safe string. Used in share URLs. |
-| `note_id` | `uuid` FK → `notes(id)` | The shared note. |
-| `owner_id` | `uuid` FK → `auth.users(id)` | For owner-scoped revocation queries. |
-| `created_at` | `timestamptz` | |
-| `expires_at` | `timestamptz` nullable | Optional expiry. |
-| `revoked_at` | `timestamptz` nullable | Set when owner revokes. Row kept for audit. |
+| Column       | Type                         | Notes                                       |
+| ------------ | ---------------------------- | ------------------------------------------- |
+| `token`      | `text` PK                    | Random URL-safe string. Used in share URLs. |
+| `note_id`    | `uuid` FK → `notes(id)`      | The shared note.                            |
+| `owner_id`   | `uuid` FK → `auth.users(id)` | For owner-scoped revocation queries.        |
+| `created_at` | `timestamptz`                |                                             |
+| `expires_at` | `timestamptz` nullable       | Optional expiry.                            |
+| `revoked_at` | `timestamptz` nullable       | Set when owner revokes. Row kept for audit. |
 
 The note's decryption key is **not** stored server-side. It lives in the URL fragment (`#k=...`), which browsers do not send to servers. Sharing details are in §9.
 
@@ -188,32 +188,32 @@ The existing `notes` table evolves; two new tables are added.
 
 **`notes`** — plaintext, as currently. Adds three sync-related fields:
 
-| Field | Notes |
-|---|---|
-| existing fields (`id`, `title`, `body`, `tags`, `pinned`, `archived`, `updatedAt`, …) | Unchanged in shape. |
-| `version` | Last server-assigned version known for this note. `0` if never synced. |
-| `dirty` | Boolean. True when local changes have not yet been pushed (i.e. an outbox entry exists). Used for UI hints and conflict detection on pull. |
-| `serverUpdatedAt` | The `updated_at` last seen from the server. Used as the LWW tiebreaker on conflict. |
+| Field                                                                                 | Notes                                                                                                                                      |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| existing fields (`id`, `title`, `body`, `tags`, `pinned`, `archived`, `updatedAt`, …) | Unchanged in shape.                                                                                                                        |
+| `version`                                                                             | Last server-assigned version known for this note. `0` if never synced.                                                                     |
+| `dirty`                                                                               | Boolean. True when local changes have not yet been pushed (i.e. an outbox entry exists). Used for UI hints and conflict detection on pull. |
+| `serverUpdatedAt`                                                                     | The `updated_at` last seen from the server. Used as the LWW tiebreaker on conflict.                                                        |
 
 **`outbox`** — pending writes to the backend.
 
-| Field | Notes |
-|---|---|
-| `opId` | UUID. Client-generated; survives retries unchanged. |
-| `noteId` | The note being written. |
-| `ciphertext`, `ciphertextIv` | The encrypted payload to send. |
-| `parentVersion` | The `version` the local edit was based on. Sent to the server for optimistic concurrency. |
-| `attempts` | Retry counter. |
-| `lastAttemptAt` | For backoff scheduling. |
-| `lastError` | Optional. For surfacing persistent failures in UI. |
+| Field                        | Notes                                                                                     |
+| ---------------------------- | ----------------------------------------------------------------------------------------- |
+| `opId`                       | UUID. Client-generated; survives retries unchanged.                                       |
+| `noteId`                     | The note being written.                                                                   |
+| `ciphertext`, `ciphertextIv` | The encrypted payload to send.                                                            |
+| `parentVersion`              | The `version` the local edit was based on. Sent to the server for optimistic concurrency. |
+| `attempts`                   | Retry counter.                                                                            |
+| `lastAttemptAt`              | For backoff scheduling.                                                                   |
+| `lastError`                  | Optional. For surfacing persistent failures in UI.                                        |
 
 Outbox is drained FIFO per note (across notes, order doesn't matter). See §6 for the worker loop.
 
 **`syncMeta`** — singleton-ish, one row per logical sync stream.
 
-| Field | Notes |
-|---|---|
-| `lastPullAt` | Timestamp of last successful pull. |
+| Field            | Notes                                                                                                   |
+| ---------------- | ------------------------------------------------------------------------------------------------------- |
+| `lastPullAt`     | Timestamp of last successful pull.                                                                      |
 | `lastPullCursor` | Highest `updated_at` seen on the server in the last pull. Used as the `since` cursor for the next pull. |
 
 ### Why this shape
@@ -243,18 +243,18 @@ The client uses `@supabase/supabase-js` directly for **signin, refresh, signout,
 Signup is the one auth operation that goes through the backend rather than direct to Supabase. The reason: account creation and `user_keys` insertion need to be atomic. A direct-Supabase signup followed by a separate `POST /auth/setup` leaves a window where the Supabase user exists but has no `user_keys` row — if the second call fails durably, the account is permanently broken and the client cannot roll back (the anon key can't delete users). A proxied signup with a compensating delete on the server avoids this.
 
 1. User enters email and password in the client.
-2. Client generates all e2ee material locally (see §5): random DEK, two random salts, derives the password-KEK, derives the recovery-KEK from a freshly generated recovery code, wraps the DEK twice. The recovery code is shown to the user *before* the network call, with a "I've saved it" confirmation gate.
+2. Client generates all e2ee material locally (see §5): random DEK, two random salts, derives the password-KEK, derives the recovery-KEK from a freshly generated recovery code, wraps the DEK twice. The recovery code is shown to the user _before_ the network call, with a "I've saved it" confirmation gate.
 3. Client POSTs everything in one request to `POST /auth/signup`:
-   ```
-   { email, password,
-     kekPasswordSalt, kekRecoverySalt,
-     wrappedDekByPassword, wrappedDekByRecovery,
-     kdfParams }
-   ```
+    ```
+    { email, password,
+      kekPasswordSalt, kekRecoverySalt,
+      wrappedDekByPassword, wrappedDekByRecovery,
+      kdfParams }
+    ```
 4. Backend orchestrates atomically:
-   - Calls `supabase.auth.signUp({ email, password })` using a server-side **anon** Supabase client. Supabase creates the unverified user, sends the verification email, returns a session.
-   - Inserts the matching `user_keys` row using the `user.id` from the returned session.
-   - On any failure during insertion, calls `supabase.auth.admin.deleteUser(userId)` (service-role client) to roll back the Supabase user, then returns the error.
+    - Calls `supabase.auth.signUp({ email, password })` using a server-side **anon** Supabase client. Supabase creates the unverified user, sends the verification email, returns a session.
+    - Inserts the matching `user_keys` row using the `user.id` from the returned session.
+    - On any failure during insertion, calls `supabase.auth.admin.deleteUser(userId)` (service-role client) to roll back the Supabase user, then returns the error.
 5. On success, the backend returns the Supabase session to the client.
 6. Client installs the session via `supabase.auth.setSession(...)` and stores the DEK in memory and in IndexedDB (`deviceKeys`). Plaintext notes can be created locally immediately; sync waits for email verification.
 
@@ -293,12 +293,12 @@ The Supabase session is auto-refreshed by `supabase-js`. The DEK is already in `
 
 ### Forgotten password — the e2ee twist
 
-The standard Supabase password reset flow gets the user back into their *account* but not into their *data*. Password reset rotates the password Supabase uses for authentication, but the DEK is wrapped by a KEK derived from the **old** password — the new password unwraps nothing.
+The standard Supabase password reset flow gets the user back into their _account_ but not into their _data_. Password reset rotates the password Supabase uses for authentication, but the DEK is wrapped by a KEK derived from the **old** password — the new password unwraps nothing.
 
 So the flow is two-stage:
 
 1. **Account recovery (Supabase Auth).** User clicks "Forgot password," receives the standard reset email, sets a new password. They can now sign in.
-2. **Data recovery (recovery code).** On first signin after reset, the client tries to unwrap with the new password-KEK and fails. The UI prompts: *"Enter your recovery code to restore access to your notes."* Client derives the recovery-KEK, unwraps `wrapped_dek_by_recovery`, recovers the DEK, then re-wraps with the new password-KEK and PUTs the updated `wrapped_dek_by_password` to the backend.
+2. **Data recovery (recovery code).** On first signin after reset, the client tries to unwrap with the new password-KEK and fails. The UI prompts: _"Enter your recovery code to restore access to your notes."_ Client derives the recovery-KEK, unwraps `wrapped_dek_by_recovery`, recovers the DEK, then re-wraps with the new password-KEK and PUTs the updated `wrapped_dek_by_password` to the backend.
 
 If the user has lost the recovery code as well, their notes are unrecoverable. The UI offers to wipe and start fresh. This is communicated explicitly at signup ("Save this recovery code somewhere safe — it is the only way to recover your notes if you forget your password").
 
@@ -377,12 +377,12 @@ What this design **does not** protect against:
 
 ### Algorithms
 
-| Purpose | Algorithm | Parameters |
-|---|---|---|
-| KDF (password / recovery → KEK) | **Argon2id** via `hash-wasm` | memory: 64 MiB, iterations: 3, parallelism: 4, output: 32 bytes. Tunable; `kdf_params` is stored alongside the wrapped DEK so parameters can be increased over time. |
-| Symmetric encryption (DEK on payload, KEK on DEK) | **AES-256-GCM** via Web Crypto API (`crypto.subtle`) | 96-bit random IV per encryption. Authentication tag concatenated with ciphertext. |
-| Random generation (DEK, salts, IVs, recovery code) | `crypto.getRandomValues` | Web Crypto CSPRNG. |
-| Recovery code format | 128-bit random, encoded as BIP-39 mnemonic (12 words) | Memorable, copy-pasteable, recognizable as a "recovery thing" by users. 128 bits is comfortably beyond brute-force feasibility for a non-online-attacked credential. |
+| Purpose                                            | Algorithm                                             | Parameters                                                                                                                                                           |
+| -------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| KDF (password / recovery → KEK)                    | **Argon2id** via `hash-wasm`                          | memory: 64 MiB, iterations: 3, parallelism: 4, output: 32 bytes. Tunable; `kdf_params` is stored alongside the wrapped DEK so parameters can be increased over time. |
+| Symmetric encryption (DEK on payload, KEK on DEK)  | **AES-256-GCM** via Web Crypto API (`crypto.subtle`)  | 96-bit random IV per encryption. Authentication tag concatenated with ciphertext.                                                                                    |
+| Random generation (DEK, salts, IVs, recovery code) | `crypto.getRandomValues`                              | Web Crypto CSPRNG.                                                                                                                                                   |
+| Recovery code format                               | 128-bit random, encoded as BIP-39 mnemonic (12 words) | Memorable, copy-pasteable, recognizable as a "recovery thing" by users. 128 bits is comfortably beyond brute-force feasibility for a non-online-attacked credential. |
 
 PBKDF2 is the Web-Crypto-native alternative to Argon2id, but Argon2id is the modern choice for password-based KDFs (memory-hard, GPU-resistant). The `hash-wasm` dependency is small (~50 KB) and well-maintained.
 
@@ -392,13 +392,13 @@ The plaintext that gets encrypted into `notes.ciphertext` is the JSON-serialized
 
 ```typescript
 type NotePayload = {
-  schema: 1;             // payload schema version, for future migrations
-  title: string;
-  body: string;           // markdown
-  tags: string[];
-  pinned: boolean;
-  archived: boolean;
-  settings?: Record<string, unknown>;  // per-note settings if any
+    schema: 1; // payload schema version, for future migrations
+    title: string;
+    body: string; // markdown
+    tags: string[];
+    pinned: boolean;
+    archived: boolean;
+    settings?: Record<string, unknown>; // per-note settings if any
 };
 ```
 
@@ -426,16 +426,16 @@ If we later increase parameters, new accounts get the new defaults and existing 
 
 ### Key flow summary
 
-| Event | Effect on keys |
-|---|---|
-| Signup | Generate DEK, recovery code. Derive both KEKs from password and recovery code. Wrap DEK twice. POST both wrappings + salts to backend. |
-| Sign-in (new device) | Derive password-KEK using salt from backend. Unwrap DEK. Cache DEK in IndexedDB on this device. |
-| Sign-in (known device) | DEK already in IndexedDB. No KDF. |
-| Password change (knows old) | Re-derive new password-KEK. Re-wrap DEK. PUT new `wrapped_dek_by_password`. Recovery slot untouched. |
-| Password reset (forgot old) | Standard Supabase reset gives a new password. On next signin, password unwrap fails → prompt for recovery code → unwrap via recovery slot → re-wrap with new password-KEK → PUT. |
-| Both forgotten | Notes are unrecoverable. Offer "wipe and start fresh." |
-| Signout | Clear DEK from IndexedDB. Clear plaintext notes from Dexie (default; user can opt out). |
-| Compromised password (user knows) | Password change. Optionally rotate DEK too (re-encrypt all notes) — out of v1 scope. |
+| Event                             | Effect on keys                                                                                                                                                                   |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Signup                            | Generate DEK, recovery code. Derive both KEKs from password and recovery code. Wrap DEK twice. POST both wrappings + salts to backend.                                           |
+| Sign-in (new device)              | Derive password-KEK using salt from backend. Unwrap DEK. Cache DEK in IndexedDB on this device.                                                                                  |
+| Sign-in (known device)            | DEK already in IndexedDB. No KDF.                                                                                                                                                |
+| Password change (knows old)       | Re-derive new password-KEK. Re-wrap DEK. PUT new `wrapped_dek_by_password`. Recovery slot untouched.                                                                             |
+| Password reset (forgot old)       | Standard Supabase reset gives a new password. On next signin, password unwrap fails → prompt for recovery code → unwrap via recovery slot → re-wrap with new password-KEK → PUT. |
+| Both forgotten                    | Notes are unrecoverable. Offer "wipe and start fresh."                                                                                                                           |
+| Signout                           | Clear DEK from IndexedDB. Clear plaintext notes from Dexie (default; user can opt out).                                                                                          |
+| Compromised password (user knows) | Password change. Optionally rotate DEK too (re-encrypt all notes) — out of v1 scope.                                                                                             |
 
 ### What we deliberately do not do
 
@@ -449,7 +449,7 @@ If we later increase parameters, new accounts get the new defaults and existing 
 
 ### Model in one paragraph
 
-The client's Dexie store is authoritative for what the user sees. Every local change is written to Dexie immediately, then a record of that change is appended to a local `outbox` table — both in one transaction. A background worker drains the outbox: it sends each pending change to the backend and removes the entry on success. Periodically, and on app focus, the worker also *pulls* changes the server knows about that the client doesn't. Conflicts are resolved last-write-wins by client timestamp. Network failures are tolerated by retry; tab closes are tolerated because the outbox is durable.
+The client's Dexie store is authoritative for what the user sees. Every local change is written to Dexie immediately, then a record of that change is appended to a local `outbox` table — both in one transaction. A background worker drains the outbox: it sends each pending change to the backend and removes the entry on success. Periodically, and on app focus, the worker also _pulls_ changes the server knows about that the client doesn't. Conflicts are resolved last-write-wins by client timestamp. Network failures are tolerated by retry; tab closes are tolerated because the outbox is durable.
 
 ### Local write path
 
@@ -475,7 +475,7 @@ loop:
   entry ← oldest outbox row (or oldest per noteId if parallelizing)
   if no entry: stop
   mark entry as in-flight (so coalescing creates a "next" entry, not a replacement)
-  
+
   try:
     if entry.opType == 'upsert':
       response ← PUT /notes/{entry.noteId}
@@ -483,14 +483,14 @@ loop:
                   auth: Bearer <Supabase JWT>
     else:
       response ← DELETE /notes/{entry.noteId}?opId=...
-    
+
     if 2xx:
       atomic Dexie transaction:
         - delete the in-flight outbox row
         - update notes.version ← response.version
         - update notes.serverUpdatedAt ← response.updatedAt
         - if no newer outbox row for this noteId, set notes.dirty = false
-    
+
     elif 401: refresh Supabase token, retry once
     elif 5xx or network error: schedule retry with backoff
     else (4xx): log, mark entry as poison, surface in UI
@@ -549,7 +549,7 @@ Last-write-wins by **client-stamped `updatedAt`**. The server treats incoming `u
 
 **Convergence**: all devices, after a full pull cycle, agree on each note's content — the one with the highest `updatedAt` wins.
 
-**Lost edits**: when device A and B edit the same note concurrently and B's `updatedAt` is later, A's edit is overwritten on the next pull. A's user is notified ("an edit on another device superseded a local change"). The lost content is *not* recovered automatically; if note history becomes important later we add a server-side `note_versions` table — out of scope for v1.
+**Lost edits**: when device A and B edit the same note concurrently and B's `updatedAt` is later, A's edit is overwritten on the next pull. A's user is notified ("an edit on another device superseded a local change"). The lost content is _not_ recovered automatically; if note history becomes important later we add a server-side `note_versions` table — out of scope for v1.
 
 For personal multi-device use where simultaneous edits are rare, this is the right tradeoff.
 
@@ -577,15 +577,15 @@ After a successful signin and DEK unwrap (§4), the client does a full pull with
 
 ### Failure modes
 
-| Scenario | Behavior |
-|---|---|
-| Tab closes mid-push | Outbox entry persists. Next session drains it. |
-| Backend down | Worker retries with backoff. UI shows "sync paused" after K failures. Local writes continue. |
-| Token expired | `supabase-js` refresh; one auto-retry on 401. If refresh fails (revoked), user is signed out and prompted to sign in. |
+| Scenario                                    | Behavior                                                                                                                |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Tab closes mid-push                         | Outbox entry persists. Next session drains it.                                                                          |
+| Backend down                                | Worker retries with backoff. UI shows "sync paused" after K failures. Local writes continue.                            |
+| Token expired                               | `supabase-js` refresh; one auto-retry on 401. If refresh fails (revoked), user is signed out and prompted to sign in.   |
 | Clock skew (client far ahead/behind server) | Server clamps incoming `updatedAt`. Mildly skewed clocks cause occasional "wrong LWW winner"; large skews are rejected. |
-| Replay of an old push | Server `last_op_id` check returns the cached response, no double-write. |
-| Pull mid-edit | Pull respects `dirty` flag — local edits are not overwritten unless the remote is later. |
-| Disk full / Dexie write fails | Local write fails, user sees an error. No sync entry is created. |
+| Replay of an old push                       | Server `last_op_id` check returns the cached response, no double-write.                                                 |
+| Pull mid-edit                               | Pull respects `dirty` flag — local edits are not overwritten unless the remote is later.                                |
+| Disk full / Dexie write fails               | Local write fails, user sees an error. No sync entry is created.                                                        |
 
 ---
 
@@ -620,27 +620,27 @@ Every endpoint below requires `Authorization: Bearer <supabase-jwt>` **except** 
 
 ### Endpoint summary
 
-| Method | Path | Purpose |
-|---|---|---|
-| `GET` | `/health` | Public health check |
-| `POST` | `/auth/signup` | **Public.** Atomic account creation: Supabase user + `user_keys` row, with rollback on failure |
-| `GET` | `/auth/keys` | Fetch wrapped DEK + salts on signin |
-| `PUT` | `/auth/keys/password` | Update `wrapped_dek_by_password` after password change / reset |
-| `GET` | `/notes` | Pull changes since cursor |
-| `PUT` | `/notes/:id` | Push upsert |
-| `DELETE` | `/notes/:id` | Push delete (tombstone) |
-| `POST` | `/notes/:id/shares` | Create a read-only share token |
-| `GET` | `/notes/:id/shares` | List active share tokens for a note |
-| `DELETE` | `/notes/:id/shares/:token` | Revoke a share token |
-| `GET` | `/shares/:token` | Public: fetch ciphertext for a shared note |
-| `POST` | `/ai/transcribe` | Proxy: speech-to-text (see §8) |
-| `POST` | `/ai/text` | Proxy: text-on-text AI ops (see §8) |
+| Method   | Path                       | Purpose                                                                                        |
+| -------- | -------------------------- | ---------------------------------------------------------------------------------------------- |
+| `GET`    | `/health`                  | Public health check                                                                            |
+| `POST`   | `/auth/signup`             | **Public.** Atomic account creation: Supabase user + `user_keys` row, with rollback on failure |
+| `GET`    | `/auth/keys`               | Fetch wrapped DEK + salts on signin                                                            |
+| `PUT`    | `/auth/keys/password`      | Update `wrapped_dek_by_password` after password change / reset                                 |
+| `GET`    | `/notes`                   | Pull changes since cursor                                                                      |
+| `PUT`    | `/notes/:id`               | Push upsert                                                                                    |
+| `DELETE` | `/notes/:id`               | Push delete (tombstone)                                                                        |
+| `POST`   | `/notes/:id/shares`        | Create a read-only share token                                                                 |
+| `GET`    | `/notes/:id/shares`        | List active share tokens for a note                                                            |
+| `DELETE` | `/notes/:id/shares/:token` | Revoke a share token                                                                           |
+| `GET`    | `/shares/:token`           | Public: fetch ciphertext for a shared note                                                     |
+| `POST`   | `/ai/transcribe`           | Proxy: speech-to-text (see §8)                                                                 |
+| `POST`   | `/ai/text`                 | Proxy: text-on-text AI ops (see §8)                                                            |
 
 ### Contracts
 
 Concise shapes; field-level meaning is in §3.
 
-#### `POST /auth/signup` *(public)*
+#### `POST /auth/signup` _(public)_
 
 The single signup entry point. Unauthenticated. Performs Supabase user creation and `user_keys` insertion as one atomic operation, with the Supabase user rolled back if key persistence fails.
 
@@ -801,7 +801,7 @@ DELETE /notes/{id}/shares/{token}
 
 Sets `revoked_at = NOW()`. Subsequent `GET /shares/:token` returns `410 Gone`.
 
-#### `GET /shares/:token` *(public)*
+#### `GET /shares/:token` _(public)_
 
 ```http
 GET /shares/{token}
@@ -854,7 +854,7 @@ E2EE and server-side AI cannot both hold. AI providers need plaintext; the serve
 
 The UI surfaces this contextually:
 
-- First-time use of any AI feature shows a one-time disclosure modal: *"AI features send the relevant text to a third-party service. This bypasses end-to-end encryption for this operation. Content is not stored on our server."*
+- First-time use of any AI feature shows a one-time disclosure modal: _"AI features send the relevant text to a third-party service. This bypasses end-to-end encryption for this operation. Content is not stored on our server."_
 - Each AI action button has an icon or label that signals "this calls a remote AI." No silent AI calls.
 
 Users who decline never see plaintext leave their device.
@@ -898,17 +898,17 @@ Per-user rate limiting wraps every call (see "Rate limiting" below).
 
 ### Feature ideas — current list
 
-These are *candidates*. None are commitments. Each has a rough first-cut implementation note.
+These are _candidates_. None are commitments. Each has a rough first-cut implementation note.
 
-| Feature | What it does | Rough implementation |
-|---|---|---|
-| **Speech-to-text** | Voice notes from the phone: record audio, get a transcript inserted at cursor. | Client records via `MediaRecorder`, uploads to `/ai/transcribe`, backend forwards to a hosted Whisper (e.g. Groq's free tier), returns text. PWA-friendly. |
-| **Text rewrite** | "Make this paragraph more concise / formal / friendly." | `/ai/text` with `op: 'rewrite', style`. Backend calls an LLM with a system prompt for the chosen style, returns the rewrite. UI offers accept / decline / try-again. |
-| **Auto-tag suggestion** | Suggest tags for a note based on its content and existing tags. | `/ai/text` with `op: 'tagSuggest', input, existingTags`. Backend prompts the LLM with the note + existing tag list, returns a short list. User picks. |
-| **Smart outline** | Generate an outline of a long note. | `/ai/text` with `op: 'outline'`. Returns a markdown outline; insertion behavior TBD. |
-| **Auto-format** | Clean up structure: heading hierarchy, list normalization, link tidying, etc. | `/ai/text` with `op: 'reformat'`. Could be partly rule-based (no AI) and partly LLM; not specified yet. |
-| **Translate** | Translate a note to another language. | Standard LLM completion. |
-| **Summarize** | Short summary of a long note for quick reference. | Standard LLM completion. |
+| Feature                 | What it does                                                                   | Rough implementation                                                                                                                                                 |
+| ----------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Speech-to-text**      | Voice notes from the phone: record audio, get a transcript inserted at cursor. | Client records via `MediaRecorder`, uploads to `/ai/transcribe`, backend forwards to a hosted Whisper (e.g. Groq's free tier), returns text. PWA-friendly.           |
+| **Text rewrite**        | "Make this paragraph more concise / formal / friendly."                        | `/ai/text` with `op: 'rewrite', style`. Backend calls an LLM with a system prompt for the chosen style, returns the rewrite. UI offers accept / decline / try-again. |
+| **Auto-tag suggestion** | Suggest tags for a note based on its content and existing tags.                | `/ai/text` with `op: 'tagSuggest', input, existingTags`. Backend prompts the LLM with the note + existing tag list, returns a short list. User picks.                |
+| **Smart outline**       | Generate an outline of a long note.                                            | `/ai/text` with `op: 'outline'`. Returns a markdown outline; insertion behavior TBD.                                                                                 |
+| **Auto-format**         | Clean up structure: heading hierarchy, list normalization, link tidying, etc.  | `/ai/text` with `op: 'reformat'`. Could be partly rule-based (no AI) and partly LLM; not specified yet.                                                              |
+| **Translate**           | Translate a note to another language.                                          | Standard LLM completion.                                                                                                                                             |
+| **Summarize**           | Short summary of a long note for quick reference.                              | Standard LLM completion.                                                                                                                                             |
 
 The list will evolve. The architecture above absorbs new operations as additions to the `AiOperation` union without changing the API shape.
 
@@ -916,12 +916,12 @@ The list will evolve. The architecture above absorbs new operations as additions
 
 Picked for cost and quality at personal scale. Final selection happens at implementation time per feature.
 
-| Provider | What it gives | Cost |
-|---|---|---|
-| **Groq** | Whisper (transcription) and open-model LLMs (Llama 3.x, Mixtral) on fast inference. | Free tier with rate limits. |
-| **Google Gemini Flash** | Strong general-purpose LLM. | Free tier (caveat: Google retains free-tier prompts for training unless on paid). |
-| **Cloudflare Workers AI** | Hosted Whisper and small models. | Free quota; pennies thereafter. |
-| **OpenAI / Anthropic** | High-quality LLMs. | Paid. Reserved for features where quality matters enough to justify cost; not v1. |
+| Provider                  | What it gives                                                                       | Cost                                                                              |
+| ------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| **Groq**                  | Whisper (transcription) and open-model LLMs (Llama 3.x, Mixtral) on fast inference. | Free tier with rate limits.                                                       |
+| **Google Gemini Flash**   | Strong general-purpose LLM.                                                         | Free tier (caveat: Google retains free-tier prompts for training unless on paid). |
+| **Cloudflare Workers AI** | Hosted Whisper and small models.                                                    | Free quota; pennies thereafter.                                                   |
+| **OpenAI / Anthropic**    | High-quality LLMs.                                                                  | Paid. Reserved for features where quality matters enough to justify cost; not v1. |
 
 The proxy lets us start free and upgrade per-feature later. STT and tag suggestion are likely fine on Groq's free tier indefinitely.
 
@@ -1001,18 +1001,18 @@ If the owner is offline when editing, the outbox entry carries the `shareUpdates
 
 Extending §3:
 
-| Column | Type | Notes |
-|---|---|---|
-| `token` | `text` PK | URL-safe random. |
-| `note_id` | `uuid` FK → `notes(id)` | |
-| `owner_id` | `uuid` FK → `auth.users(id)` | |
-| `share_ciphertext` | `bytea` | Payload encrypted with K_share. Re-written on every owner edit. |
-| `share_iv` | `bytea` | Fresh IV per re-encryption. |
-| `wrapped_share_key` | `bytea` | K_share encrypted with the owner's DEK. Lets the owner recover K_share. |
-| `wrapped_share_key_iv` | `bytea` | |
-| `created_at` | `timestamptz` | |
-| `expires_at` | `timestamptz` nullable | |
-| `revoked_at` | `timestamptz` nullable | |
+| Column                 | Type                         | Notes                                                                   |
+| ---------------------- | ---------------------------- | ----------------------------------------------------------------------- |
+| `token`                | `text` PK                    | URL-safe random.                                                        |
+| `note_id`              | `uuid` FK → `notes(id)`      |                                                                         |
+| `owner_id`             | `uuid` FK → `auth.users(id)` |                                                                         |
+| `share_ciphertext`     | `bytea`                      | Payload encrypted with K_share. Re-written on every owner edit.         |
+| `share_iv`             | `bytea`                      | Fresh IV per re-encryption.                                             |
+| `wrapped_share_key`    | `bytea`                      | K_share encrypted with the owner's DEK. Lets the owner recover K_share. |
+| `wrapped_share_key_iv` | `bytea`                      |                                                                         |
+| `created_at`           | `timestamptz`                |                                                                         |
+| `expires_at`           | `timestamptz` nullable       |                                                                         |
+| `revoked_at`           | `timestamptz` nullable       |                                                                         |
 
 ### Recipient flow
 
@@ -1104,7 +1104,7 @@ Probably 1–2 focused weeks of work. Not blocking sync rollout.
 
 ### The problem
 
-Existing users have notes in Dexie that were never synced. Signin must preserve them: their local notes become the initial state of their account. The flow must also be safe when a user signs in on a *second* local-only device — both devices' notes should merge rather than one silently overwrite the other.
+Existing users have notes in Dexie that were never synced. Signin must preserve them: their local notes become the initial state of their account. The flow must also be safe when a user signs in on a _second_ local-only device — both devices' notes should merge rather than one silently overwrite the other.
 
 ### First signin — happy path
 
@@ -1157,7 +1157,7 @@ For the rare user who wants their account to start clean despite local notes exi
 
 This is a UI affordance, not a default. The default is always import.
 
-### What migration does *not* try to do
+### What migration does _not_ try to do
 
 - **No automatic dedup** of "same note on two devices but different IDs." We do not run content similarity heuristics. The user gets both notes and can delete one.
 - **No re-encryption of historical local edits.** Local notes have no history; only their current state is captured into the encrypted payload.
@@ -1171,12 +1171,12 @@ This is a UI affordance, not a default. The default is always import.
 
 Three logical environments. Vercel previews are essentially free, so per-branch previews stay. Railway and Supabase aren't, so only two real backend/DB environments exist; previews share `beta`.
 
-| Env | Client (Vercel) | Backend (Railway) | DB + Auth (Supabase) |
-|---|---|---|---|
-| Local | `localhost:5173` | `localhost:3000` (Nest) | Supabase CLI (local Docker) |
-| PR preview | `ardoise-{branch}.vercel.app` (auto per PR) | → `api.beta.ardoise.page` | → Beta Supabase project |
-| Beta | `beta.ardoise.app` | `api.beta.ardoise.page` | Beta Supabase project |
-| Prod | `ardoise.app` | `api.ardoise.app` | Prod Supabase project |
+| Env        | Client (Vercel)                             | Backend (Railway)         | DB + Auth (Supabase)        |
+| ---------- | ------------------------------------------- | ------------------------- | --------------------------- |
+| Local      | `localhost:5173`                            | `localhost:3000` (Nest)   | Supabase CLI (local Docker) |
+| PR preview | `ardoise-{branch}.vercel.app` (auto per PR) | → `api.beta.ardoise.page` | → Beta Supabase project     |
+| Beta       | `beta.ardoise.app`                          | `api.beta.ardoise.page`   | Beta Supabase project       |
+| Prod       | `ardoise.app`                               | `api.ardoise.app`         | Prod Supabase project       |
 
 Vercel has three env-var scopes (Production / Preview / Development). The `beta` branch deploys as a Vercel "Preview" — that's expected: it gets the same `VITE_API_URL` as feature-branch previews, all pointing at the beta backend.
 
@@ -1247,15 +1247,15 @@ Supabase Auth has its own allowlist for redirect URLs (used after email verifica
 
 Stored in the deployment platform, not in the repo, not in `.env` files committed to git.
 
-| Secret | Where it lives | Used by |
-|---|---|---|
-| Supabase project URL | Railway env (per env) | Nest backend |
-| Supabase **service-role** key | Railway env (per env) | Nest backend only |
-| Supabase **anon** key | Vercel env (per scope) | Client (public, safe to ship) |
-| AI provider keys (Groq, Gemini, …) | Railway env (per env) | Nest backend |
-| Supabase CLI deploy key | GitHub Actions secret | CI migrations |
-| `JWT_AUDIENCE` / `JWT_ISSUER` | Railway env | Nest JWT guard |
-| `ALLOWED_ORIGINS` | Railway env | Nest CORS |
+| Secret                             | Where it lives         | Used by                       |
+| ---------------------------------- | ---------------------- | ----------------------------- |
+| Supabase project URL               | Railway env (per env)  | Nest backend                  |
+| Supabase **service-role** key      | Railway env (per env)  | Nest backend only             |
+| Supabase **anon** key              | Vercel env (per scope) | Client (public, safe to ship) |
+| AI provider keys (Groq, Gemini, …) | Railway env (per env)  | Nest backend                  |
+| Supabase CLI deploy key            | GitHub Actions secret  | CI migrations                 |
+| `JWT_AUDIENCE` / `JWT_ISSUER`      | Railway env            | Nest JWT guard                |
+| `ALLOWED_ORIGINS`                  | Railway env            | Nest CORS                     |
 
 `.env.example` files in `apps/api` and `apps/client` document the expected variables without holding values.
 
@@ -1289,51 +1289,51 @@ A guideline, not a contract — order will adapt as the early phases land and su
 
 Iso-functional refactors that set up the monorepo and the deploy targets. The client behaves identically to today after each.
 
-| # | Commit | Effect |
-|---|---|---|
-| A1 | `refactor: move client to apps/client` | Existing app moves under `apps/`. Build, dev, deploy continue working. |
-| A2 | `refactor: scaffold packages/shared` | Empty TS types package, wired into client. No types yet, just the workspace. |
-| A3 | `chore: scaffold apps/api with Nest healthcheck` | Nest app with `/health` only. Railway deploy of beta env succeeds. |
-| A4 | `chore: add Supabase CLI and initial empty migration` | `supabase/` directory, `supabase start` works locally. Beta project linked. |
+| #   | Commit                                                | Effect                                                                       |
+| --- | ----------------------------------------------------- | ---------------------------------------------------------------------------- |
+| A1  | `refactor: move client to apps/client`                | Existing app moves under `apps/`. Build, dev, deploy continue working.       |
+| A2  | `refactor: scaffold packages/shared`                  | Empty TS types package, wired into client. No types yet, just the workspace. |
+| A3  | `chore: scaffold apps/api with Nest healthcheck`      | Nest app with `/health` only. Railway deploy of beta env succeeds.           |
+| A4  | `chore: add Supabase CLI and initial empty migration` | `supabase/` directory, `supabase start` works locally. Beta project linked.  |
 
 ### Phase B — auth (users can sign up, no data yet)
 
-| # | Commit | Effect |
-|---|---|---|
-| B1 | `feat: atomic signup with e2ee key setup` | `POST /auth/signup` end-to-end: client generates DEK + recovery code + wrappings, posts to backend, backend creates Supabase user and `user_keys` row atomically (with rollback). Client installs the returned session. Recovery code UI with confirmation gate. Verification email is sent. |
-| B2 | `feat: backend JWT verification and /auth/keys` | Nest JWT guard via Supabase JWKS. `GET /auth/keys` returns the wrapped DEK + salts to the authenticated user. Foundation for signin on a second device. |
-| B3 | `feat: signin and DEK unwrap` | Client uses `supabase.auth.signInWithPassword` directly, then fetches keys, derives KEK, unwraps DEK, caches in IndexedDB. Cross-device login works (no data to sync yet). |
-| B4 | `feat: password change and reset flows` | `PUT /auth/keys/password` for both the change-with-old-password case and the post-reset-recovery-code case. Recovery UI on signin-after-reset. |
+| #   | Commit                                          | Effect                                                                                                                                                                                                                                                                                       |
+| --- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| B1  | `feat: atomic signup with e2ee key setup`       | `POST /auth/signup` end-to-end: client generates DEK + recovery code + wrappings, posts to backend, backend creates Supabase user and `user_keys` row atomically (with rollback). Client installs the returned session. Recovery code UI with confirmation gate. Verification email is sent. |
+| B2  | `feat: backend JWT verification and /auth/keys` | Nest JWT guard via Supabase JWKS. `GET /auth/keys` returns the wrapped DEK + salts to the authenticated user. Foundation for signin on a second device.                                                                                                                                      |
+| B3  | `feat: signin and DEK unwrap`                   | Client uses `supabase.auth.signInWithPassword` directly, then fetches keys, derives KEK, unwraps DEK, caches in IndexedDB. Cross-device login works (no data to sync yet).                                                                                                                   |
+| B4  | `feat: password change and reset flows`         | `PUT /auth/keys/password` for both the change-with-old-password case and the post-reset-recovery-code case. Recovery UI on signin-after-reset.                                                                                                                                               |
 
 ### Phase C — sync (encrypted notes propagate between devices)
 
-| # | Commit | Effect |
-|---|---|---|
-| C1 | `feat: notes pull endpoint and table` | Server has `notes` table and `GET /notes?since=`. Client can pull (and decrypt — but server has nothing yet, so the pull is empty). |
-| C2 | `feat: notes push (outbox + PUT /notes)` | Client outbox + worker. Every edit propagates to the server as encrypted ciphertext. Notes created on this device appear on a second device after pull. **First user-visible sync.** |
-| C3 | `feat: note deletion sync` | `DELETE /notes/:id`, tombstones, pull respects `deletedAt`. Deletes propagate across devices. |
-| C4 | `feat: conflict resolution on pull` | LWW logic for the "local has unflushed edits + remote is newer" case. Until this lands, conflicts are rare-but-possible silent overwrites; this makes the behavior explicit and surfaces a notification. |
-| C5 | `feat: import existing local notes on first signin` | Initial-sync routine: pull + push of local-only notes. Pre-sync users keep their notes. |
+| #   | Commit                                              | Effect                                                                                                                                                                                                   |
+| --- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C1  | `feat: notes pull endpoint and table`               | Server has `notes` table and `GET /notes?since=`. Client can pull (and decrypt — but server has nothing yet, so the pull is empty).                                                                      |
+| C2  | `feat: notes push (outbox + PUT /notes)`            | Client outbox + worker. Every edit propagates to the server as encrypted ciphertext. Notes created on this device appear on a second device after pull. **First user-visible sync.**                     |
+| C3  | `feat: note deletion sync`                          | `DELETE /notes/:id`, tombstones, pull respects `deletedAt`. Deletes propagate across devices.                                                                                                            |
+| C4  | `feat: conflict resolution on pull`                 | LWW logic for the "local has unflushed edits + remote is newer" case. Until this lands, conflicts are rare-but-possible silent overwrites; this makes the behavior explicit and surfaces a notification. |
+| C5  | `feat: import existing local notes on first signin` | Initial-sync routine: pull + push of local-only notes. Pre-sync users keep their notes.                                                                                                                  |
 
 ### Phase D — secondary features
 
-| # | Commit | Effect |
-|---|---|---|
-| D1 | `feat: PWA manifest and service worker` | App is installable on phone home screen. App shell cached offline. |
-| D2 | `feat: mobile read layout` | Below 768px, single-pane read-only view of notes. Editor hidden on mobile. |
-| D3 | `feat: AI proxy scaffolding` | `/ai/*` endpoints with provider abstraction. One trivial operation wired (e.g. echo) to validate the shape. |
-| D4 | `feat: speech-to-text` | `/ai/transcribe` calls a hosted Whisper (Groq free tier). Client records audio, gets transcript inserted at cursor. |
-| D5 | `feat: AI text rewrite` | `/ai/text` with `op: 'rewrite'`. Rewrite UI in editor. |
-| D6 | `feat: AI tag suggestion` | `/ai/text` with `op: 'tagSuggest'`. Suggestion UI in tag editor. |
-| D7 | `feat: read-only share links` | Share creation, URL with key in fragment, public read endpoint, revocation. Owner edits propagate to share content. |
+| #   | Commit                                  | Effect                                                                                                              |
+| --- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| D1  | `feat: PWA manifest and service worker` | App is installable on phone home screen. App shell cached offline.                                                  |
+| D2  | `feat: mobile read layout`              | Below 768px, single-pane read-only view of notes. Editor hidden on mobile.                                          |
+| D3  | `feat: AI proxy scaffolding`            | `/ai/*` endpoints with provider abstraction. One trivial operation wired (e.g. echo) to validate the shape.         |
+| D4  | `feat: speech-to-text`                  | `/ai/transcribe` calls a hosted Whisper (Groq free tier). Client records audio, gets transcript inserted at cursor. |
+| D5  | `feat: AI text rewrite`                 | `/ai/text` with `op: 'rewrite'`. Rewrite UI in editor.                                                              |
+| D6  | `feat: AI tag suggestion`               | `/ai/text` with `op: 'tagSuggest'`. Suggestion UI in tag editor.                                                    |
+| D7  | `feat: read-only share links`           | Share creation, URL with key in fragment, public read endpoint, revocation. Owner edits propagate to share content. |
 
 ### Phase E — production cutover
 
-| # | Commit / action | Effect |
-|---|---|---|
-| E1 | `chore: provision prod Railway env + Supabase project` | Prod env exists, schema migrated. No traffic yet. |
-| E2 | `chore: prod env vars and DNS` | `ardoise.app` and `api.ardoise.app` resolve. Vercel Production scope points at prod backend. |
-| E3 | Manual: announce + flip | Existing users sign up, first signin runs the import routine for any local notes. |
+| #   | Commit / action                                        | Effect                                                                                       |
+| --- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| E1  | `chore: provision prod Railway env + Supabase project` | Prod env exists, schema migrated. No traffic yet.                                            |
+| E2  | `chore: prod env vars and DNS`                         | `ardoise.app` and `api.ardoise.app` resolve. Vercel Production scope points at prod backend. |
+| E3  | Manual: announce + flip                                | Existing users sign up, first signin runs the import routine for any local notes.            |
 
 ### What is intentionally not in the plan
 
