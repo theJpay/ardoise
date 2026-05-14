@@ -24,25 +24,22 @@ export async function getTrashedNotes(): Promise<Note[]> {
     return await db.notes.orderBy("deletedAt").reverse().toArray();
 }
 
-export async function createNote(write: NoteWrite): Promise<Note> {
+export async function createNote(write: NoteWrite = {}): Promise<Note> {
     const now = new Date();
-    const newNoteId = await db.notes.add({
-        ...write,
+    const newNote: Note = {
         id: crypto.randomUUID(),
+        title: "",
+        content: "",
         createdAt: now,
         updatedAt: now,
         lastActivityAt: now,
         parentId: null,
         pinnedAt: null,
         archivedAt: null,
-        deletedAt: null
-    });
-
-    const newNote = await db.notes.get(newNoteId);
-
-    if (!newNote) {
-        throw new Error("Failed to retrieve the newly created note");
-    }
+        deletedAt: null,
+        ...write
+    };
+    await db.notes.add(newNote);
     return newNote;
 }
 

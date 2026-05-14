@@ -12,7 +12,7 @@ export function useAddNote() {
 
     const addNote = async () => {
         const isFirstNote = notes.length === 0;
-        const newNote = await createNote({ title: "", content: "" });
+        const newNote = await createNote();
         setMode("edit");
 
         if (isFirstNote) {
