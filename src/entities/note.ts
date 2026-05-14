@@ -11,9 +11,9 @@ export type Note = {
     deletedAt: Date | null;
 };
 
-export type NoteWrite = Partial<Pick<Note, "title" | "content">>;
+export type NoteWrite = Partial<Pick<Note, "title" | "content" | "parentId">>;
 
-export type NoteUpdate = NoteWrite;
+export type NoteUpdate = Partial<Pick<Note, "title" | "content">>;
 
 const WORDS_PER_MINUTE = 200;
 

@@ -1,7 +1,9 @@
-import { ChevronRight, File, MoreHorizontal } from "lucide-react";
+import { ChevronRight, File, MoreHorizontal, Plus } from "lucide-react";
 import { useRef } from "react";
 import { Link, useParams } from "react-router";
 
+import { MAX_DEPTH } from "@entities";
+import { useAddNote } from "@hooks/useAddNote";
 import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useDeletionState } from "@stores/deletion.store";
 
@@ -66,7 +68,13 @@ function NoteItem({ note, isMenuOpen, onOpenMenu, onCloseMenu, treeRow }: NoteIt
             ) : (
                 <span className="text-ui-sm text-muted flex-1 truncate italic">Untitled</span>
             )}
-            <MenuButton isMenuOpen={isMenuOpen} onCloseMenu={onCloseMenu} onOpenMenu={onOpenMenu} />
+            <RowActions
+                isMenuOpen={isMenuOpen}
+                noteId={note.id}
+                treeRow={treeRow}
+                onCloseMenu={onCloseMenu}
+                onOpenMenu={onOpenMenu}
+            />
         </Link>
     );
 }
@@ -96,37 +104,59 @@ function ChevronToggle({ hasChildren, isExpanded, onToggleExpand }: TreeRowProps
     );
 }
 
-type MenuButtonProps = {
+type RowActionsProps = {
     isMenuOpen: boolean;
+    noteId: string;
+    treeRow?: TreeRowProps;
     onOpenMenu: (anchor: Anchor) => void;
     onCloseMenu: () => void;
 };
 
-function MenuButton({ isMenuOpen, onOpenMenu, onCloseMenu }: MenuButtonProps) {
-    const buttonRef = useRef<HTMLButtonElement>(null);
+function RowActions({ isMenuOpen, noteId, treeRow, onOpenMenu, onCloseMenu }: RowActionsProps) {
+    const menuButtonRef = useRef<HTMLButtonElement>(null);
+    const { addNote } = useAddNote();
+    const showAddChild = treeRow !== undefined && treeRow.depth < MAX_DEPTH;
 
     return (
-        <button
-            ref={buttonRef}
-            aria-label="Note actions"
-            className={`text-subtle hover:bg-border duration-fast absolute inset-y-0 right-1 my-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-sm transition-opacity ${
+        <div
+            className={`duration-fast absolute inset-y-0 right-1 my-auto flex items-center gap-0.5 transition-opacity ${
                 isMenuOpen
                     ? "opacity-100"
                     : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100"
             }`}
-            type="button"
-            onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (isMenuOpen) {
-                    onCloseMenu();
-                } else {
-                    onOpenMenu({ type: "element", ref: buttonRef });
-                }
-            }}
         >
-            <MoreHorizontal size={13} strokeWidth={1.5} />
-        </button>
+            {showAddChild && (
+                <button
+                    aria-label="New child note"
+                    className="text-subtle hover:bg-border hover:text-text duration-fast flex h-6 w-6 items-center justify-center rounded-sm transition-colors"
+                    type="button"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        addNote(noteId);
+                    }}
+                >
+                    <Plus size={13} strokeWidth={1.5} />
+                </button>
+            )}
+            <button
+                ref={menuButtonRef}
+                aria-label="Note actions"
+                className="text-subtle hover:bg-border hover:text-text duration-fast flex h-6 w-6 items-center justify-center rounded-sm transition-colors"
+                type="button"
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (isMenuOpen) {
+                        onCloseMenu();
+                    } else {
+                        onOpenMenu({ type: "element", ref: menuButtonRef });
+                    }
+                }}
+            >
+                <MoreHorizontal size={13} strokeWidth={1.5} />
+            </button>
+        </div>
     );
 }
 

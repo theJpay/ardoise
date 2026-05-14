@@ -1,4 +1,4 @@
-import { TRASH_RETENTION_DAYS } from "@entities";
+import { MAX_DEPTH, TRASH_RETENTION_DAYS } from "@entities";
 
 import db from "./db";
 
@@ -25,6 +25,9 @@ export async function getTrashedNotes(): Promise<Note[]> {
 }
 
 export async function createNote(write: NoteWrite = {}): Promise<Note> {
+    if (write.parentId !== undefined && write.parentId !== null) {
+        await assertParentAcceptsChild(write.parentId);
+    }
     const now = new Date();
     const newNote: Note = {
         id: crypto.randomUUID(),
@@ -41,6 +44,26 @@ export async function createNote(write: NoteWrite = {}): Promise<Note> {
     };
     await db.notes.add(newNote);
     return newNote;
+}
+
+async function assertParentAcceptsChild(parentId: string): Promise<void> {
+    const parent = await db.notes.get(parentId);
+    if (!parent || parent.deletedAt !== null) {
+        throw new Error(`Parent note ${parentId} does not exist`);
+    }
+    let depth = 0;
+    let currentId: string | null = parent.parentId;
+    while (currentId !== null) {
+        depth++;
+        const ancestor = await db.notes.get(currentId);
+        if (!ancestor) {
+            break;
+        }
+        currentId = ancestor.parentId;
+    }
+    if (depth >= MAX_DEPTH) {
+        throw new Error("Maximum nesting depth reached");
+    }
 }
 
 export async function duplicateNote(id: string): Promise<Note> {

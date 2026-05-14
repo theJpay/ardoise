@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { generateNote } from "@entities/note.fixtures";
 
-import { ancestorsOf, buildNoteTree } from "./noteTree";
+import { ancestorsOf, buildNoteTree, depthOf } from "./noteTree";
 
 describe("buildNoteTree", () => {
     it("returns an empty array for no notes", () => {
@@ -58,6 +58,22 @@ describe("buildNoteTree", () => {
         const tree = buildNoteTree([root, childA, childB], "alphabetical");
 
         expect(tree[0].children.map((c) => c.note.id)).toEqual(["b", "a"]);
+    });
+});
+
+describe("depthOf", () => {
+    it("returns 0 for a root note", () => {
+        const root = generateNote({ id: "root" });
+
+        expect(depthOf("root", [root])).toBe(0);
+    });
+
+    it("counts ancestors up to the queried note", () => {
+        const root = generateNote({ id: "root" });
+        const child = generateNote({ id: "child", parentId: "root" });
+        const grandchild = generateNote({ id: "grand", parentId: "child" });
+
+        expect(depthOf("grand", [root, child, grandchild])).toBe(2);
     });
 });
 

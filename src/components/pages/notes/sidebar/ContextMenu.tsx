@@ -1,8 +1,9 @@
-import { Archive, Command, Copy, Delete, Pin, Share2, Trash2 } from "lucide-react";
+import { Archive, Command, Copy, Delete, Pin, Plus, Share2, Trash2 } from "lucide-react";
 import { useMatch } from "react-router";
 
 import { DepletionBar, Popover, ShortcutKey } from "@components/generics";
-import { NoteEntity } from "@entities";
+import { MAX_DEPTH, NoteEntity } from "@entities";
+import { useAddNote } from "@hooks/useAddNote";
 import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useArmedAction } from "@hooks/useArmedAction";
 import {
@@ -14,6 +15,8 @@ import {
     unpinNote
 } from "@services/notes.service";
 import { useDeletionActions } from "@stores/deletion.store";
+import { useNotes } from "@stores/notes.store";
+import { depthOf } from "@utils/noteTree";
 
 import type { Note } from "@entities";
 import type { Anchor } from "@hooks/useFloatingMenu";
@@ -31,8 +34,11 @@ type ContextMenuProps = {
 function ContextMenu({ note, anchor, onClose, onShare }: ContextMenuProps) {
     const { navigate } = useAppNavigate();
     const { setDeleting, reset } = useDeletionActions();
+    const { notes } = useNotes();
+    const { addNote } = useAddNote();
     const currentNoteMatch = useMatch("/notes/:noteId");
     const isCurrent = currentNoteMatch?.params.noteId === note.id;
+    const canAddChild = depthOf(note.id, notes) < MAX_DEPTH;
     const { armed, trigger } = useArmedAction({
         onConfirm: () => {
             onClose();
@@ -73,6 +79,11 @@ function ContextMenu({ note, anchor, onClose, onShare }: ContextMenuProps) {
         }
     };
 
+    const handleNewChild = async () => {
+        onClose();
+        await addNote(note.id);
+    };
+
     return (
         <Popover anchor={anchor} className="w-48 rounded p-1" open={true} onClose={onClose}>
             <MenuItem icon={Copy} label="Duplicate" onClick={handleDuplicate} />
@@ -86,6 +97,13 @@ function ContextMenu({ note, anchor, onClose, onShare }: ContextMenuProps) {
                 onClick={handleTogglePin}
             />
             <MenuItem icon={Archive} label="Archive" onClick={handleArchive} />
+            <MenuItem
+                disabled={!canAddChild}
+                disabledHint="Maximum nesting depth reached"
+                icon={Plus}
+                label="New child"
+                onClick={handleNewChild}
+            />
             <MenuDivider />
             <button
                 className={`text-ui-base duration-fast relative flex w-full items-center justify-between overflow-hidden rounded-sm px-2.5 py-1.5 transition-colors ${
@@ -118,14 +136,29 @@ type MenuItemProps = {
     label: string;
     onClick: () => void;
     accent?: boolean;
+    disabled?: boolean;
+    disabledHint?: string;
 };
 
-function MenuItem({ icon: Icon, label, onClick, accent = false }: MenuItemProps) {
+function MenuItem({
+    icon: Icon,
+    label,
+    onClick,
+    accent = false,
+    disabled = false,
+    disabledHint
+}: MenuItemProps) {
     return (
         <button
-            className={`text-ui-base hover:bg-accent-surface duration-fast flex w-full items-center gap-2 rounded-sm px-2.5 py-1.5 transition-colors ${
-                accent ? "text-accent" : "text-muted hover:text-text"
+            className={`text-ui-base duration-fast flex w-full items-center gap-2 rounded-sm px-2.5 py-1.5 transition-colors ${
+                disabled
+                    ? "text-dim cursor-not-allowed"
+                    : accent
+                      ? "hover:bg-accent-surface text-accent"
+                      : "text-muted hover:bg-accent-surface hover:text-text"
             }`}
+            disabled={disabled}
+            title={disabled ? disabledHint : undefined}
             onClick={onClick}
         >
             <Icon size={13} strokeWidth={1.5} />

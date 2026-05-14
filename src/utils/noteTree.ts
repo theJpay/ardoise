@@ -32,6 +32,10 @@ export function buildNoteTree(notes: Note[], sort: SortOrder): NoteTreeNode[] {
     }
 }
 
+export function depthOf(noteId: string, notes: Note[]): number {
+    return ancestorsOf(noteId, notes).length;
+}
+
 export function ancestorsOf(noteId: string, notes: Note[]): Note[] {
     const byId = new Map(notes.map((n) => [n.id, n]));
     const chain: Note[] = [];
