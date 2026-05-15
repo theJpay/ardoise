@@ -110,11 +110,40 @@ export async function restoreFromArchive(id: string): Promise<void> {
 }
 
 export async function restoreFromTrash(id: string): Promise<void> {
-    await db.notes.update(id, { deletedAt: null });
+    await db.transaction("rw", db.notes, async () => {
+        const note = await db.notes.get(id);
+        if (!note) {
+            return;
+        }
+        let parentId = note.parentId;
+        if (parentId !== null) {
+            const parent = await db.notes.get(parentId);
+            if (!parent || parent.deletedAt !== null) {
+                parentId = null;
+            }
+        }
+        await db.notes.update(id, { deletedAt: null, parentId });
+    });
 }
 
 export async function deleteNote(id: string): Promise<void> {
-    await db.notes.update(id, { deletedAt: new Date(), archivedAt: null });
+    const now = new Date();
+    await db.transaction("rw", db.notes, async () => {
+        const ids = await collectSubtreeIds(id);
+        await db.notes.where("id").anyOf(ids).modify({ deletedAt: now, archivedAt: null });
+    });
+}
+
+async function collectSubtreeIds(rootId: string): Promise<string[]> {
+    const all: string[] = [rootId];
+    let frontier: string[] = [rootId];
+    while (frontier.length > 0) {
+        const children = await db.notes.where("parentId").anyOf(frontier).toArray();
+        const childIds = children.map((c) => c.id);
+        all.push(...childIds);
+        frontier = childIds;
+    }
+    return all;
 }
 
 export async function hardDeleteNote(id: string): Promise<void> {

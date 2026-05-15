@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { generateNote } from "@entities/note.fixtures";
 
-import { ancestorsOf, buildNoteTree, depthOf } from "./noteTree";
+import { ancestorsOf, buildNoteTree, depthOf, descendantsOf } from "./noteTree";
 
 describe("buildNoteTree", () => {
     it("returns an empty array for no notes", () => {
@@ -108,5 +108,33 @@ describe("ancestorsOf", () => {
         const chain = ancestorsOf("nope", [generateNote({ id: "a" })]);
 
         expect(chain).toEqual([]);
+    });
+});
+
+describe("descendantsOf", () => {
+    it("returns an empty array for a leaf", () => {
+        const leaf = generateNote({ id: "a" });
+
+        expect(descendantsOf("a", [leaf])).toEqual([]);
+    });
+
+    it("returns the full subtree below a note", () => {
+        const root = generateNote({ id: "root" });
+        const childA = generateNote({ id: "a", parentId: "root" });
+        const childB = generateNote({ id: "b", parentId: "root" });
+        const grandchild = generateNote({ id: "grand", parentId: "a" });
+
+        const result = descendantsOf("root", [root, childA, childB, grandchild]);
+
+        expect(result.map((n) => n.id).sort()).toEqual(["a", "b", "grand"]);
+    });
+
+    it("does not include the queried note itself", () => {
+        const root = generateNote({ id: "root" });
+        const child = generateNote({ id: "child", parentId: "root" });
+
+        const result = descendantsOf("root", [root, child]);
+
+        expect(result.map((n) => n.id)).toEqual(["child"]);
     });
 });

@@ -52,3 +52,29 @@ export function ancestorsOf(noteId: string, notes: Note[]): Note[] {
 
     return chain.reverse();
 }
+
+export function descendantsOf(noteId: string, notes: Note[]): Note[] {
+    const childrenByParent = new Map<string, Note[]>();
+    for (const note of notes) {
+        if (note.parentId === null) {
+            continue;
+        }
+        const siblings = childrenByParent.get(note.parentId) ?? [];
+        siblings.push(note);
+        childrenByParent.set(note.parentId, siblings);
+    }
+
+    const result: Note[] = [];
+    const stack = [noteId];
+    while (stack.length > 0) {
+        const currentId = stack.pop();
+        if (currentId === undefined) {
+            break;
+        }
+        for (const child of childrenByParent.get(currentId) ?? []) {
+            result.push(child);
+            stack.push(child.id);
+        }
+    }
+    return result;
+}

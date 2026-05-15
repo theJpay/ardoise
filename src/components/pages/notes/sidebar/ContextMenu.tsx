@@ -16,7 +16,7 @@ import {
 } from "@services/notes.service";
 import { useDeletionActions } from "@stores/deletion.store";
 import { useNotes } from "@stores/notes.store";
-import { depthOf } from "@utils/noteTree";
+import { depthOf, descendantsOf } from "@utils/noteTree";
 
 import type { Note } from "@entities";
 import type { Anchor } from "@hooks/useFloatingMenu";
@@ -37,7 +37,12 @@ function ContextMenu({ note, anchor, onClose, onShare }: ContextMenuProps) {
     const { notes } = useNotes();
     const { addNote } = useAddNote();
     const currentNoteMatch = useMatch("/notes/:noteId");
-    const isCurrent = currentNoteMatch?.params.noteId === note.id;
+    const currentNoteId = currentNoteMatch?.params.noteId;
+    const isCurrent = currentNoteId === note.id;
+    const isCurrentInSubtree =
+        isCurrent ||
+        (currentNoteId !== undefined &&
+            descendantsOf(note.id, notes).some((d) => d.id === currentNoteId));
     const canAddChild = depthOf(note.id, notes) < MAX_DEPTH;
     const { armed, trigger } = useArmedAction({
         onConfirm: () => {
@@ -50,7 +55,9 @@ function ContextMenu({ note, anchor, onClose, onShare }: ContextMenuProps) {
                     await deleteNote(note.id);
                 }
                 reset();
-                navigate("/notes");
+                if (isCurrentInSubtree) {
+                    navigate("/notes");
+                }
             }, EXIT_ANIMATION_DURATION);
         }
     });
