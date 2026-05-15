@@ -5,9 +5,9 @@ import { generateNote } from "@entities/note.fixtures";
 import { sortNotes } from "./sortNotes";
 
 describe("sortNotes", () => {
-    it("orders by updatedAt descending under 'updated'", () => {
-        const older = generateNote({ id: "a", updatedAt: new Date(2026, 0, 1) });
-        const newer = generateNote({ id: "b", updatedAt: new Date(2026, 3, 1) });
+    it("orders by lastActivityAt descending under 'updated'", () => {
+        const older = generateNote({ id: "a", lastActivityAt: new Date(2026, 0, 1) });
+        const newer = generateNote({ id: "b", lastActivityAt: new Date(2026, 3, 1) });
 
         const result = sortNotes([older, newer], "updated");
 
@@ -44,8 +44,8 @@ describe("sortNotes", () => {
     });
 
     it("does not mutate the input array", () => {
-        const a = generateNote({ id: "a", updatedAt: new Date(2026, 0, 1) });
-        const b = generateNote({ id: "b", updatedAt: new Date(2026, 3, 1) });
+        const a = generateNote({ id: "a", lastActivityAt: new Date(2026, 0, 1) });
+        const b = generateNote({ id: "b", lastActivityAt: new Date(2026, 3, 1) });
         const input = [a, b];
 
         sortNotes(input, "updated");

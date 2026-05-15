@@ -16,7 +16,7 @@ export function sortNotes(notes: Note[], order: SortOrder): Note[] {
     const copy = [...notes];
     switch (order) {
         case SORT_ORDERS.UPDATED:
-            return copy.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+            return copy.sort((a, b) => b.lastActivityAt.getTime() - a.lastActivityAt.getTime());
         case SORT_ORDERS.CREATED:
             return copy.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
         case SORT_ORDERS.ALPHABETICAL:
