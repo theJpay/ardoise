@@ -85,3 +85,6 @@ export const useIsTreeRowExpanded = (id: string) =>
     useTreeExpansionStore((s) => s.expanded.has(id));
 
 export const useTreeExpansionActions = () => useTreeExpansionStore((s) => s.actions);
+
+export const getTreeExpansionSnapshot = (): Set<string> =>
+    new Set(useTreeExpansionStore.getState().expanded);

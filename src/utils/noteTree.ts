@@ -1,7 +1,11 @@
+import { MAX_DEPTH } from "@entities";
+
 import { sortNotes } from "./sortNotes";
 
 import type { SortOrder } from "./sortNotes";
 import type { Note } from "@entities";
+
+export type MoveBlocker = "self" | "descendant" | "depth";
 
 export type NoteTreeNode = {
     note: Note;
@@ -53,16 +57,45 @@ export function ancestorsOf(noteId: string, notes: Note[]): Note[] {
     return chain.reverse();
 }
 
-export function descendantsOf(noteId: string, notes: Note[]): Note[] {
-    const childrenByParent = new Map<string, Note[]>();
-    for (const note of notes) {
-        if (note.parentId === null) {
-            continue;
+export function subtreeDepthOf(noteId: string, notes: Note[]): number {
+    const children = childrenByParent(notes);
+
+    function dive(id: string): number {
+        const direct = children.get(id) ?? [];
+        if (direct.length === 0) {
+            return 0;
         }
-        const siblings = childrenByParent.get(note.parentId) ?? [];
-        siblings.push(note);
-        childrenByParent.set(note.parentId, siblings);
+        return 1 + Math.max(...direct.map((c) => dive(c.id)));
     }
+
+    return dive(noteId);
+}
+
+export function moveBlocker(
+    noteId: string,
+    targetParentId: string | null,
+    notes: Note[]
+): MoveBlocker | null {
+    if (targetParentId === null) {
+        return null;
+    }
+    if (targetParentId === noteId) {
+        return "self";
+    }
+    const subtreeIds = new Set(descendantsOf(noteId, notes).map((n) => n.id));
+    if (subtreeIds.has(targetParentId)) {
+        return "descendant";
+    }
+    const targetDepth = depthOf(targetParentId, notes);
+    const subtreeDepth = subtreeDepthOf(noteId, notes);
+    if (targetDepth + 1 + subtreeDepth > MAX_DEPTH) {
+        return "depth";
+    }
+    return null;
+}
+
+export function descendantsOf(noteId: string, notes: Note[]): Note[] {
+    const children = childrenByParent(notes);
 
     const result: Note[] = [];
     const stack = [noteId];
@@ -71,10 +104,23 @@ export function descendantsOf(noteId: string, notes: Note[]): Note[] {
         if (currentId === undefined) {
             break;
         }
-        for (const child of childrenByParent.get(currentId) ?? []) {
+        for (const child of children.get(currentId) ?? []) {
             result.push(child);
             stack.push(child.id);
         }
     }
     return result;
+}
+
+function childrenByParent(notes: Note[]): Map<string, Note[]> {
+    const map = new Map<string, Note[]>();
+    for (const note of notes) {
+        if (note.parentId === null) {
+            continue;
+        }
+        const siblings = map.get(note.parentId) ?? [];
+        siblings.push(note);
+        map.set(note.parentId, siblings);
+    }
+    return map;
 }

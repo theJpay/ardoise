@@ -1,4 +1,14 @@
-import { Archive, Command, Copy, Delete, Pin, Plus, Share2, Trash2 } from "lucide-react";
+import {
+    Archive,
+    Command,
+    Copy,
+    Delete,
+    FolderInput,
+    Pin,
+    Plus,
+    Share2,
+    Trash2
+} from "lucide-react";
 import { useMatch } from "react-router";
 
 import { DepletionBar, Popover, ShortcutKey } from "@components/generics";
@@ -29,9 +39,10 @@ type ContextMenuProps = {
     anchor: Anchor;
     onClose: () => void;
     onShare: () => void;
+    onMoveTo: (note: Note) => void;
 };
 
-function ContextMenu({ note, anchor, onClose, onShare }: ContextMenuProps) {
+function ContextMenu({ note, anchor, onClose, onShare, onMoveTo }: ContextMenuProps) {
     const { navigate } = useAppNavigate();
     const { setDeleting, reset } = useDeletionActions();
     const { notes } = useNotes();
@@ -91,6 +102,11 @@ function ContextMenu({ note, anchor, onClose, onShare }: ContextMenuProps) {
         await addNote(note.id);
     };
 
+    const handleMoveTo = () => {
+        onClose();
+        onMoveTo(note);
+    };
+
     return (
         <Popover anchor={anchor} className="w-48 rounded p-1" open={true} onClose={onClose}>
             <MenuItem icon={Copy} label="Duplicate" onClick={handleDuplicate} />
@@ -104,6 +120,7 @@ function ContextMenu({ note, anchor, onClose, onShare }: ContextMenuProps) {
                 onClick={handleTogglePin}
             />
             <MenuItem icon={Archive} label="Archive" onClick={handleArchive} />
+            <MenuItem icon={FolderInput} label="Move to…" onClick={handleMoveTo} />
             <MenuItem
                 disabled={!canAddChild}
                 disabledHint="Maximum nesting depth reached"

@@ -2,7 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import { generateNote } from "@entities/note.fixtures";
 
-import { ancestorsOf, buildNoteTree, depthOf, descendantsOf } from "./noteTree";
+import {
+    ancestorsOf,
+    buildNoteTree,
+    depthOf,
+    descendantsOf,
+    moveBlocker,
+    subtreeDepthOf
+} from "./noteTree";
 
 describe("buildNoteTree", () => {
     it("returns an empty array for no notes", () => {
@@ -108,6 +115,62 @@ describe("ancestorsOf", () => {
         const chain = ancestorsOf("nope", [generateNote({ id: "a" })]);
 
         expect(chain).toEqual([]);
+    });
+});
+
+describe("subtreeDepthOf", () => {
+    it("returns 0 for a leaf", () => {
+        const leaf = generateNote({ id: "a" });
+
+        expect(subtreeDepthOf("a", [leaf])).toBe(0);
+    });
+
+    it("returns the distance to the deepest descendant", () => {
+        const root = generateNote({ id: "root" });
+        const child = generateNote({ id: "child", parentId: "root" });
+        const grandchild = generateNote({ id: "grand", parentId: "child" });
+
+        expect(subtreeDepthOf("root", [root, child, grandchild])).toBe(2);
+    });
+});
+
+describe("moveBlocker", () => {
+    it("allows moving to root", () => {
+        const a = generateNote({ id: "a" });
+
+        expect(moveBlocker("a", null, [a])).toBe(null);
+    });
+
+    it("blocks moving a note onto itself", () => {
+        const a = generateNote({ id: "a" });
+
+        expect(moveBlocker("a", "a", [a])).toBe("self");
+    });
+
+    it("blocks moving a note into one of its descendants", () => {
+        const root = generateNote({ id: "root" });
+        const child = generateNote({ id: "child", parentId: "root" });
+
+        expect(moveBlocker("root", "child", [root, child])).toBe("descendant");
+    });
+
+    it("blocks moves whose resulting depth would exceed the cap", () => {
+        const a1 = generateNote({ id: "a1" });
+        const a2 = generateNote({ id: "a2", parentId: "a1" });
+        const a3 = generateNote({ id: "a3", parentId: "a2" });
+        const a4 = generateNote({ id: "a4", parentId: "a3" });
+        const b1 = generateNote({ id: "b1" });
+
+        expect(moveBlocker("a1", "b1", [a1, a2, a3, a4, b1])).toBe("depth");
+    });
+
+    it("allows moves that just fit within the cap", () => {
+        const a1 = generateNote({ id: "a1" });
+        const a2 = generateNote({ id: "a2", parentId: "a1" });
+        const a3 = generateNote({ id: "a3", parentId: "a2" });
+        const b1 = generateNote({ id: "b1" });
+
+        expect(moveBlocker("a1", "b1", [a1, a2, a3, b1])).toBe(null);
     });
 });
 

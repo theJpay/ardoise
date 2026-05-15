@@ -8,11 +8,12 @@ import { useAutoExpandAncestors } from "@hooks/useAutoExpandAncestors";
 import { useNoteSearch } from "@hooks/useNoteSearch";
 import { useNotes } from "@stores/notes.store";
 import { useSortOrder } from "@stores/sort.store";
-import { useTreeExpansionActions } from "@stores/treeExpansion.store";
+import { getTreeExpansionSnapshot, useTreeExpansionActions } from "@stores/treeExpansion.store";
 import { sortNotes } from "@utils";
 import { buildNoteTree } from "@utils/noteTree";
 
 import InlineHint from "./InlineHint";
+import MoveNoteModal from "./MoveNoteModal";
 import NoteList from "./NoteList";
 import NoteMenu from "./NoteMenu";
 import NoteTree from "./NoteTree";
@@ -33,6 +34,11 @@ type MenuState = {
     note: Note;
     anchor: Anchor;
     source: MenuSource;
+} | null;
+
+type MoveTargetState = {
+    note: Note;
+    initiallyExpanded: Set<string>;
 } | null;
 
 function SideBar({ searchRef }: SideBarProps) {
@@ -81,6 +87,12 @@ function SideBar({ searchRef }: SideBarProps) {
     const handleCloseMenu = useCallback(() => setMenu(null), []);
     const pinnedMenuOpenId = menu?.source === "pinned" ? menu.note.id : null;
     const notesMenuOpenId = menu?.source === "notes" ? menu.note.id : null;
+
+    const [moveTarget, setMoveTarget] = useState<MoveTargetState>(null);
+    const handleMoveTo = useCallback((note: Note) => {
+        setMoveTarget({ note, initiallyExpanded: getTreeExpansionSnapshot() });
+    }, []);
+    const handleCloseMoveModal = useCallback(() => setMoveTarget(null), []);
 
     useAutoExpandAncestors(notes);
     useOneTimePrune(notes, isPending);
@@ -155,7 +167,22 @@ function SideBar({ searchRef }: SideBarProps) {
                 )}
             </div>
 
-            {menu && <NoteMenu anchor={menu.anchor} note={menu.note} onClose={handleCloseMenu} />}
+            {menu && (
+                <NoteMenu
+                    anchor={menu.anchor}
+                    note={menu.note}
+                    onClose={handleCloseMenu}
+                    onMoveTo={handleMoveTo}
+                />
+            )}
+
+            {moveTarget && (
+                <MoveNoteModal
+                    initiallyExpanded={moveTarget.initiallyExpanded}
+                    note={moveTarget.note}
+                    onClose={handleCloseMoveModal}
+                />
+            )}
         </div>
     );
 }

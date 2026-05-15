@@ -1,4 +1,5 @@
 import { MAX_DEPTH, TRASH_RETENTION_DAYS } from "@entities";
+import { moveBlocker } from "@utils/noteTree";
 
 import db from "./db";
 
@@ -99,6 +100,19 @@ export async function pinNote(id: string): Promise<void> {
 
 export async function unpinNote(id: string): Promise<void> {
     await db.notes.update(id, { pinnedAt: null });
+}
+
+export async function moveNote(id: string, newParentId: string | null): Promise<void> {
+    await db.transaction("rw", db.notes, async () => {
+        const liveNotes = await db.notes
+            .filter((n) => n.deletedAt === null && n.archivedAt === null)
+            .toArray();
+        const blocker = moveBlocker(id, newParentId, liveNotes);
+        if (blocker !== null) {
+            throw new Error(`Cannot move note: ${blocker}`);
+        }
+        await db.notes.update(id, { parentId: newParentId });
+    });
 }
 
 type HiddenField = "deletedAt" | "archivedAt";

@@ -11,9 +11,10 @@ type NoteMenuProps = {
     note: Note;
     anchor: Anchor;
     onClose: () => void;
+    onMoveTo: (note: Note) => void;
 };
 
-function NoteMenu({ note, anchor, onClose }: NoteMenuProps) {
+function NoteMenu({ note, anchor, onClose, onMoveTo }: NoteMenuProps) {
     const [view, setView] = useState<"context" | "share">("context");
 
     if (view === "share") {
@@ -33,6 +34,7 @@ function NoteMenu({ note, anchor, onClose }: NoteMenuProps) {
             anchor={anchor}
             note={note}
             onClose={onClose}
+            onMoveTo={onMoveTo}
             onShare={() => setView("share")}
         />
     );
