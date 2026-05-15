@@ -101,15 +101,30 @@ export async function unpinNote(id: string): Promise<void> {
     await db.notes.update(id, { pinnedAt: null });
 }
 
-export async function archiveNote(id: string): Promise<void> {
+type HiddenField = "deletedAt" | "archivedAt";
+
+export const archiveNote = (id: string) => cascadeHide(id, "archivedAt");
+export const deleteNote = (id: string) => cascadeHide(id, "deletedAt", "archivedAt");
+export const restoreFromArchive = (id: string) => restoreFromHidden(id, "archivedAt");
+export const restoreFromTrash = (id: string) => restoreFromHidden(id, "deletedAt");
+
+async function cascadeHide(
+    rootId: string,
+    field: HiddenField,
+    alsoClear?: HiddenField
+): Promise<void> {
     const now = new Date();
     await db.transaction("rw", db.notes, async () => {
-        const ids = await collectSubtreeIds(id);
-        await db.notes.where("id").anyOf(ids).modify({ archivedAt: now });
+        const ids = await collectSubtreeIds(rootId);
+        const patch: Partial<Note> = {
+            [field]: now,
+            ...(alsoClear ? { [alsoClear]: null } : {})
+        };
+        await db.notes.where("id").anyOf(ids).modify(patch);
     });
 }
 
-export async function restoreFromArchive(id: string): Promise<void> {
+async function restoreFromHidden(id: string, field: HiddenField): Promise<void> {
     await db.transaction("rw", db.notes, async () => {
         const note = await db.notes.get(id);
         if (!note) {
@@ -118,36 +133,11 @@ export async function restoreFromArchive(id: string): Promise<void> {
         let parentId = note.parentId;
         if (parentId !== null) {
             const parent = await db.notes.get(parentId);
-            if (!parent || parent.archivedAt !== null) {
+            if (!parent || parent[field] !== null) {
                 parentId = null;
             }
         }
-        await db.notes.update(id, { archivedAt: null, parentId });
-    });
-}
-
-export async function restoreFromTrash(id: string): Promise<void> {
-    await db.transaction("rw", db.notes, async () => {
-        const note = await db.notes.get(id);
-        if (!note) {
-            return;
-        }
-        let parentId = note.parentId;
-        if (parentId !== null) {
-            const parent = await db.notes.get(parentId);
-            if (!parent || parent.deletedAt !== null) {
-                parentId = null;
-            }
-        }
-        await db.notes.update(id, { deletedAt: null, parentId });
-    });
-}
-
-export async function deleteNote(id: string): Promise<void> {
-    const now = new Date();
-    await db.transaction("rw", db.notes, async () => {
-        const ids = await collectSubtreeIds(id);
-        await db.notes.where("id").anyOf(ids).modify({ deletedAt: now, archivedAt: null });
+        await db.notes.update(id, { [field]: null, parentId });
     });
 }
 
