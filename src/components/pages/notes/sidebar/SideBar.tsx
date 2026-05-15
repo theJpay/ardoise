@@ -9,7 +9,7 @@ import { useNoteSearch } from "@hooks/useNoteSearch";
 import { useNotes } from "@stores/notes.store";
 import { useSortOrder } from "@stores/sort.store";
 import { getTreeExpansionSnapshot, useTreeExpansionActions } from "@stores/treeExpansion.store";
-import { sortNotes } from "@utils";
+import { SORT_ORDERS, sortNotes } from "@utils";
 import { buildNoteTree } from "@utils/noteTree";
 
 import InlineHint from "./InlineHint";
@@ -46,6 +46,8 @@ function SideBar({ searchRef }: SideBarProps) {
     const order = useSortOrder();
     const { search, setSearch, filteredNotes } = useNoteSearch(notes);
     const isSearchMode = search.trim() !== "";
+    const isFlatSort = order === SORT_ORDERS.RECENT_FLAT;
+    const isFlatMode = isSearchMode || isFlatSort;
 
     const sortedFilteredNotes = useMemo(
         () => sortNotes(filteredNotes, order),
@@ -61,8 +63,8 @@ function SideBar({ searchRef }: SideBarProps) {
     );
 
     const tree = useMemo(
-        () => (isSearchMode ? [] : buildNoteTree(notes, order)),
-        [notes, order, isSearchMode]
+        () => (isFlatMode ? [] : buildNoteTree(notes, order)),
+        [notes, order, isFlatMode]
     );
 
     const [menu, setMenu] = useState<MenuState>(null);
@@ -140,7 +142,7 @@ function SideBar({ searchRef }: SideBarProps) {
                                 />
                             </>
                         )}
-                        {isSearchMode
+                        {isFlatMode
                             ? flatUnpinnedMatches.length > 0 && (
                                   <>
                                       <SectionTitle label="Notes" />

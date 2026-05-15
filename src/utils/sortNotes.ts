@@ -5,7 +5,8 @@ import type { Note } from "@entities";
 export const SORT_ORDERS = {
     UPDATED: "updated",
     CREATED: "created",
-    ALPHABETICAL: "alphabetical"
+    ALPHABETICAL: "alphabetical",
+    RECENT_FLAT: "recent-flat"
 } as const;
 
 export type SortOrder = (typeof SORT_ORDERS)[keyof typeof SORT_ORDERS];
@@ -16,6 +17,7 @@ export function sortNotes(notes: Note[], order: SortOrder): Note[] {
     const copy = [...notes];
     switch (order) {
         case SORT_ORDERS.UPDATED:
+        case SORT_ORDERS.RECENT_FLAT:
             return copy.sort((a, b) => b.lastActivityAt.getTime() - a.lastActivityAt.getTime());
         case SORT_ORDERS.CREATED:
             return copy.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());

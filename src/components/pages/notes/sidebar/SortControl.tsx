@@ -1,5 +1,5 @@
 import { Check, ChevronDown } from "lucide-react";
-import { useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 
 import { Popover } from "@components/generics";
 import { useSortActions, useSortOrder } from "@stores/sort.store";
@@ -8,10 +8,16 @@ import { SORT_ORDERS } from "@utils";
 import type { SortOrder } from "@utils";
 
 const LABELS: Record<SortOrder, string> = {
-    updated: "Last modified",
-    alphabetical: "Alphabetical",
-    created: "Created"
+    [SORT_ORDERS.UPDATED]: "Last modified",
+    [SORT_ORDERS.ALPHABETICAL]: "Alphabetical",
+    [SORT_ORDERS.CREATED]: "Created",
+    [SORT_ORDERS.RECENT_FLAT]: "Recent — flat"
 };
+
+const SORT_GROUPS: SortOrder[][] = [
+    [SORT_ORDERS.UPDATED, SORT_ORDERS.ALPHABETICAL, SORT_ORDERS.CREATED],
+    [SORT_ORDERS.RECENT_FLAT]
+];
 
 function SortControl() {
     const order = useSortOrder();
@@ -38,16 +44,21 @@ function SortControl() {
                 placement="bottom-start"
                 onClose={() => setIsOpen(false)}
             >
-                {Object.values(SORT_ORDERS).map((opt) => (
-                    <SortControlItem
-                        key={opt}
-                        order={opt}
-                        selected={opt === order}
-                        onSelect={() => {
-                            setOrder(opt);
-                            setIsOpen(false);
-                        }}
-                    />
+                {SORT_GROUPS.map((group, groupIndex) => (
+                    <Fragment key={groupIndex}>
+                        {groupIndex > 0 && <div className="bg-border-soft mx-1 my-0.5 h-px" />}
+                        {group.map((opt) => (
+                            <SortControlItem
+                                key={opt}
+                                order={opt}
+                                selected={opt === order}
+                                onSelect={() => {
+                                    setOrder(opt);
+                                    setIsOpen(false);
+                                }}
+                            />
+                        ))}
+                    </Fragment>
                 ))}
             </Popover>
         </>
