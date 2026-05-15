@@ -43,7 +43,12 @@ export async function createNote(write: NoteWrite = {}): Promise<Note> {
         deletedAt: null,
         ...write
     };
-    await db.notes.add(newNote);
+    await db.transaction("rw", db.notes, async () => {
+        await db.notes.add(newNote);
+        if (newNote.parentId !== null) {
+            await bumpLastActivity(newNote.parentId, now);
+        }
+    });
     return newNote;
 }
 
@@ -80,13 +85,26 @@ export async function duplicateNote(id: string): Promise<Note> {
 }
 
 export async function updateNote(id: string, updatedFields: NoteUpdate): Promise<Note> {
-    const nbUpdated = await db.notes.update(id, { ...updatedFields, updatedAt: new Date() });
+    const now = new Date();
+    let updatedNote: Note | undefined;
 
-    if (nbUpdated === 0) {
-        throw new Error(`Note with id ${id} not found`);
-    }
-
-    const updatedNote = await db.notes.get(id);
+    await db.transaction("rw", db.notes, async () => {
+        const nbUpdated = await db.notes.update(id, {
+            ...updatedFields,
+            updatedAt: now,
+            lastActivityAt: now
+        });
+        if (nbUpdated === 0) {
+            throw new Error(`Note with id ${id} not found`);
+        }
+        updatedNote = await db.notes.get(id);
+        if (!updatedNote) {
+            throw new Error("Failed to retrieve the updated note");
+        }
+        if (updatedNote.parentId !== null) {
+            await bumpLastActivity(updatedNote.parentId, now);
+        }
+    });
 
     if (!updatedNote) {
         throw new Error("Failed to retrieve the updated note");
@@ -112,6 +130,15 @@ export async function moveNote(id: string, newParentId: string | null): Promise<
             throw new Error(`Cannot move note: ${blocker}`);
         }
         await db.notes.update(id, { parentId: newParentId });
+        if (newParentId !== null) {
+            const subtreeIds = await collectSubtreeIds(id);
+            const subtreeNotes = await db.notes.where("id").anyOf(subtreeIds).toArray();
+            const maxActivity = subtreeNotes.reduce(
+                (max, n) => (n.lastActivityAt > max ? n.lastActivityAt : max),
+                new Date(0)
+            );
+            await bumpLastActivity(newParentId, maxActivity);
+        }
     });
 }
 
@@ -153,6 +180,20 @@ async function restoreFromHidden(id: string, field: HiddenField): Promise<void> 
         }
         await db.notes.update(id, { [field]: null, parentId });
     });
+}
+
+async function bumpLastActivity(startNoteId: string, when: Date): Promise<void> {
+    let currentId: string | null = startNoteId;
+    while (currentId !== null) {
+        const note: Note | undefined = await db.notes.get(currentId);
+        if (!note) {
+            break;
+        }
+        if (note.lastActivityAt < when) {
+            await db.notes.update(currentId, { lastActivityAt: when });
+        }
+        currentId = note.parentId;
+    }
 }
 
 async function collectSubtreeIds(rootId: string): Promise<string[]> {
