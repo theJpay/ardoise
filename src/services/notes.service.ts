@@ -102,11 +102,28 @@ export async function unpinNote(id: string): Promise<void> {
 }
 
 export async function archiveNote(id: string): Promise<void> {
-    await db.notes.update(id, { archivedAt: new Date() });
+    const now = new Date();
+    await db.transaction("rw", db.notes, async () => {
+        const ids = await collectSubtreeIds(id);
+        await db.notes.where("id").anyOf(ids).modify({ archivedAt: now });
+    });
 }
 
 export async function restoreFromArchive(id: string): Promise<void> {
-    await db.notes.update(id, { archivedAt: null });
+    await db.transaction("rw", db.notes, async () => {
+        const note = await db.notes.get(id);
+        if (!note) {
+            return;
+        }
+        let parentId = note.parentId;
+        if (parentId !== null) {
+            const parent = await db.notes.get(parentId);
+            if (!parent || parent.archivedAt !== null) {
+                parentId = null;
+            }
+        }
+        await db.notes.update(id, { archivedAt: null, parentId });
+    });
 }
 
 export async function restoreFromTrash(id: string): Promise<void> {

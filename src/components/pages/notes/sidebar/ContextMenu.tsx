@@ -81,7 +81,7 @@ function ContextMenu({ note, anchor, onClose, onShare }: ContextMenuProps) {
     const handleArchive = async () => {
         onClose();
         await archiveNote(note.id);
-        if (isCurrent) {
+        if (isCurrentInSubtree) {
             navigate("/notes");
         }
     };
