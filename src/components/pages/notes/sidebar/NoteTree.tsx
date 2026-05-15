@@ -37,7 +37,7 @@ type NoteTreeRowProps = {
 
 function NoteTreeRow({ node, menuOpenNoteId, onOpenMenu, onCloseMenu }: NoteTreeRowProps) {
     const isExpanded = useIsTreeRowExpanded(node.note.id);
-    const { toggle } = useTreeExpansionActions();
+    const { toggle, expand } = useTreeExpansionActions();
     const hasChildren = node.children.length > 0;
 
     return (
@@ -63,6 +63,7 @@ function NoteTreeRow({ node, menuOpenNoteId, onOpenMenu, onCloseMenu }: NoteTree
                     }}
                     onCloseMenu={onCloseMenu}
                     onOpenMenu={(anchor) => onOpenMenu(node.note.id, anchor)}
+                    onSelect={hasChildren ? () => expand([node.note.id]) : undefined}
                 />
             </li>
             {hasChildren && isExpanded && (

@@ -22,6 +22,7 @@ type NoteItemProps = {
     isMenuOpen: boolean;
     onOpenMenu: (anchor: Anchor) => void;
     onCloseMenu: () => void;
+    onSelect?: () => void;
     treeRow?: TreeRowProps;
     parentPath?: string[];
 };
@@ -36,6 +37,7 @@ function NoteItem({
     isMenuOpen,
     onOpenMenu,
     onCloseMenu,
+    onSelect,
     treeRow,
     parentPath
 }: NoteItemProps) {
@@ -67,6 +69,7 @@ function NoteItem({
             }`}
             style={{ paddingLeft: `${paddingLeft}px` }}
             to={buildLink(`/notes/${note.id}`)}
+            onClick={onSelect}
         >
             <div className="flex items-center gap-2">
                 {treeRow && <ChevronToggle {...treeRow} />}
