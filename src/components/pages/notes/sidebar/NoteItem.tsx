@@ -1,5 +1,5 @@
 import { ChevronRight, File, MoreHorizontal, Plus } from "lucide-react";
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import { Link, useParams } from "react-router";
 
 import { MAX_DEPTH } from "@entities";
@@ -23,6 +23,7 @@ type NoteItemProps = {
     onOpenMenu: (anchor: Anchor) => void;
     onCloseMenu: () => void;
     treeRow?: TreeRowProps;
+    parentPath?: string[];
 };
 
 const TREE_BASE_PADDING_PX = 10;
@@ -30,12 +31,20 @@ const TREE_DEPTH_STEP_PX = 14;
 const FLAT_PADDING_PX = 34;
 const ACTIVE_BORDER_OFFSET_PX = 2;
 
-function NoteItem({ note, isMenuOpen, onOpenMenu, onCloseMenu, treeRow }: NoteItemProps) {
+function NoteItem({
+    note,
+    isMenuOpen,
+    onOpenMenu,
+    onCloseMenu,
+    treeRow,
+    parentPath
+}: NoteItemProps) {
     const { noteId } = useParams();
     const { buildLink } = useAppNavigate();
     const { deletingNoteId } = useDeletionState();
     const isActive = noteId === note.id;
     const isExiting = deletingNoteId === note.id;
+    const showPath = parentPath !== undefined && parentPath.length > 0;
 
     const paddingLeft = treeRow
         ? TREE_BASE_PADDING_PX +
@@ -45,7 +54,9 @@ function NoteItem({ note, isMenuOpen, onOpenMenu, onCloseMenu, treeRow }: NoteIt
 
     return (
         <Link
-            className={`text-text duration-base group relative box-border flex h-8 items-center gap-2 border-l-2 pr-2.5 transition-[opacity,transform,background-color,border-color,padding-left] ease-out focus-visible:-outline-offset-2 ${
+            className={`text-text duration-base group relative box-border flex flex-col justify-center border-l-2 pr-2.5 transition-[opacity,transform,background-color,border-color,padding-left] ease-out focus-visible:-outline-offset-2 ${
+                showPath ? "py-1.5" : "h-8"
+            } ${
                 isExiting
                     ? "pointer-events-none -translate-y-1 opacity-0"
                     : isActive
@@ -57,17 +68,20 @@ function NoteItem({ note, isMenuOpen, onOpenMenu, onCloseMenu, treeRow }: NoteIt
             style={{ paddingLeft: `${paddingLeft}px` }}
             to={buildLink(`/notes/${note.id}`)}
         >
-            {treeRow && <ChevronToggle {...treeRow} />}
-            <File
-                className={`shrink-0 ${isActive ? "text-accent" : "text-subtle"}`}
-                size={13}
-                strokeWidth={1.5}
-            />
-            {note.title ? (
-                <span className="text-ui-base flex-1 truncate">{note.title}</span>
-            ) : (
-                <span className="text-ui-sm text-muted flex-1 truncate italic">Untitled</span>
-            )}
+            <div className="flex items-center gap-2">
+                {treeRow && <ChevronToggle {...treeRow} />}
+                <File
+                    className={`shrink-0 ${isActive ? "text-accent" : "text-subtle"}`}
+                    size={13}
+                    strokeWidth={1.5}
+                />
+                {note.title ? (
+                    <span className="text-ui-base flex-1 truncate">{note.title}</span>
+                ) : (
+                    <span className="text-ui-sm text-muted flex-1 truncate italic">Untitled</span>
+                )}
+            </div>
+            {showPath && <ParentPath segments={parentPath} />}
             <RowActions
                 isMenuOpen={isMenuOpen}
                 noteId={note.id}
@@ -76,6 +90,19 @@ function NoteItem({ note, isMenuOpen, onOpenMenu, onCloseMenu, treeRow }: NoteIt
                 onOpenMenu={onOpenMenu}
             />
         </Link>
+    );
+}
+
+function ParentPath({ segments }: { segments: string[] }) {
+    return (
+        <span className="text-ui-sm text-subtle truncate">
+            {segments.map((segment, i) => (
+                <Fragment key={i}>
+                    {i > 0 && <span className="text-dim mx-1">›</span>}
+                    {segment}
+                </Fragment>
+            ))}
+        </span>
     );
 }
 

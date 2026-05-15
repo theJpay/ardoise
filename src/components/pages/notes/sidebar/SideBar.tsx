@@ -10,7 +10,7 @@ import { useNotes } from "@stores/notes.store";
 import { useSortOrder } from "@stores/sort.store";
 import { getTreeExpansionSnapshot, useTreeExpansionActions } from "@stores/treeExpansion.store";
 import { SORT_ORDERS, sortNotes } from "@utils";
-import { buildNoteTree } from "@utils/noteTree";
+import { ancestorsOf, buildNoteTree } from "@utils/noteTree";
 
 import InlineHint from "./InlineHint";
 import MoveNoteModal from "./MoveNoteModal";
@@ -66,6 +66,23 @@ function SideBar({ searchRef }: SideBarProps) {
         () => (isFlatMode ? [] : buildNoteTree(notes, order)),
         [notes, order, isFlatMode]
     );
+
+    const parentPathsById = useMemo<Map<string, string[]> | undefined>(() => {
+        if (!isSearchMode) {
+            return undefined;
+        }
+        const map = new Map<string, string[]>();
+        for (const note of sortedFilteredNotes) {
+            const ancestors = ancestorsOf(note.id, notes);
+            if (ancestors.length > 0) {
+                map.set(
+                    note.id,
+                    ancestors.map((a) => NoteEntity.getTitle(a))
+                );
+            }
+        }
+        return map;
+    }, [isSearchMode, sortedFilteredNotes, notes]);
 
     const [menu, setMenu] = useState<MenuState>(null);
     const openPinnedMenu = useCallback(
@@ -137,6 +154,7 @@ function SideBar({ searchRef }: SideBarProps) {
                                 <NoteList
                                     menuOpenNoteId={pinnedMenuOpenId}
                                     notes={pinnedNotes}
+                                    parentPathsById={parentPathsById}
                                     onCloseMenu={handleCloseMenu}
                                     onOpenMenu={openPinnedMenu}
                                 />
@@ -149,6 +167,7 @@ function SideBar({ searchRef }: SideBarProps) {
                                       <NoteList
                                           menuOpenNoteId={notesMenuOpenId}
                                           notes={flatUnpinnedMatches}
+                                          parentPathsById={parentPathsById}
                                           onCloseMenu={handleCloseMenu}
                                           onOpenMenu={openNotesMenu}
                                       />

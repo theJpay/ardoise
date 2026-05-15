@@ -6,11 +6,18 @@ import type { Anchor } from "@hooks/useFloatingMenu";
 type NoteListProps = {
     notes: Note[];
     menuOpenNoteId: string | null;
+    parentPathsById?: Map<string, string[]>;
     onOpenMenu: (noteId: string, anchor: Anchor) => void;
     onCloseMenu: () => void;
 };
 
-function NoteList({ notes, menuOpenNoteId, onOpenMenu, onCloseMenu }: NoteListProps) {
+function NoteList({
+    notes,
+    menuOpenNoteId,
+    parentPathsById,
+    onOpenMenu,
+    onCloseMenu
+}: NoteListProps) {
     return (
         <ul>
             {notes.map((note) => (
@@ -28,6 +35,7 @@ function NoteList({ notes, menuOpenNoteId, onOpenMenu, onCloseMenu }: NoteListPr
                     <NoteItem
                         isMenuOpen={menuOpenNoteId === note.id}
                         note={note}
+                        parentPath={parentPathsById?.get(note.id)}
                         onCloseMenu={onCloseMenu}
                         onOpenMenu={(anchor) => onOpenMenu(note.id, anchor)}
                     />
