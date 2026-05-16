@@ -7,6 +7,7 @@ type TreeExpansionStore = {
     actions: {
         toggle: (id: string) => void;
         expand: (ids: string[]) => void;
+        collapseAll: () => void;
         pruneTo: (liveIds: Set<string>) => void;
     };
 };
@@ -38,6 +39,15 @@ const useTreeExpansionStore = create<TreeExpansionStore>((set) => ({
                 if (!changed) {
                     return state;
                 }
+                persist(next);
+                return { expanded: next };
+            }),
+        collapseAll: () =>
+            set((state) => {
+                if (state.expanded.size === 0) {
+                    return state;
+                }
+                const next = new Set<string>();
                 persist(next);
                 return { expanded: next };
             }),

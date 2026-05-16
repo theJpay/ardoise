@@ -29,7 +29,7 @@ function SortControl() {
         <>
             <button
                 ref={triggerRef}
-                className="text-ui-sm text-subtle hover:text-muted flex h-6 items-center gap-1 self-start font-mono"
+                className="text-ui-sm text-subtle hover:text-muted flex h-6 items-center gap-1 font-mono"
                 onClick={() => setIsOpen((v) => !v)}
             >
                 <span>{LABELS[order]}</span>

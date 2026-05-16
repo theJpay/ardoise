@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { ChevronsDownUp, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button } from "@components/generics";
@@ -113,6 +113,8 @@ function SideBar({ searchRef }: SideBarProps) {
     }, []);
     const handleCloseMoveModal = useCallback(() => setMoveTarget(null), []);
 
+    const { collapseAll } = useTreeExpansionActions();
+
     useAutoExpandAncestors(notes);
     useOneTimePrune(notes, isPending);
 
@@ -126,7 +128,10 @@ function SideBar({ searchRef }: SideBarProps) {
             <div className="border-border-soft flex shrink-0 flex-col gap-2 border-b p-3">
                 <SearchBar ref={searchRef} value={search} onChange={setSearch} />
                 <Button icon={Plus} label="New note" onClick={addNote} />
-                <SortControl />
+                <div className="flex items-center justify-between">
+                    <SortControl />
+                    <CollapseAllButton onCollapse={collapseAll} />
+                </div>
             </div>
 
             <div className="flex flex-1 flex-col overflow-y-auto">
@@ -210,6 +215,20 @@ function SideBar({ searchRef }: SideBarProps) {
 
 function SectionTitle({ label }: { label: string }) {
     return <div className="text-ui-xs text-dim shrink-0 px-3 pt-2.5 pb-0.5 font-mono">{label}</div>;
+}
+
+function CollapseAllButton({ onCollapse }: { onCollapse: () => void }) {
+    return (
+        <button
+            aria-label="Collapse all"
+            className="text-subtle hover:bg-border hover:text-text duration-fast flex h-6 w-6 items-center justify-center rounded-sm transition-colors"
+            title="Collapse all"
+            type="button"
+            onClick={onCollapse}
+        >
+            <ChevronsDownUp size={13} strokeWidth={1.5} />
+        </button>
+    );
 }
 
 function useOneTimePrune(notes: Note[], isPending: boolean) {
