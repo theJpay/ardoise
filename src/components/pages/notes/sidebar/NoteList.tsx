@@ -1,54 +1,47 @@
-import { useCallback, useState } from "react";
-
-import { useSortOrder } from "@stores/sort.store";
-import { dateFieldForSort } from "@utils";
-
 import NoteItem from "./NoteItem";
-import NoteMenu from "./NoteMenu";
 
 import type { Note } from "@entities";
+import type { Anchor } from "@hooks/useFloatingMenu";
 
 type NoteListProps = {
     notes: Note[];
+    menuOpenNoteId: string | null;
+    parentPathsById?: Map<string, string[]>;
+    onOpenMenu: (noteId: string, anchor: Anchor) => void;
+    onCloseMenu: () => void;
 };
 
-type MenuState = {
-    note: Note;
-    position: { x: number; y: number };
-} | null;
-
-function NoteList({ notes }: NoteListProps) {
-    const [menu, setMenu] = useState<MenuState>(null);
-    const dateField = dateFieldForSort(useSortOrder());
-
-    const handleContextMenu = useCallback(
-        (e: React.MouseEvent, noteId: string) => {
-            e.preventDefault();
-            const note = notes.find((n) => n.id === noteId);
-            if (note) {
-                setMenu({ note, position: { x: e.clientX, y: e.clientY } });
-            }
-        },
-        [notes]
-    );
-
-    const handleCloseMenu = useCallback(() => {
-        setMenu(null);
-    }, []);
-
+function NoteList({
+    notes,
+    menuOpenNoteId,
+    parentPathsById,
+    onOpenMenu,
+    onCloseMenu
+}: NoteListProps) {
     return (
-        <>
-            <ul>
-                {notes.map((note) => (
-                    <li key={note.id} onContextMenu={(e) => handleContextMenu(e, note.id)}>
-                        <NoteItem dateField={dateField} note={note} />
-                    </li>
-                ))}
-            </ul>
-            {menu && (
-                <NoteMenu note={menu.note} position={menu.position} onClose={handleCloseMenu} />
-            )}
-        </>
+        <ul>
+            {notes.map((note) => (
+                <li
+                    key={note.id}
+                    onContextMenu={(e) => {
+                        e.preventDefault();
+                        onOpenMenu(note.id, {
+                            type: "coordinates",
+                            x: e.clientX,
+                            y: e.clientY
+                        });
+                    }}
+                >
+                    <NoteItem
+                        isMenuOpen={menuOpenNoteId === note.id}
+                        note={note}
+                        parentPath={parentPathsById?.get(note.id)}
+                        onCloseMenu={onCloseMenu}
+                        onOpenMenu={(anchor) => onOpenMenu(note.id, anchor)}
+                    />
+                </li>
+            ))}
+        </ul>
     );
 }
 

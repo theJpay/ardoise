@@ -25,7 +25,7 @@ const useSortStore = create<SortStore>((set) => ({
 
 function readInitial(): SortOrder {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored !== null && (SORT_ORDERS as readonly string[]).includes(stored)) {
+    if (stored !== null && (Object.values(SORT_ORDERS) as string[]).includes(stored)) {
         return stored as SortOrder;
     }
     return DEFAULT_SORT_ORDER;

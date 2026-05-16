@@ -1,4 +1,4 @@
-import { escapeHtml } from "@utils/escapeHtml";
+import { escapeHtml } from "@editor/escapeHtml";
 
 import { ACTIONS } from "./actions";
 import { findEnclosingFence } from "./lib/findEnclosingFence";

@@ -1,4 +1,4 @@
-import { escapeHtml } from "@utils/escapeHtml";
+import { escapeHtml } from "@editor/escapeHtml";
 
 import { inlineTokenize } from "../inline";
 

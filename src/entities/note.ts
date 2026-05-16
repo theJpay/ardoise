@@ -4,18 +4,22 @@ export type Note = {
     title: string;
     createdAt: Date;
     updatedAt: Date;
+    lastActivityAt: Date;
+    parentId: string | null;
     pinnedAt: Date | null;
     archivedAt: Date | null;
     deletedAt: Date | null;
 };
 
-export type NoteWrite = Pick<Note, "title" | "content">;
+export type NoteWrite = Partial<Pick<Note, "title" | "content" | "parentId">>;
 
-export type NoteUpdate = Partial<NoteWrite>;
+export type NoteUpdate = Partial<Pick<Note, "title" | "content">>;
 
 const WORDS_PER_MINUTE = 200;
 
 export const TRASH_RETENTION_DAYS = 30;
+
+export const MAX_DEPTH = 3;
 
 export const NoteEntity = {
     isEmpty: (note: Note) => note.title.trim() === "" && note.content.trim() === "",

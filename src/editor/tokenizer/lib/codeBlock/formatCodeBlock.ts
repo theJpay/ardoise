@@ -1,4 +1,4 @@
-import { escapeHtml } from "@utils/escapeHtml";
+import { escapeHtml } from "@editor/escapeHtml";
 import { highlightToHtml, isRegistered } from "@utils/lowlight";
 
 export function formatCodeBlock(lines: string[], lang: string | null): string {
