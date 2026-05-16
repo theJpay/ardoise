@@ -108,7 +108,13 @@ function ContextMenu({ note, anchor, onClose, onShare, onMoveTo }: ContextMenuPr
     };
 
     return (
-        <Popover anchor={anchor} className="w-48 rounded p-1" open={true} onClose={onClose}>
+        <Popover
+            anchor={anchor}
+            className="w-48 rounded p-1"
+            ignoreClickOutsideRef={anchor.type === "element" ? anchor.ref : undefined}
+            open={true}
+            onClose={onClose}
+        >
             <MenuItem icon={Copy} label="Duplicate" onClick={handleDuplicate} />
             <MenuDivider />
             <MenuItem icon={Share2} label="Share" onClick={onShare} />
