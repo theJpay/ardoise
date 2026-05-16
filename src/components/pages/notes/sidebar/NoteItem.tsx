@@ -149,7 +149,7 @@ function RowActions({ isMenuOpen, noteId, treeRow, onOpenMenu, onCloseMenu }: Ro
 
     return (
         <div
-            className={`duration-fast absolute inset-y-0 right-1 my-auto flex items-center gap-0.5 transition-opacity ${
+            className={`duration-fast bg-elevated before:from-elevated absolute inset-y-0 right-0 my-auto flex items-center gap-0.5 pr-1 transition-opacity before:absolute before:inset-y-0 before:right-full before:w-4 before:bg-linear-to-l before:to-transparent before:content-[''] ${
                 isMenuOpen
                     ? "opacity-100"
                     : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100"
