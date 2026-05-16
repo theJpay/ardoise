@@ -9,6 +9,7 @@ import { useDeletionState } from "@stores/deletion.store";
 
 import type { Note } from "@entities";
 import type { Anchor } from "@hooks/useFloatingMenu";
+import type { ReactNode, Ref } from "react";
 
 type TreeRowProps = {
     depth: number;
@@ -156,27 +157,14 @@ function RowActions({ isMenuOpen, noteId, treeRow, onOpenMenu, onCloseMenu }: Ro
             }`}
         >
             {showAddChild && (
-                <button
-                    aria-label="New child note"
-                    className="text-subtle hover:bg-border hover:text-text duration-fast flex h-6 w-6 items-center justify-center rounded-sm transition-colors"
-                    type="button"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        addNote(noteId);
-                    }}
-                >
+                <RowActionButton label="New child note" onActivate={() => addNote(noteId)}>
                     <Plus size={13} strokeWidth={1.5} />
-                </button>
+                </RowActionButton>
             )}
-            <button
+            <RowActionButton
                 ref={menuButtonRef}
-                aria-label="Note actions"
-                className="text-subtle hover:bg-border hover:text-text duration-fast flex h-6 w-6 items-center justify-center rounded-sm transition-colors"
-                type="button"
-                onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                label="Note actions"
+                onActivate={() => {
                     if (isMenuOpen) {
                         onCloseMenu();
                     } else {
@@ -185,8 +173,33 @@ function RowActions({ isMenuOpen, noteId, treeRow, onOpenMenu, onCloseMenu }: Ro
                 }}
             >
                 <MoreHorizontal size={13} strokeWidth={1.5} />
-            </button>
+            </RowActionButton>
         </div>
+    );
+}
+
+type RowActionButtonProps = {
+    label: string;
+    onActivate: () => void;
+    children: ReactNode;
+    ref?: Ref<HTMLButtonElement>;
+};
+
+function RowActionButton({ label, onActivate, children, ref }: RowActionButtonProps) {
+    return (
+        <button
+            ref={ref}
+            aria-label={label}
+            className="text-subtle hover:bg-border hover:text-text duration-fast flex h-6 w-6 items-center justify-center rounded-sm transition-colors"
+            type="button"
+            onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onActivate();
+            }}
+        >
+            {children}
+        </button>
     );
 }
 
