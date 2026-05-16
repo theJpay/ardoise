@@ -19,7 +19,7 @@
 }
 
 .ardoise-editor .ed-heading {
-    color: var(--color-editor-text);
+    color: var(--color-accent);
     font-weight: 500;
 }
 
@@ -47,12 +47,12 @@
 }
 
 .ardoise-editor .ed-bold {
-    color: var(--color-editor-text);
+    color: var(--color-accent);
     font-weight: 500;
 }
 
 .ardoise-editor .ed-italic {
-    color: var(--color-editor-text);
+    color: var(--color-accent);
     font-style: italic;
 }
 

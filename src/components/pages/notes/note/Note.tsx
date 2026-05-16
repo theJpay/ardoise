@@ -65,7 +65,7 @@ function Note() {
 
             <div ref={scrollContainerRef} className="flex-1 scroll-pt-9 scroll-pb-48 overflow-auto">
                 {(armed || saveStatus === "error") && (
-                    <div className="sticky top-0 z-10">
+                    <div className="sticky top-0 z-10 -mb-9">
                         {armed ? (
                             <DeleteBanner noteTitle={armedNoteTitle} />
                         ) : (
