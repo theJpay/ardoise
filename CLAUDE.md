@@ -5,8 +5,8 @@
 - Discuss fixes before implementing — wait for explicit approval
 - Suggest generic components, design tokens, or shared abstractions when they'd fit — don't add them unilaterally
 - If we establish a convention mid-session, propose adding it here so it doesn't evaporate
-- After non-trivial implementation, explain choices: distinguish forced (no real alternative) from discussable. For discussable ones, name the alternatives and the tradeoff so the call can be revisited.
-- Before implementation, propose the commit sequence as a table (one row per commit, user-visible name + one-sentence effect). Keep splitting until each row is a single concern.
+
+Workflow skills (invoke as `/skill-name` at the relevant moment): `/kickoff` to start a feature, `/commit-plan` before implementing, `/post-impl` after non-trivial work, `/pm-design` for product/UX discussion, `/ready` before reporting a commit ready.
 
 ## Design system
 
