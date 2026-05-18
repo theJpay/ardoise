@@ -4,8 +4,8 @@ import { useParams } from "react-router";
 import { ShareButton } from "@components/share";
 import { Editor, EditorToolbar, useEditor } from "@editor";
 import { useEditorMode } from "@hooks/useEditorMode";
-import { useSettingsQuery } from "@queries/useSettingsQuery";
 import { useDeletionState } from "@stores/deletion.store";
+import { useSettings } from "@stores/settings.store";
 
 import DeleteBanner from "./DeleteBanner";
 import NoteFooter from "./NoteFooter";
@@ -30,7 +30,7 @@ function Note() {
 
     const { mode, toggleMode } = useEditorMode();
     const { armed, noteTitle: armedNoteTitle } = useDeletionState();
-    const { settings } = useSettingsQuery();
+    const { settings } = useSettings();
 
     const { isPending, selectedNote, title, content, saveStatus, retrySave, handleChange } =
         useNoteData(noteId);
@@ -65,7 +65,7 @@ function Note() {
 
             <div ref={scrollContainerRef} className="flex-1 scroll-pt-9 scroll-pb-48 overflow-auto">
                 {(armed || saveStatus === "error") && (
-                    <div className="sticky top-0 z-10">
+                    <div className="sticky top-0 z-10 -mb-9">
                         {armed ? (
                             <DeleteBanner noteTitle={armedNoteTitle} />
                         ) : (

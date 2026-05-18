@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code — track shared config (skills, etc.) but not local overrides
+.claude/settings.local.json
+

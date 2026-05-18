@@ -1,4 +1,5 @@
-import { TRASH_RETENTION_DAYS } from "@entities";
+import { MAX_DEPTH, TRASH_RETENTION_DAYS } from "@entities";
+import { moveBlocker } from "@utils/noteTree";
 
 import db from "./db";
 
@@ -24,23 +25,51 @@ export async function getTrashedNotes(): Promise<Note[]> {
     return await db.notes.orderBy("deletedAt").reverse().toArray();
 }
 
-export async function createNote(write: NoteWrite): Promise<Note> {
-    const newNoteId = await db.notes.add({
-        ...write,
+export async function createNote(write: NoteWrite = {}): Promise<Note> {
+    if (write.parentId !== undefined && write.parentId !== null) {
+        await assertParentAcceptsChild(write.parentId);
+    }
+    const now = new Date();
+    const newNote: Note = {
         id: crypto.randomUUID(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        title: "",
+        content: "",
+        createdAt: now,
+        updatedAt: now,
+        lastActivityAt: now,
+        parentId: null,
         pinnedAt: null,
         archivedAt: null,
-        deletedAt: null
+        deletedAt: null,
+        ...write
+    };
+    await db.transaction("rw", db.notes, async () => {
+        await db.notes.add(newNote);
+        if (newNote.parentId !== null) {
+            await bumpLastActivity(newNote.parentId, now);
+        }
     });
-
-    const newNote = await db.notes.get(newNoteId);
-
-    if (!newNote) {
-        throw new Error("Failed to retrieve the newly created note");
-    }
     return newNote;
+}
+
+async function assertParentAcceptsChild(parentId: string): Promise<void> {
+    const parent = await db.notes.get(parentId);
+    if (!parent || parent.deletedAt !== null) {
+        throw new Error(`Parent note ${parentId} does not exist`);
+    }
+    let depth = 0;
+    let currentId: string | null = parent.parentId;
+    while (currentId !== null) {
+        depth++;
+        const ancestor = await db.notes.get(currentId);
+        if (!ancestor) {
+            break;
+        }
+        currentId = ancestor.parentId;
+    }
+    if (depth >= MAX_DEPTH) {
+        throw new Error("Maximum nesting depth reached");
+    }
 }
 
 export async function duplicateNote(id: string): Promise<Note> {
@@ -56,13 +85,26 @@ export async function duplicateNote(id: string): Promise<Note> {
 }
 
 export async function updateNote(id: string, updatedFields: NoteUpdate): Promise<Note> {
-    const nbUpdated = await db.notes.update(id, { ...updatedFields, updatedAt: new Date() });
+    const now = new Date();
+    let updatedNote: Note | undefined;
 
-    if (nbUpdated === 0) {
-        throw new Error(`Note with id ${id} not found`);
-    }
-
-    const updatedNote = await db.notes.get(id);
+    await db.transaction("rw", db.notes, async () => {
+        const nbUpdated = await db.notes.update(id, {
+            ...updatedFields,
+            updatedAt: now,
+            lastActivityAt: now
+        });
+        if (nbUpdated === 0) {
+            throw new Error(`Note with id ${id} not found`);
+        }
+        updatedNote = await db.notes.get(id);
+        if (!updatedNote) {
+            throw new Error("Failed to retrieve the updated note");
+        }
+        if (updatedNote.parentId !== null) {
+            await bumpLastActivity(updatedNote.parentId, now);
+        }
+    });
 
     if (!updatedNote) {
         throw new Error("Failed to retrieve the updated note");
@@ -78,22 +120,92 @@ export async function unpinNote(id: string): Promise<void> {
     await db.notes.update(id, { pinnedAt: null });
 }
 
-export async function archiveNote(id: string): Promise<void> {
-    await db.notes.update(id, { archivedAt: new Date() });
+export async function moveNote(id: string, newParentId: string | null): Promise<void> {
+    await db.transaction("rw", db.notes, async () => {
+        const liveNotes = await db.notes
+            .filter((n) => n.deletedAt === null && n.archivedAt === null)
+            .toArray();
+        const blocker = moveBlocker(id, newParentId, liveNotes);
+        if (blocker !== null) {
+            throw new Error(`Cannot move note: ${blocker}`);
+        }
+        await db.notes.update(id, { parentId: newParentId });
+        if (newParentId !== null) {
+            const subtreeIds = await collectSubtreeIds(id);
+            const subtreeNotes = await db.notes.where("id").anyOf(subtreeIds).toArray();
+            const maxActivity = subtreeNotes.reduce(
+                (max, n) => (n.lastActivityAt > max ? n.lastActivityAt : max),
+                new Date(0)
+            );
+            await bumpLastActivity(newParentId, maxActivity);
+        }
+    });
 }
 
-export async function restoreFromArchive(id: string): Promise<void> {
-    await db.notes.update(id, { archivedAt: null });
+type HiddenField = "deletedAt" | "archivedAt";
+
+export const archiveNote = (id: string) => cascadeHide(id, "archivedAt");
+export const deleteNote = (id: string) => cascadeHide(id, "deletedAt", "archivedAt");
+export const restoreFromArchive = (id: string) => restoreFromHidden(id, "archivedAt");
+export const restoreFromTrash = (id: string) => restoreFromHidden(id, "deletedAt");
+
+async function cascadeHide(
+    rootId: string,
+    field: HiddenField,
+    alsoClear?: HiddenField
+): Promise<void> {
+    const now = new Date();
+    await db.transaction("rw", db.notes, async () => {
+        const ids = await collectSubtreeIds(rootId);
+        const patch: Partial<Note> = {
+            [field]: now,
+            ...(alsoClear ? { [alsoClear]: null } : {})
+        };
+        await db.notes.where("id").anyOf(ids).modify(patch);
+    });
 }
 
-export async function restoreFromTrash(id: string): Promise<void> {
-    await db.notes.update(id, { deletedAt: null });
+async function restoreFromHidden(id: string, field: HiddenField): Promise<void> {
+    await db.transaction("rw", db.notes, async () => {
+        const note = await db.notes.get(id);
+        if (!note) {
+            return;
+        }
+        let parentId = note.parentId;
+        if (parentId !== null) {
+            const parent = await db.notes.get(parentId);
+            if (!parent || parent[field] !== null) {
+                parentId = null;
+            }
+        }
+        await db.notes.update(id, { [field]: null, parentId });
+    });
 }
 
-export async function deleteNote(id: string): Promise<boolean> {
-    const nbUpdated = await db.notes.update(id, { deletedAt: new Date(), archivedAt: null });
+async function bumpLastActivity(startNoteId: string, when: Date): Promise<void> {
+    let currentId: string | null = startNoteId;
+    while (currentId !== null) {
+        const note: Note | undefined = await db.notes.get(currentId);
+        if (!note) {
+            break;
+        }
+        if (note.lastActivityAt < when) {
+            await db.notes.update(currentId, { lastActivityAt: when });
+        }
+        currentId = note.parentId;
+    }
+}
 
-    return nbUpdated > 0;
+async function collectSubtreeIds(rootId: string): Promise<string[]> {
+    const all: string[] = [rootId];
+    let frontier: string[] = [rootId];
+    while (frontier.length > 0) {
+        const children = await db.notes.where("parentId").anyOf(frontier).toArray();
+        const childIds = children.map((c) => c.id);
+        all.push(...childIds);
+        frontier = childIds;
+    }
+    return all;
 }
 
 export async function hardDeleteNote(id: string): Promise<void> {

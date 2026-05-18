@@ -1,7 +1,7 @@
 {
     "name": "ardoise",
     "private": true,
-    "version": "0.2.0",
+    "version": "0.3.0",
     "type": "module",
     "description": "Local-first markdown notes, in your browser.",
     "author": "Jules Paris",
@@ -29,7 +29,7 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "format": "prettier --write .",
-        "release:pr": "gh pr create --base main --head beta --title \"Release v$npm_package_version\" --body \"$(git log main..beta --pretty=format:'- %s' --no-merges)\"",
+        "release:pr": "gh pr create --base main --head beta --title \"Release v$npm_package_version\" --body \"$(git log --since=\"$(git log -1 --format=%aI $(git describe --tags --abbrev=0 main))\" beta --first-parent --no-merges --pretty=format:'- %s')\"",
         "release:sync-beta": "git checkout beta && git fetch origin && git merge origin/main --no-edit && git push",
         "release:tag": "gh release create \"v$npm_package_version\" --target main --generate-notes --title \"v$npm_package_version\""
     },

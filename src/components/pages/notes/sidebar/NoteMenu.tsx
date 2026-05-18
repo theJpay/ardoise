@@ -5,20 +5,22 @@ import { ShareMenu } from "@components/share";
 import ContextMenu from "./ContextMenu";
 
 import type { Note } from "@entities";
+import type { Anchor } from "@hooks/useFloatingMenu";
 
 type NoteMenuProps = {
     note: Note;
-    position: { x: number; y: number };
+    anchor: Anchor;
     onClose: () => void;
+    onMoveTo: (note: Note) => void;
 };
 
-function NoteMenu({ note, position, onClose }: NoteMenuProps) {
+function NoteMenu({ note, anchor, onClose, onMoveTo }: NoteMenuProps) {
     const [view, setView] = useState<"context" | "share">("context");
 
     if (view === "share") {
         return (
             <ShareMenu
-                anchor={{ type: "coordinates", x: position.x, y: position.y }}
+                anchor={anchor}
                 note={note}
                 open={true}
                 placement="bottom-start"
@@ -29,9 +31,10 @@ function NoteMenu({ note, position, onClose }: NoteMenuProps) {
 
     return (
         <ContextMenu
+            anchor={anchor}
             note={note}
-            position={position}
             onClose={onClose}
+            onMoveTo={onMoveTo}
             onShare={() => setView("share")}
         />
     );
