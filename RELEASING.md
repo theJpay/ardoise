@@ -30,6 +30,6 @@ Schema caveat: Dexie migrations run client-side when a user loads the app. A cod
 
 | Script              | Action                                                                                                |
 | ------------------- | ----------------------------------------------------------------------------------------------------- |
-| `release:pr`        | Opens PR `beta → main`, title `Release v$npm_package_version`, body seeded from `git log main..beta`. |
+| `release:pr`        | Opens PR `beta → main`, title `Release v$npm_package_version`, body seeded from `git log` on `beta` since the previous tag's date (first-parent, no merges) — so squash-merge phantom commits from prior releases don't reappear. |
 | `release:sync-beta` | `git checkout beta && git fetch origin && git merge origin/main --no-edit && git push`.               |
 | `release:tag`       | `gh release create v$npm_package_version --target main --generate-notes`.                             |
