@@ -67,12 +67,9 @@ function SideBar({ searchRef }: SideBarProps) {
         [notes, order, isFlatMode]
     );
 
-    const parentPathsById = useMemo<Map<string, string[]> | undefined>(() => {
-        if (!isSearchMode) {
-            return undefined;
-        }
+    const pinnedParentPathsById = useMemo(() => {
         const map = new Map<string, string[]>();
-        for (const note of sortedFilteredNotes) {
+        for (const note of pinnedNotes) {
             const ancestors = ancestorsOf(note.id, notes);
             if (ancestors.length > 0) {
                 map.set(
@@ -82,7 +79,24 @@ function SideBar({ searchRef }: SideBarProps) {
             }
         }
         return map;
-    }, [isSearchMode, sortedFilteredNotes, notes]);
+    }, [pinnedNotes, notes]);
+
+    const searchParentPathsById = useMemo<Map<string, string[]> | undefined>(() => {
+        if (!isSearchMode) {
+            return undefined;
+        }
+        const map = new Map<string, string[]>();
+        for (const note of flatUnpinnedMatches) {
+            const ancestors = ancestorsOf(note.id, notes);
+            if (ancestors.length > 0) {
+                map.set(
+                    note.id,
+                    ancestors.map((a) => NoteEntity.getTitle(a))
+                );
+            }
+        }
+        return map;
+    }, [isSearchMode, flatUnpinnedMatches, notes]);
 
     const [menu, setMenu] = useState<MenuState>(null);
     const openPinnedMenu = useCallback(
@@ -159,7 +173,7 @@ function SideBar({ searchRef }: SideBarProps) {
                                 <NoteList
                                     menuOpenNoteId={pinnedMenuOpenId}
                                     notes={pinnedNotes}
-                                    parentPathsById={parentPathsById}
+                                    parentPathsById={pinnedParentPathsById}
                                     onCloseMenu={handleCloseMenu}
                                     onOpenMenu={openPinnedMenu}
                                 />
@@ -172,7 +186,7 @@ function SideBar({ searchRef }: SideBarProps) {
                                       <NoteList
                                           menuOpenNoteId={notesMenuOpenId}
                                           notes={flatUnpinnedMatches}
-                                          parentPathsById={parentPathsById}
+                                          parentPathsById={searchParentPathsById}
                                           onCloseMenu={handleCloseMenu}
                                           onOpenMenu={openNotesMenu}
                                       />
