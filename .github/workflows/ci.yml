@@ -21,7 +21,7 @@ jobs:
                   cache: npm
 
             - name: Install dependencies
-              run: npm ci
+              run: npm install --include=optional
 
             - name: Lint
               run: npm run lint
@@ -46,7 +46,7 @@ jobs:
                   cache: npm
 
             - name: Install dependencies
-              run: npm ci
+              run: npm install --include=optional
 
             - name: Test
               run: npm run client:test
