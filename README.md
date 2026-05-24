@@ -50,17 +50,22 @@ Built on [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlan
 git clone https://github.com/theJpay/ardoise.git
 cd ardoise
 npm install
-npm run dev
+cp apps/client/.env.example apps/client/.env.local   # optional: enables the backend health ping
+npm run client:dev
 ```
 
 Then open [http://localhost:5173](http://localhost:5173).
 
+`.env*` files are gitignored except `.env.example` (the template). Copy the template to `.env.local` per app and edit values locally; never commit secrets.
+
 Available scripts:
 
-- `npm run dev` — start the dev server
-- `npm run build` — type-check and build for production
-- `npm run preview` — preview the production build
-- `npm test` — run the Vitest suite
+- `npm run client:dev` — start the dev server
+- `npm run client:build` — type-check and build the client for production
+- `npm run client:preview` — preview the production build
+- `npm run client:test` — run the Vitest suite
+- `npm run api:dev` — start the API in watch mode
+- `npm run api:build` — build the API
 - `npm run lint` — ESLint
 - `npm run format` — Prettier
 

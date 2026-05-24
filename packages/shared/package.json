@@ -1,0 +1,14 @@
+{
+    "name": "@ardoise/shared",
+    "private": true,
+    "version": "0.3.0",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "rm -rf dist && tsc",
+        "dev": "tsc --watch"
+    },
+    "dependencies": {
+        "zod": "^4.0.0"
+    }
+}

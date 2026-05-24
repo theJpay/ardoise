@@ -1257,7 +1257,15 @@ Stored in the deployment platform, not in the repo, not in `.env` files committe
 | `JWT_AUDIENCE` / `JWT_ISSUER`      | Railway env            | Nest JWT guard                |
 | `ALLOWED_ORIGINS`                  | Railway env            | Nest CORS                     |
 
-`.env.example` files in `apps/api` and `apps/client` document the expected variables without holding values.
+### Local env files
+
+`.env*` is gitignored except `.env.example`. The convention:
+
+- `.env.example` (per app) — committed template. Documents what variables exist, with placeholder values only.
+- `.env.local` (client) / `.env` (api) — gitignored. The developer copies from the template and edits locally.
+- Production env vars come from the platform (Vercel scopes, Railway environments), never from a checked-in file.
+
+The api gets a proper config module (`@nestjs/config` with schema validation) at the start of **Phase B**, when the first required secret (`SUPABASE_SERVICE_KEY`) lands. Phase A relies on hard-coded defaults in `main.ts` for the one optional var (`ALLOWED_ORIGINS`).
 
 ### Observability minimum
 

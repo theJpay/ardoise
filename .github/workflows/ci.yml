@@ -21,13 +21,16 @@ jobs:
                   cache: npm
 
             - name: Install dependencies
-              run: npm ci
+              run: npm install --include=optional
 
             - name: Lint
               run: npm run lint
 
-            - name: Build (includes typecheck)
-              run: npm run build
+            - name: Build client (includes typecheck)
+              run: npm run client:build
+
+            - name: Build api
+              run: npm run api:build
 
     tests:
         name: Test
@@ -43,7 +46,7 @@ jobs:
                   cache: npm
 
             - name: Install dependencies
-              run: npm ci
+              run: npm install --include=optional
 
             - name: Test
-              run: npm test
+              run: npm run client:test

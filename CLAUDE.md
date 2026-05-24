@@ -25,9 +25,34 @@ Workflow skills (invoke as `/skill-name` at the relevant moment): `/kickoff` to 
 - If a feature needs a refactor to land cleanly, ship the refactor as its own iso-functional commit first — don't bundle it into the feature commit.
 - Name commits by user-visible behavior, not implementation (good: "add title search in command palette"; bad: "add usePaletteResults hook")
 - Prefix commits and PR titles with conventional type: `fix:`, `feat:`, `refactor:`, `chore:`, `docs:`
-- ESLint enforces `curly`, `jsx-sort-props`, `import/order` (`@aliases` as internal)
+- ESLint: universal rules include `curly` and `import/order`; the client overlay adds `jsx-sort-props` and the `@*` path aliases as internal
 - `@utils` for shared utilities
 - Editor text operations go through `replaceRange`
+
+## Architecture
+
+- Three layers — **domain** (entities, ports, pure rules), **application** (use cases through ports), **infrastructure** (HTTP, DB, framework wiring). Dependencies are one-way: `infrastructure → application → domain`.
+- Ports are interfaces in the domain; adapters in infrastructure are the only things that touch the outside world.
+
+### Backend (`apps/api/src/`)
+
+- Bounded contexts at the top level (`auth/`, `notes/`, `shares/`, `ai/`, `monitoring/`), each with `domain/`, `application/`, `infrastructure/` folders created only when populated.
+- `common/` for context-less framework plumbing (exception filter, logger, Supabase client factory).
+- `shared-kernel/` only when two contexts genuinely share a primitive. Don't lift speculatively.
+- Cross-context calls go through the providing context's **published surface** in its `infrastructure/` (e.g. an `@CurrentUser()` decorator from `auth/`), never into another context's `domain/` or `application/` directly.
+- Operational endpoints (`/health`, `/metrics`) live in `monitoring/`, not as flat controllers.
+
+### Client (`apps/client/src/`)
+
+- `entities/` = domain (types, value-helpers, ports, constants).
+- `services/` = infrastructure adapters + application use cases. The application/domain split is deferred to when sync forces it.
+- `stores/` + `components/` = driving adapters (React/UI).
+- `utils/` = mostly domain helpers (pure functions).
+
+### `packages/shared`
+
+- Isomorphic API contracts only (Zod schemas + their inferred types).
+- No domain entities, no platform APIs (Web Crypto, Dexie, `fs`), no heavy deps. Must run unchanged in Node and the browser.
 
 ## Keyboard shortcuts
 
@@ -51,6 +76,6 @@ Workflow skills (invoke as `/skill-name` at the relevant moment): `/kickoff` to 
 ## Editor architecture
 
 - Textarea + mirror div for syntax highlighting, phantom div for selection measurement
-- `EditorEngine` (class in `src/editor/engine/`) owns formatting logic and exposes `replaceRange` as a method; actions in `engine/actions.ts` use `as const satisfies` for type-safe names
-- Tokenizer lives in `src/editor/tokenizer/` as a standalone module with co-located test spec
-- Keyboard handlers split into `src/editor/keyboard/` (smart enter, smart pairs, formatting shortcuts); floating UI (toolbar, slash menu) in `src/editor/floating/`
+- `EditorEngine` (class in `@editor/engine`) owns formatting logic and exposes `replaceRange` as a method; actions in `@editor/engine/actions` use `as const satisfies` for type-safe names
+- Tokenizer lives in `@editor/tokenizer` as a standalone module with co-located test spec
+- Keyboard handlers split into `@editor/keyboard` (smart enter, smart pairs, formatting shortcuts); floating UI (toolbar, slash menu) in `@editor/floating`
