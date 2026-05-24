@@ -26,8 +26,11 @@ jobs:
             - name: Lint
               run: npm run lint
 
-            - name: Build (includes typecheck)
-              run: npm run build
+            - name: Build client (includes typecheck)
+              run: npm run client:build
+
+            - name: Build api
+              run: npm run api:build
 
     tests:
         name: Test
@@ -46,4 +49,4 @@ jobs:
               run: npm ci
 
             - name: Test
-              run: npm test
+              run: npm run client:test
