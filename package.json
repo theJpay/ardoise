@@ -36,6 +36,8 @@
         "api:dev": "npm run dev -w @ardoise/api",
         "api:build": "npm run build -w @ardoise/api",
         "api:start": "npm run start -w @ardoise/api",
+        "supabase:start": "supabase start",
+        "supabase:stop": "supabase stop",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "format": "prettier --write .",
@@ -56,6 +58,7 @@
         "globals": "^17.6.0",
         "prettier": "^3.8.1",
         "prettier-plugin-tailwindcss": "^0.8.0",
+        "supabase": "^2.101.0",
         "typescript": "~6.0.3",
         "typescript-eslint": "^8.59.4"
     }
