@@ -26,6 +26,7 @@
         "packages/*"
     ],
     "scripts": {
+        "postinstall": "npm run build -w @ardoise/shared",
         "dev": "npm run dev -w @ardoise/client",
         "build": "npm run build -w @ardoise/client",
         "preview": "npm run preview -w @ardoise/client",
