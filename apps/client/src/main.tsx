@@ -4,7 +4,7 @@ import { RouterProvider } from "react-router/dom";
 
 import { ErrorBoundary } from "@components";
 
-import { router } from "./routes.tsx";
+import { router } from "./routes";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(

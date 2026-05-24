@@ -10,31 +10,48 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
-    globalIgnores(["dist"]),
+    globalIgnores(["**/dist"]),
     {
         files: ["**/*.{ts,tsx}"],
-        extends: [
-            js.configs.recommended,
-            tseslint.configs.recommended,
-            reactHooks.configs.flat.recommended,
-            reactRefresh.configs.vite,
-            prettier
-        ],
+        extends: [js.configs.recommended, tseslint.configs.recommended, prettier],
+        plugins: {
+            import: importPlugin,
+            prettier: prettierPlugin
+        },
+        rules: {
+            "prettier/prettier": "error",
+            "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+            curly: "error",
+            "sort-imports": ["warn", { ignoreDeclarationSort: true, ignoreCase: true }],
+            "import/order": [
+                "error",
+                {
+                    groups: [
+                        "builtin",
+                        "external",
+                        "internal",
+                        ["parent", "sibling", "index"],
+                        "type"
+                    ],
+                    alphabetize: { order: "asc", caseInsensitive: true },
+                    "newlines-between": "always"
+                }
+            ]
+        }
+    },
+    {
+        files: ["apps/client/**/*.{ts,tsx}"],
+        extends: [reactHooks.configs.flat.recommended, reactRefresh.configs.vite],
         languageOptions: {
             ecmaVersion: 2020,
             globals: globals.browser
         },
         plugins: {
-            react,
-            import: importPlugin,
-            prettier: prettierPlugin
+            react
         },
         rules: {
             ...reactHooks.configs.recommended.rules,
             "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-            "prettier/prettier": "error",
-            "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
-            curly: "error",
             "react-hooks/refs": "off",
             "react/jsx-sort-props": [
                 "warn",
@@ -45,7 +62,6 @@ export default defineConfig([
                     ignoreCase: true
                 }
             ],
-            "sort-imports": ["warn", { ignoreDeclarationSort: true, ignoreCase: true }],
             "import/order": [
                 "error",
                 {
