@@ -33,10 +33,23 @@ export default defineConfig([
                         ["parent", "sibling", "index"],
                         "type"
                     ],
+                    pathGroups: [
+                        {
+                            pattern: "@ardoise/**",
+                            group: "internal"
+                        }
+                    ],
+                    pathGroupsExcludedImportTypes: ["type"],
                     alphabetize: { order: "asc", caseInsensitive: true },
                     "newlines-between": "always"
                 }
             ]
+        }
+    },
+    {
+        files: ["apps/api/**/*.ts"],
+        languageOptions: {
+            globals: globals.node
         }
     },
     {
@@ -73,6 +86,10 @@ export default defineConfig([
                         "type"
                     ],
                     pathGroups: [
+                        {
+                            pattern: "@ardoise/**",
+                            group: "internal"
+                        },
                         {
                             pattern:
                                 "@{assets,components,editor,entities,hooks,services,stores,utils}{,/**}",
