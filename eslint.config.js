@@ -1,9 +1,8 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import js from "@eslint/js";
 import prettier from "eslint-config-prettier";
-import importPlugin from "eslint-plugin-import";
+import perfectionist from "eslint-plugin-perfectionist";
 import prettierPlugin from "eslint-plugin-prettier";
-import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
@@ -15,7 +14,7 @@ export default defineConfig([
         files: ["**/*.{ts,tsx}"],
         extends: [js.configs.recommended, tseslint.configs.recommended, prettier],
         plugins: {
-            import: importPlugin,
+            perfectionist,
             prettier: prettierPlugin
         },
         rules: {
@@ -23,25 +22,21 @@ export default defineConfig([
             "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
             curly: "error",
             "sort-imports": ["warn", { ignoreDeclarationSort: true, ignoreCase: true }],
-            "import/order": [
+            "perfectionist/sort-imports": [
                 "error",
                 {
+                    type: "alphabetical",
+                    order: "asc",
+                    ignoreCase: true,
+                    newlinesBetween: 1,
+                    internalPattern: ["^@ardoise/"],
                     groups: [
                         "builtin",
                         "external",
                         "internal",
                         ["parent", "sibling", "index"],
                         "type"
-                    ],
-                    pathGroups: [
-                        {
-                            pattern: "@ardoise/**",
-                            group: "internal"
-                        }
-                    ],
-                    pathGroupsExcludedImportTypes: ["type"],
-                    alphabetize: { order: "asc", caseInsensitive: true },
-                    "newlines-between": "always"
+                    ]
                 }
             ]
         }
@@ -59,46 +54,41 @@ export default defineConfig([
             ecmaVersion: 2020,
             globals: globals.browser
         },
-        plugins: {
-            react
-        },
         rules: {
             ...reactHooks.configs.recommended.rules,
             "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
             "react-hooks/refs": "off",
-            "react/jsx-sort-props": [
+            "perfectionist/sort-jsx-props": [
                 "warn",
                 {
-                    reservedFirst: true,
-                    callbacksLast: true,
-                    shorthandLast: true,
-                    ignoreCase: true
+                    type: "alphabetical",
+                    order: "asc",
+                    ignoreCase: true,
+                    groups: ["reserved", "unknown", "shorthand-prop", "callback"],
+                    customGroups: [
+                        { groupName: "reserved", elementNamePattern: "^(key|ref)$" },
+                        { groupName: "callback", elementNamePattern: "^on[A-Z]" }
+                    ]
                 }
             ],
-            "import/order": [
+            "perfectionist/sort-imports": [
                 "error",
                 {
+                    type: "alphabetical",
+                    order: "asc",
+                    ignoreCase: true,
+                    newlinesBetween: 1,
+                    internalPattern: [
+                        "^@ardoise/",
+                        "^@(assets|components|editor|entities|hooks|services|stores|utils)(/|$)"
+                    ],
                     groups: [
                         "builtin",
                         "external",
                         "internal",
                         ["parent", "sibling", "index"],
                         "type"
-                    ],
-                    pathGroups: [
-                        {
-                            pattern: "@ardoise/**",
-                            group: "internal"
-                        },
-                        {
-                            pattern:
-                                "@{assets,components,editor,entities,hooks,services,stores,utils}{,/**}",
-                            group: "internal"
-                        }
-                    ],
-                    pathGroupsExcludedImportTypes: ["type"],
-                    alphabetize: { order: "asc", caseInsensitive: true },
-                    "newlines-between": "always"
+                    ]
                 }
             ]
         }
