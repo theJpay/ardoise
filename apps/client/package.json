@@ -20,7 +20,7 @@
         "fflate": "^0.8.3",
         "hast-util-to-html": "^9.0.5",
         "lowlight": "^3.3.0",
-        "lucide-react": "^1.27.0",
+        "lucide-react": "^1.28.0",
         "react": "^19.2.8",
         "react-dom": "^19.2.8",
         "react-router": "^7.16.0",
