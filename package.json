@@ -41,7 +41,7 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "format": "prettier --write .",
-        "release:pr": "gh pr create --base main --head beta --title \"Release v$npm_package_version\" --body \"$(git log --since=\"$(git log -1 --format=%aI $(git describe --tags --abbrev=0 main))\" beta --first-parent --no-merges --pretty=format:'- %s')\"",
+        "release:pr": "git fetch origin --tags --quiet && gh pr create --base main --head beta --title \"Release v$npm_package_version\" --body \"$(git log --since=\"$(git log -1 --format=%aI $(git describe --tags --abbrev=0 origin/main))\" origin/beta --first-parent --no-merges --pretty=format:'- %s')\"",
         "release:sync-beta": "git checkout beta && git fetch origin && git merge origin/main --no-edit && git push",
         "release:tag": "gh release create \"v$npm_package_version\" --target main --generate-notes --title \"v$npm_package_version\""
     },
