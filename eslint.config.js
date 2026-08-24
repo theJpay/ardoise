@@ -1,71 +1,94 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import js from "@eslint/js";
 import prettier from "eslint-config-prettier";
-import importPlugin from "eslint-plugin-import";
+import perfectionist from "eslint-plugin-perfectionist";
 import prettierPlugin from "eslint-plugin-prettier";
-import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
-    globalIgnores(["dist"]),
+    globalIgnores(["**/dist"]),
     {
         files: ["**/*.{ts,tsx}"],
-        extends: [
-            js.configs.recommended,
-            tseslint.configs.recommended,
-            reactHooks.configs.flat.recommended,
-            reactRefresh.configs.vite,
-            prettier
-        ],
-        languageOptions: {
-            ecmaVersion: 2020,
-            globals: globals.browser
-        },
+        extends: [js.configs.recommended, tseslint.configs.recommended, prettier],
         plugins: {
-            react,
-            import: importPlugin,
+            perfectionist,
             prettier: prettierPlugin
         },
         rules: {
-            ...reactHooks.configs.recommended.rules,
-            "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
             "prettier/prettier": "error",
             "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
             curly: "error",
-            "react-hooks/refs": "off",
-            "react/jsx-sort-props": [
-                "warn",
-                {
-                    reservedFirst: true,
-                    callbacksLast: true,
-                    shorthandLast: true,
-                    ignoreCase: true
-                }
-            ],
             "sort-imports": ["warn", { ignoreDeclarationSort: true, ignoreCase: true }],
-            "import/order": [
+            "perfectionist/sort-imports": [
                 "error",
                 {
+                    type: "alphabetical",
+                    order: "asc",
+                    ignoreCase: true,
+                    newlinesBetween: 1,
+                    internalPattern: ["^@ardoise/"],
                     groups: [
                         "builtin",
                         "external",
                         "internal",
                         ["parent", "sibling", "index"],
                         "type"
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        files: ["apps/api/**/*.ts"],
+        languageOptions: {
+            globals: globals.node
+        }
+    },
+    {
+        files: ["apps/client/**/*.{ts,tsx}"],
+        extends: [reactHooks.configs.flat.recommended, reactRefresh.configs.vite],
+        languageOptions: {
+            ecmaVersion: 2020,
+            globals: globals.browser
+        },
+        rules: {
+            ...reactHooks.configs.recommended.rules,
+            "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+            "react-hooks/refs": "off",
+            "perfectionist/sort-jsx-props": [
+                "warn",
+                {
+                    type: "alphabetical",
+                    order: "asc",
+                    ignoreCase: true,
+                    groups: ["reserved", "unknown", "shorthand-prop", "callback"],
+                    customGroups: [
+                        { groupName: "reserved", elementNamePattern: "^(key|ref)$" },
+                        { groupName: "callback", elementNamePattern: "^on[A-Z]" }
+                    ]
+                }
+            ],
+            "perfectionist/sort-imports": [
+                "error",
+                {
+                    type: "alphabetical",
+                    order: "asc",
+                    ignoreCase: true,
+                    newlinesBetween: 1,
+                    internalPattern: [
+                        "^@ardoise/",
+                        "^@(assets|components|editor|entities|hooks|services|stores|utils)(/|$)"
                     ],
-                    pathGroups: [
-                        {
-                            pattern:
-                                "@{assets,components,editor,entities,hooks,services,stores,utils}{,/**}",
-                            group: "internal"
-                        }
-                    ],
-                    pathGroupsExcludedImportTypes: ["type"],
-                    alphabetize: { order: "asc", caseInsensitive: true },
-                    "newlines-between": "always"
+                    groups: [
+                        "builtin",
+                        "external",
+                        "internal",
+                        ["parent", "sibling", "index"],
+                        "type"
+                    ]
                 }
             ]
         }

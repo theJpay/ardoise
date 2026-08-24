@@ -10,7 +10,7 @@ import {
     SettingsPage
 } from "@components/pages/settings";
 
-import App from "./App.tsx";
+import App from "./App";
 
 export const router = createBrowserRouter([
     {

@@ -9,7 +9,7 @@ Run these four commands in order. Report each one's result. Do **not** skip any 
 
 1. `npx tsc --noEmit -p tsconfig.app.json` — type check (this repo has no `npm run typecheck` script)
 2. `npm run lint` — ESLint
-3. `npm test` — Vitest (or `npx vitest run <path>` for a scoped run during iteration)
+3. `npm run client:test` — Vitest (or `npx vitest run <path>` for a scoped run during iteration)
 4. `npm run format` — Prettier write
 
 After step 4, run `git status --short` again — Prettier writes in place, so it may have produced edits that still need staging.
