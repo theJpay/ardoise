@@ -36,9 +36,9 @@
     "devDependencies": {
         "@types/react": "^19.2.18",
         "@types/react-dom": "^19.2.4",
-        "@vitejs/plugin-react": "^6.1.0",
-        "autoprefixer": "^10.5.4",
-        "postcss": "^8.5.26",
+        "@vitejs/plugin-react": "^6.1.1",
+        "autoprefixer": "^10.5.5",
+        "postcss": "^8.5.28",
         "tailwindcss": "^4.3.2",
         "vite": "^8.2.2",
         "vite-plugin-svgr": "^5.0.0",
